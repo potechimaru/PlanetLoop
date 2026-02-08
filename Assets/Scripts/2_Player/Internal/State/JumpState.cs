@@ -14,6 +14,7 @@ internal class JumpState : IPlayerState
     }
     public async UniTask Enter()
     {
+        _playerController.StartJump();
         await UniTask.CompletedTask;
     }
 
@@ -24,6 +25,10 @@ internal class JumpState : IPlayerState
 
     public async UniTask Tick()
     {
+        if (_playerController.TickJump())
+        {
+            NextState.Execute(PlayerStateKey.Move);
+        }
         await UniTask.CompletedTask;
     }
 }

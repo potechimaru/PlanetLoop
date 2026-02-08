@@ -9,7 +9,7 @@ public class ClosedSplineLine : MonoBehaviour
 
     [Header("Spline Control Points (Local Space)")]
     [SerializeField]
-    private List<Vector2> controlPoints = new List<Vector2>()
+    private List<Vector2> controlPoints = new()
     {
         new Vector2( 1f,  0f),
         new Vector2( 0f,  1f),
@@ -21,8 +21,9 @@ public class ClosedSplineLine : MonoBehaviour
     [SerializeField, Range(8, 256)]
     private int resolution = 64;
 
+    [Tooltip("Editor上で制御点編集時に毎フレーム更新するか")]
     [SerializeField]
-    private bool updateEveryFrame = true;
+    private bool updateEveryFrameInEditor = true;
 
     [Header("Gizmos")]
     [SerializeField]
@@ -31,34 +32,46 @@ public class ClosedSplineLine : MonoBehaviour
     [SerializeField]
     private float gizmoPointRadius = 0.05f;
 
-    private LineRenderer lineRenderer;
+    private LineRenderer _lineRenderer;
+
+    // 判定用サンプル（ワールド座標）
+    private readonly List<Vector3> _collisionSamples = new();
+    public IReadOnlyList<Vector3> CollisionSamples => _collisionSamples;
+
+
+
+    // 再利用バッファ（GC削減）
+    private readonly List<Vector3> _positions = new();
 
     private void Awake()
     {
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.loop = true;
-        lineRenderer.useWorldSpace = false;
+        _lineRenderer = GetComponent<LineRenderer>();
+        _lineRenderer.loop = true;
+        _lineRenderer.useWorldSpace = false;
+
+        UpdateLine(); // 初回のみ生成
     }
 
-    private void Start()
-    {
-        UpdateLine();
-    }
-
+#if UNITY_EDITOR
     private void Update()
     {
-        if (updateEveryFrame)
+        // Editor でのみ制御点編集に追従
+        if (!Application.isPlaying && updateEveryFrameInEditor)
         {
             UpdateLine();
         }
     }
+#endif
 
+    /// <summary>
+    /// スプライン形状を LineRenderer に反映
+    /// </summary>
     private void UpdateLine()
     {
         if (controlPoints == null || controlPoints.Count < 3)
             return;
 
-        List<Vector3> positions = new List<Vector3>();
+        _positions.Clear();
 
         int count = controlPoints.Count;
         int segmentResolution = Mathf.Max(1, resolution / count);
@@ -74,12 +87,24 @@ public class ClosedSplineLine : MonoBehaviour
             {
                 float t = j / (float)segmentResolution;
                 Vector2 p = CatmullRom(p0, p1, p2, p3, t);
-                positions.Add(p);
+                _positions.Add(p);
             }
         }
 
-        lineRenderer.positionCount = positions.Count;
-        lineRenderer.SetPositions(positions.ToArray());
+        _lineRenderer.positionCount = _positions.Count;
+        _lineRenderer.SetPositions(_positions.ToArray());
+
+        _collisionSamples.Clear();
+
+        foreach (var localPos in _positions)
+        {
+            _collisionSamples.Add(transform.TransformPoint(localPos));
+        }
+
+        // 閉曲線を明示的に閉じる
+        if (_collisionSamples.Count > 0)
+            _collisionSamples.Add(_collisionSamples[0]);
+
     }
 
     private Vector2 CatmullRom(
@@ -100,6 +125,9 @@ public class ClosedSplineLine : MonoBehaviour
         );
     }
 
+    /// <summary>
+    /// 判定・移動用：ワールド座標のサンプル点列を取得
+    /// </summary>
     public List<Vector3> GetSampledWorldPoints(int sampleCount, bool useLocalPlaneXY)
     {
         if (controlPoints == null || controlPoints.Count < 3 || sampleCount < 8)
@@ -130,7 +158,7 @@ public class ClosedSplineLine : MonoBehaviour
             }
         }
 
-        // 閉曲線を明示的に閉じる（最初の点を最後にも入れる）
+        // 閉曲線を明示的に閉じる
         if (list.Count > 0)
             list.Add(list[0]);
 
@@ -155,7 +183,7 @@ public class ClosedSplineLine : MonoBehaviour
             Gizmos.DrawSphere(controlPoints[i], gizmoPointRadius);
         }
 
-        // 制御点間の補助線
+        // 補助線
         Gizmos.color = Color.gray;
         for (int i = 0; i < count; i++)
         {
@@ -164,7 +192,7 @@ public class ClosedSplineLine : MonoBehaviour
             Gizmos.DrawLine(a, b);
         }
 
-        // スプライン曲線
+        // スプライン表示
         Gizmos.color = Color.cyan;
 
         Vector2 prev = controlPoints[0];

@@ -1,36 +1,84 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+internal delegate bool TryFindTouchedSplineFunc(
+    Vector3 pos,
+    float radius,
+    ClosedSplineLine exclude,
+    out ClosedSplineLine result
+);
+
 internal class PlayerSplineMover
 {
+    private const float AttachRadius = 0.1f;
+
     private readonly PlayerView _view;
     private readonly PlayerModel _model;
+    private readonly TryFindTouchedSplineFunc _tryFindTouchedSpline;
+
+    private ClosedSplineLine _currentSpline;
 
     private readonly List<Vector3> _samples = new();
     private readonly List<float> _cumLen = new();
 
     private float _totalLen;
     private float _distance;
+    private Vector3 _center;
 
-    private Vector3 _center;   // ★ 追加：閉曲線の中心
+    private bool _isAttaching;
+    private float _attachT;
+    private Vector3 _attachFrom;
+    private Vector3 _attachTo;
+    private const float AttachDuration = 0.03f;
 
-    private const int SampleCount = 256;
-
-    internal PlayerSplineMover(PlayerView view, PlayerModel model)
+    internal PlayerSplineMover(
+        PlayerView view,
+        PlayerModel model,
+        TryFindTouchedSplineFunc tryFindTouchedSpline)
     {
         _view = view;
         _model = model;
+        _tryFindTouchedSpline = tryFindTouchedSpline;
 
-        RebuildTable();
-        _distance = 0f;
-        ApplyPosition();
+        _currentSpline = _view.Spline;
     }
+
+    public void Initialize()
+    {
+        RebuildTable();
+
+        if (_totalLen <= 0.0001f)
+        {
+            Debug.LogError(
+                "[PlayerSplineMover] Initialize failed: spline samples are empty");
+        }
+    }
+
+    /* =========================
+     * 通常周回
+     * ========================= */
 
     public void Tick(float deltaTime)
     {
-        if (_totalLen <= 0.0001f) return;
         if (_model.IsGameOver) return;
-        if (_model.IsJumping) return;
+        if (_totalLen <= 0.0001f) return;
+
+        // ★ 吸着中はLerpで位置を寄せる
+        if (_isAttaching)
+        {
+            _attachT += deltaTime / AttachDuration;
+            float t = Mathf.SmoothStep(0f, 1f, _attachT);
+
+            Vector3 pos = Vector3.Lerp(_attachFrom, _attachTo, t);
+            _view.SetPosition(pos);
+
+            if (_attachT >= 1f)
+            {
+                _isAttaching = false;
+            }
+            return;
+        }
 
         float dir = _model.Clockwise ? -1f : 1f;
         _distance = Mathf.Repeat(
@@ -41,17 +89,76 @@ internal class PlayerSplineMover
         ApplyPosition();
     }
 
-    public void RebuildTable()
-    {
-        var spline = _view.Spline;
-        if (spline == null)
-        {
-            _totalLen = 0f;
-            return;
-        }
 
-        var pts = spline.GetSampledWorldPoints(SampleCount, _view.UseLocalPlaneXY);
-        if (pts == null || pts.Count < 3)
+    /* =========================
+     * Jump
+     * ========================= */
+
+    public void Jump()
+    {
+        if (_model.IsGameOver)
+            return;
+
+        Vector3 normal = GetOuterNormal();
+
+        _view.StartJump(
+            _view.transform.position,
+            normal,
+            _model.Jumpspeed
+        );
+    }
+
+    public bool TickJumpAndCheckAttach(Vector3 playerWorldPos)
+    {
+        //Debug.Log("TickJump");
+
+
+        //  OrbitManagerに他のOrbitに触れたか問い合わせる
+        if (_tryFindTouchedSpline(
+            playerWorldPos,
+            AttachRadius,
+            _currentSpline,
+            out var touchedSpline))
+        {
+            //Debug.Log("AttachToSpline");
+            //Debug.Log("TryFindTouchedSpline : true");
+            AttachToSpline(touchedSpline, playerWorldPos);
+            return true;
+        }
+        return false;
+
+    }
+
+    /* =========================
+     * 再吸着
+     * ========================= */
+
+    private void AttachToSpline(
+    ClosedSplineLine newSpline,
+    Vector3 playerWorldPos)
+    {
+        _view.SetSpline(newSpline);
+        _currentSpline = newSpline;
+
+        RebuildTable();
+
+        _distance = FindNearestDistance(playerWorldPos);
+
+        // ★ 吸着アニメーション準備
+        _attachFrom = _view.transform.position;
+        _attachTo = EvaluateByDistance(_distance);
+
+        _attachT = 0f;
+        _isAttaching = true;
+    }
+
+    /* =========================
+     * Spline Table
+     * ========================= */
+
+    private void RebuildTable()
+    {
+        if (_currentSpline == null)
         {
             _totalLen = 0f;
             return;
@@ -59,9 +166,15 @@ internal class PlayerSplineMover
 
         _samples.Clear();
         _cumLen.Clear();
-        _samples.AddRange(pts);
 
-        // --- 累積長 ---
+        _samples.AddRange(_currentSpline.CollisionSamples);
+
+        if (_samples.Count < 3)
+        {
+            _totalLen = 0f;
+            return;
+        }
+
         float acc = 0f;
         _cumLen.Add(0f);
 
@@ -74,7 +187,6 @@ internal class PlayerSplineMover
         _totalLen = acc;
         _distance = Mathf.Repeat(_distance, Mathf.Max(_totalLen, 0.0001f));
 
-        // 中心点（重心）を計算
         _center = Vector3.zero;
         foreach (var p in _samples)
             _center += p;
@@ -102,32 +214,18 @@ internal class PlayerSplineMover
 
         float l0 = _cumLen[i - 1];
         float l1 = _cumLen[i];
-        float t = Mathf.Abs(l1 - l0) < 1e-6f ? 0f : Mathf.InverseLerp(l0, l1, distance);
+        float t = Mathf.Abs(l1 - l0) < 1e-6f
+            ? 0f
+            : Mathf.InverseLerp(l0, l1, distance);
 
         return Vector3.LerpUnclamped(_samples[i - 1], _samples[i], t);
     }
 
-    public void Jump()
-    {
-        if (_model.IsJumping || _model.IsGameOver)
-            return;
+    /* =========================
+     * 幾何
+     * ========================= */
 
-        _model.IsJumping = true;
-
-        Vector3 normal = GetOuterNormal();
-
-        _view.StartJump(
-            _view.transform.position,
-            normal,
-            _model.MoveSpeed,
-            _model.Jumpspeed
-        );
-    }
-
-    /// <summary>
-    /// 常に「閉曲線の外側」を向く法線
-    /// </summary>
-    private Vector3 GetOuterNormal()
+    public Vector3 GetOuterNormal()
     {
         const float epsilon = 0.01f;
 
@@ -138,25 +236,47 @@ internal class PlayerSplineMover
         Vector3 p1 = EvaluateByDistance(d1);
 
         Vector3 tangent = (p1 - p0).normalized;
-
         Vector3 normal;
 
         if (_view.UseLocalPlaneXY)
-        {
-            normal = new Vector3(-tangent.y, tangent.x, 0f).normalized;
-        }
+            normal = new Vector3(-tangent.y, tangent.x, 0f);
         else
-        {
-            normal = new Vector3(-tangent.z, 0f, tangent.x).normalized;
-        }
+            normal = new Vector3(-tangent.z, 0f, tangent.x);
 
-        // 外側判定
         Vector3 toCenter = (_center - _view.transform.position).normalized;
-
-        // 内向きなら反転
         if (Vector3.Dot(normal, toCenter) > 0f)
             normal = -normal;
 
-        return normal;
+        return normal.normalized;
+    }
+
+    private float FindNearestDistance(Vector3 worldPos)
+    {
+        float minSqrDist = float.MaxValue;
+        float nearestDistance = 0f;
+
+        for (int i = 0; i < _samples.Count - 1; i++)
+        {
+            Vector3 a = _samples[i];
+            Vector3 b = _samples[i + 1];
+
+            Vector3 ab = b - a;
+            float abSqr = ab.sqrMagnitude;
+            if (abSqr < 1e-6f)
+                continue;
+
+            float t = Vector3.Dot(worldPos - a, ab) / abSqr;
+            t = Mathf.Clamp01(t);
+
+            float sqrDist = (worldPos - (a + ab * t)).sqrMagnitude;
+
+            if (sqrDist < minSqrDist)
+            {
+                minSqrDist = sqrDist;
+                nearestDistance = _cumLen[i] + Mathf.Sqrt(abSqr) * t;
+            }
+        }
+
+        return nearestDistance;
     }
 }

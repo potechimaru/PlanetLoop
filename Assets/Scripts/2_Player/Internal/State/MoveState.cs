@@ -25,6 +25,7 @@ internal class MoveState : IPlayerState
 
     public async UniTask Tick()
     {
+        _playerController.TickMove();
         await UniTask.CompletedTask;
     }
 }

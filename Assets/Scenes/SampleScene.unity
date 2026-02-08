@@ -182,7 +182,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 168959525}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0.01}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -190,7 +190,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 1.9500122, y: -1.2299805}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0.5, y: 0.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &168959527
@@ -275,8 +275,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 491595094}
-  - {fileID: 923261569}
   - {fileID: 1894126422}
+  - {fileID: 923261569}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &272473623
@@ -438,6 +438,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -563,6 +564,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22fd985a85706f346a1ed36a5cb4f70b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _target: {fileID: 168959526}
+  _offset: {x: 0, y: 0, z: -10}
+  _smoothTime: 0.15
 --- !u!1 &557874748
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,7 +617,7 @@ MonoBehaviour:
   - {x: 0, y: -1}
   - {x: 2.54, y: -1}
   resolution: 64
-  updateEveryFrame: 1
+  updateEveryFrameInEditor: 1
   drawGizmos: 1
   gizmoPointRadius: 0.05
 --- !u!120 &557874750
@@ -1105,7 +1121,7 @@ MonoBehaviour:
   - {x: 0, y: -0.96}
   - {x: 2.54, y: -1}
   resolution: 64
-  updateEveryFrame: 1
+  updateEveryFrameInEditor: 1
   drawGizmos: 1
   gizmoPointRadius: 0.05
 --- !u!120 &828577842
@@ -1268,7 +1284,7 @@ MonoBehaviour:
   - {x: 0, y: -2.66}
   - {x: 2.54, y: -2.74}
   resolution: 64
-  updateEveryFrame: 1
+  updateEveryFrameInEditor: 1
   drawGizmos: 1
   gizmoPointRadius: 0.05
 --- !u!120 &836807043
@@ -1467,7 +1483,7 @@ MonoBehaviour:
   - {x: 0, y: -0.89}
   - {x: 2.54, y: -0.61}
   resolution: 64
-  updateEveryFrame: 1
+  updateEveryFrameInEditor: 1
   drawGizmos: 1
   gizmoPointRadius: 0.05
 --- !u!120 &1132633521
@@ -1674,6 +1690,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 58aec9548fc40c440855842d77090419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _linesRoot: {fileID: 923261569}
 --- !u!1 &1894126421
 GameObject:
   m_ObjectHideFlags: 0
@@ -1829,7 +1846,7 @@ MonoBehaviour:
   - {x: 0, y: -0.89}
   - {x: 2.54, y: -0.61}
   resolution: 64
-  updateEveryFrame: 1
+  updateEveryFrameInEditor: 1
   drawGizmos: 1
   gizmoPointRadius: 0.05
 --- !u!120 &2010036826

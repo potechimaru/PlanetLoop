@@ -13,7 +13,7 @@ public enum PlayerStateKey
     Jump
 }
 
-public class PlayerStateMachine
+public class PlayerStateMachine : IDisposable
 {
     private readonly Dictionary<PlayerStateKey, IPlayerState> _states = new();
     private IPlayerState _currentState;
@@ -31,6 +31,7 @@ public class PlayerStateMachine
         RegisterState(PlayerStateKey.Jump, new JumpState(_playerController));
 
         ChangeState(PlayerStateKey.Idle);
+        _playerController.SetPlayerStateMachine(this);
     }
 
     public void StartMove()
@@ -58,4 +59,10 @@ public class PlayerStateMachine
     {
         _currentState?.Tick();
     }
+
+    public void Dispose()
+    {
+        _disposables.Dispose();
+    }
+
 }

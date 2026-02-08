@@ -10,39 +10,30 @@ public class PlayerView : MonoBehaviour
     public bool UseLocalPlaneXY => _useLocalPlaneXY;
 
     // --- Jump state ---
-    private bool _isJumping;
     private Vector3 _jumpDirection;
     private float _jumpSpeed = 5f;
 
     public void SetPosition(Vector3 worldPos)
     {
-        if (_isJumping)
-            return;
+        worldPos = new Vector3(worldPos.x, worldPos.y, worldPos.z - 0.01f);
         transform.position = worldPos;
     }
 
-    public void StartJump(Vector3 startPos, Vector3 normal, float moveSpeed, float jumpSpeed)
+    public void SetSpline(ClosedSplineLine spline)
+    {
+        _spline = spline;
+    }
+
+    public void StartJump(Vector3 startPos, Vector3 normal, float jumpSpeed)
     {
         transform.position = startPos;
 
         _jumpDirection = normal.normalized;
-        _isJumping = true;
         _jumpSpeed = jumpSpeed;
     }
 
-    public void Tick()
+    public void UpdateJump(float deltaTime)
     {
-        if (!_isJumping)
-            return;
-
-        transform.position += _jumpDirection * _jumpSpeed * Time.deltaTime;
-    }
-
-    /// <summary>
-    /// 外部からジャンプ終了させる用（再吸着時など）
-    /// </summary>
-    public void EndJump()
-    {
-        _isJumping = false;
+        transform.position += _jumpDirection * _jumpSpeed * deltaTime;
     }
 }

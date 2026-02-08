@@ -6,10 +6,10 @@ public interface IInputFacade
 {
     void JumpSubscribe(Action OnJump);
     void JumpUnsubscribe();
-    void MoveSubscribe();
+    void MoveSubscribe(Action OnMove);
     void MoveUnsubscribe();
 
-    void AllSubscribe(Action OnJump);
+    void AllSubscribe(Action OnJump, Action OnMove);
 
 }
 
@@ -29,7 +29,7 @@ public class InputFacade : IInputFacade
     {
         _jumpDisposable = _inputService.OnJump.Subscribe( _=>
         {
-            Debug.Log("InputFacade Jump");
+            //Debug.Log("InputFacade Jump");
             OnJump?.Invoke();
         });
     }
@@ -40,11 +40,12 @@ public class InputFacade : IInputFacade
         _jumpDisposable = null;
     }
 
-    public void MoveSubscribe()
+    public void MoveSubscribe(Action OnMove)
     {
-        _moveDisposable = _inputService.OnVector2Input.Subscribe( dir =>
+        _moveDisposable = _inputService.OnMove.Subscribe( _=>
         {
-            Debug.Log($"InputFacade Move: {dir}");
+            //Debug.Log($"InputFacade Move: {dir}");
+            OnMove?.Invoke();
         });
     }
 
@@ -55,10 +56,10 @@ public class InputFacade : IInputFacade
 
     }
 
-    public void AllSubscribe(Action OnJump)
+    public void AllSubscribe(Action OnJump, Action OnMove)
     {
         JumpSubscribe(OnJump);
-        MoveSubscribe();
+        MoveSubscribe(OnMove);
     }
 
     public void AllUnsubscribe()
