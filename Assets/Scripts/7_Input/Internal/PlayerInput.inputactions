@@ -30,7 +30,7 @@
                     "name": "",
                     "id": "da84c41b-a88f-430c-bd24-f56f0982c736",
                     "path": "<Mouse>/leftButton",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "",
                     "action": "Jump",

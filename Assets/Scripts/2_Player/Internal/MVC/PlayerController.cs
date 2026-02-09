@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEditorInternal;
 using UnityEngine;
 using VContainer.Unity;
@@ -26,13 +27,29 @@ public class PlayerController : ITickable
 
         _playerExternalFacade.MoveSubscribe(() =>
         {
-            Debug.Log("RightClick");
-            _model.Clockwise = !_model.Clockwise;
+            // ジャンプチャージ中は反転キャンセル
+            if (_playerStateMachine.CurrentState is ChargeState)
+            {
+                _model.InitializeMoveSpeed();
+                _model.InitializeJumpSpeed();
+                _playerStateMachine.ChangeState(PlayerStateKey.Move);
+            }
+            // 通常は移動方向反転
+            else
+            {
+                _model.Clockwise = !_model.Clockwise;
+            }
         });
-        _playerExternalFacade.JumpSubscribe(() =>
+        _playerExternalFacade.JumpReleasedSubscribe(() =>
         {
-            Debug.Log("Jump");
+            if (_playerStateMachine.CurrentState is MoveState) return;
+            //Debug.Log("JumpReleased");
             _playerStateMachine.ChangeState(PlayerStateKey.Jump);
+        });
+        _playerExternalFacade.JumpPressedSubscribe(() =>
+        {
+            //Debug.Log("JumpPressed");
+            _playerStateMachine.ChangeState(PlayerStateKey.Charge);
         });
     }
 
@@ -49,6 +66,7 @@ public class PlayerController : ITickable
     public void StartMove()
     {
         _mover.Initialize();
+        _model.InitializeMoveSpeed();
     }
 
     public void TickMove()
@@ -60,13 +78,27 @@ public class PlayerController : ITickable
     {
         _mover.Jump();
         var normal = _mover.GetOuterNormal();
-        _view.StartJump(_view.transform.position, normal, _model.Jumpspeed);
+        _view.StartJump(_view.transform.position, normal, _model.CurrentJumpspeed);
     }
 
     public bool TickJump()
     {
         _view.UpdateJump(Time.deltaTime);
         return _mover.TickJumpAndCheckAttach(_view.transform.position);
+    }
+
+    public void StartCharge()
+    {
+        _model.CurrentChargeDuaration = 0f;
+
+    }
+
+    public void TickCharge()
+    {
+        Debug.Log(_model.CurrentMoveSpeed);
+        _model.CurrentChargeDuaration += Time.deltaTime;
+        _model.ApplyChargeJumpSpeed();
+        _model.ApplyChargeMoveSpeed();
     }
 
 }

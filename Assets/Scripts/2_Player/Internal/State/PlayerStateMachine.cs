@@ -10,17 +10,19 @@ public enum PlayerStateKey
 {
     Idle,
     Move,
+    Charge,
     Jump
 }
 
 public class PlayerStateMachine : IDisposable
 {
     private readonly Dictionary<PlayerStateKey, IPlayerState> _states = new();
-    private IPlayerState _currentState;
+    internal IPlayerState CurrentState { get; private set; }
 
     private readonly CompositeDisposable _disposables = new();
 
     private PlayerController _playerController;
+
 
     public PlayerStateMachine(PlayerController playerController)
     {
@@ -29,6 +31,7 @@ public class PlayerStateMachine : IDisposable
         RegisterState(PlayerStateKey.Idle, new IdleState(_playerController));
         RegisterState(PlayerStateKey.Move, new MoveState(_playerController));
         RegisterState(PlayerStateKey.Jump, new JumpState(_playerController));
+        RegisterState(PlayerStateKey.Charge, new ChargeState(_playerController));
 
         ChangeState(PlayerStateKey.Idle);
         _playerController.SetPlayerStateMachine(this);
@@ -50,14 +53,14 @@ public class PlayerStateMachine : IDisposable
 
     public void ChangeState(PlayerStateKey key)
     {
-        _currentState?.Exit();
-        _currentState = _states[key];
-        _currentState.Enter();
+        CurrentState?.Exit();
+        CurrentState = _states[key];
+        CurrentState.Enter();
     }
 
     public void Tick()
     {
-        _currentState?.Tick();
+        CurrentState?.Tick();
     }
 
     public void Dispose()

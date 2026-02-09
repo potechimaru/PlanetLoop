@@ -1,19 +1,21 @@
 using System;
 using UniRx;
-using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class InputService : IDisposable
 {
     private PlayerInput _playerActions = new();
 
-    // ---- Move（時計回り / 反時計回り トグル） ----
+    // ---- Move（方向反転）----
     private Subject<Unit> _onMove = new();
     public IObservable<Unit> OnMove => _onMove;
 
     // ---- Jump ----
-    private Subject<Unit> _onJump = new();
-    public IObservable<Unit> OnJump => _onJump;
+    private Subject<Unit> _onJumpPressed = new();
+    private Subject<Unit> _onJumpReleased = new();
+
+    public IObservable<Unit> OnJumpPressed => _onJumpPressed;
+    public IObservable<Unit> OnJumpReleased => _onJumpReleased;
 
     internal InputService()
     {
@@ -22,28 +24,19 @@ public class InputService : IDisposable
 
         move.actionMap.Enable();
 
-        // --- Move（トグル） ---
-        move.performed += OnMoveToggle;
+        // --- Move（右クリック） ---
+        move.performed += _ => _onMove.OnNext(Unit.Default);
 
-        // --- Jump ---
-        jump.performed += OnJumpPerformed;
-
-    }
-
-    private void OnMoveToggle(InputAction.CallbackContext ctx)
-    {
-        _onMove.OnNext(Unit.Default);
-    }
-
-    private void OnJumpPerformed(InputAction.CallbackContext ctx)
-    {
-        _onJump.OnNext(Unit.Default);
+        // --- Jump（左クリック） ---
+        jump.started += _ => _onJumpPressed.OnNext(Unit.Default);
+        jump.canceled += _ => _onJumpReleased.OnNext(Unit.Default);
     }
 
     public void Dispose()
     {
         _onMove?.Dispose();
-        _onJump?.Dispose();
+        _onJumpPressed?.Dispose();
+        _onJumpReleased?.Dispose();
 
         _playerActions?.Dispose();
     }

@@ -4,7 +4,9 @@ public interface IPlayerExternalFacade
 {
     // Input
     void MoveSubscribe(Action move);
-    void JumpSubscribe(Action jump);
+    void JumpReleasedSubscribe(Action jumpReleased);
+
+    void JumpPressedSubscribe(Action jumpPressed);
 
     // Orbit
     bool TryFindTouchedSpline(
@@ -35,9 +37,14 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         _inputFacade.MoveSubscribe(move);
     }
 
-    public void JumpSubscribe(Action jump)
+    public void JumpReleasedSubscribe(Action jumpReleased)
     {
-        _inputFacade.JumpSubscribe(jump);
+        _inputFacade.JumpReleasedSubscribe(jumpReleased);
+    }
+
+    public void JumpPressedSubscribe(Action jumpPressed)
+    {
+        _inputFacade.JumpPressedSubscribe(jumpPressed);
     }
 
     // Orbit

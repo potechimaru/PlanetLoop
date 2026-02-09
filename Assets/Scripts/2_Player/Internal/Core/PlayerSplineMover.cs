@@ -82,7 +82,7 @@ internal class PlayerSplineMover
 
         float dir = _model.Clockwise ? -1f : 1f;
         _distance = Mathf.Repeat(
-            _distance + dir * _model.MoveSpeed * deltaTime,
+            _distance + dir * _model.CurrentMoveSpeed * deltaTime,
             _totalLen
         );
 
@@ -104,7 +104,7 @@ internal class PlayerSplineMover
         _view.StartJump(
             _view.transform.position,
             normal,
-            _model.Jumpspeed
+            _model.CurrentJumpspeed
         );
     }
 

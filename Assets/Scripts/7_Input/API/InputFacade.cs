@@ -4,12 +4,15 @@ using System;
 
 public interface IInputFacade
 {
-    void JumpSubscribe(Action OnJump);
+    void JumpReleasedSubscribe(Action OnJumpReleased);
+
+    void JumpPressedSubscribe(Action OnJumpPressed);
+
     void JumpUnsubscribe();
     void MoveSubscribe(Action OnMove);
     void MoveUnsubscribe();
 
-    void AllSubscribe(Action OnJump, Action OnMove);
+    void AllSubscribe(Action OnJumpReleased, Action OnJumpPressed, Action OnMove);
 
 }
 
@@ -17,7 +20,8 @@ public class InputFacade : IInputFacade
 {
     private InputService _inputService;
 
-    private IDisposable _jumpDisposable;
+    private IDisposable _jumpReleasedDisposable;
+    private IDisposable _jumpPressedDisposable;
     private IDisposable _moveDisposable;
 
     internal InputFacade(InputService inputService)
@@ -25,19 +29,29 @@ public class InputFacade : IInputFacade
         _inputService = inputService;
     }
 
-    public void JumpSubscribe(Action OnJump)
+    public void JumpReleasedSubscribe(Action OnJumpReleased)
     {
-        _jumpDisposable = _inputService.OnJump.Subscribe( _=>
+        _jumpReleasedDisposable = _inputService.OnJumpReleased.Subscribe( _=>
         {
             //Debug.Log("InputFacade Jump");
-            OnJump?.Invoke();
+            OnJumpReleased?.Invoke();
+        });
+    }
+
+    public void JumpPressedSubscribe(Action OnJumpPressed)
+    {
+        _jumpPressedDisposable = _inputService.OnJumpPressed.Subscribe( _=>
+        {
+            OnJumpPressed?.Invoke();
         });
     }
 
     public void JumpUnsubscribe()
     {
-        _jumpDisposable?.Dispose();
-        _jumpDisposable = null;
+        _jumpReleasedDisposable?.Dispose();
+        _jumpPressedDisposable?.Dispose();
+        _jumpReleasedDisposable = null;
+        _jumpPressedDisposable = null;
     }
 
     public void MoveSubscribe(Action OnMove)
@@ -56,9 +70,10 @@ public class InputFacade : IInputFacade
 
     }
 
-    public void AllSubscribe(Action OnJump, Action OnMove)
+    public void AllSubscribe(Action OnJumpReleased, Action OnJumpPressed, Action OnMove)
     {
-        JumpSubscribe(OnJump);
+        JumpReleasedSubscribe(OnJumpReleased);
+        JumpPressedSubscribe(OnJumpPressed);
         MoveSubscribe(OnMove);
     }
 
