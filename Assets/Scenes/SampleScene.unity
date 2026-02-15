@@ -624,6 +624,8 @@ MonoBehaviour:
   - {x: 2.54, y: -1}
   resolution: 64
   updateInEditor: 1
+  rotatePoints: 0
+  rotationSpeed: 1
 --- !u!120 &557874750
 LineRenderer:
   serializedVersion: 2
@@ -1379,6 +1381,8 @@ MonoBehaviour:
   - {x: 2.54, y: -1}
   resolution: 64
   updateInEditor: 1
+  rotatePoints: 0
+  rotationSpeed: 1
 --- !u!120 &828577842
 LineRenderer:
   serializedVersion: 2
@@ -1619,6 +1623,8 @@ MonoBehaviour:
   - {x: 2.54, y: -2.74}
   resolution: 64
   updateInEditor: 1
+  rotatePoints: 0
+  rotationSpeed: 1
 --- !u!120 &836807043
 LineRenderer:
   serializedVersion: 2
@@ -1980,6 +1986,8 @@ MonoBehaviour:
   - {x: 2.54, y: -0.61}
   resolution: 64
   updateInEditor: 1
+  rotatePoints: 1
+  rotationSpeed: 1
 --- !u!120 &1132633521
 LineRenderer:
   serializedVersion: 2
@@ -2835,6 +2843,8 @@ MonoBehaviour:
   - {x: 2.54, y: -0.61}
   resolution: 64
   updateInEditor: 1
+  rotatePoints: 0
+  rotationSpeed: 1
 --- !u!120 &2010036826
 LineRenderer:
   serializedVersion: 2

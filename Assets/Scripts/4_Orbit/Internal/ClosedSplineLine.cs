@@ -31,19 +31,31 @@ public class ClosedSplineLine : MonoBehaviour
     private bool updateInEditor = true;
 
     /* =====================================
+     * ポイント周回設定
+     * ===================================== */
+
+    [Header("Point Rotation")]
+    [SerializeField] private bool rotatePoints = false;
+
+    [Tooltip("距離 / 秒")]
+    [SerializeField] private float rotationSpeed = 1f;
+
+    private float _distanceOffset = 0f;
+
+    /* =====================================
      * 内部
      * ===================================== */
 
     private LineRenderer _lineRenderer;
 
-    // ローカル座標サンプル
+    // ローカルサンプル点
     private readonly List<Vector3> _positions = new();
 
     // 距離テーブル
     private readonly List<float> _cumLen = new();
     private float _totalLength;
 
-    // ローカル中心（外向き判定用）
+    // ローカル中心（外向き補正用）
     private Vector3 _localCenter;
 
     /* =====================================
@@ -62,6 +74,19 @@ public class ClosedSplineLine : MonoBehaviour
         if (!Application.isPlaying && updateInEditor)
         {
             Rebuild();
+        }
+
+        if (Application.isPlaying && rotatePoints)
+        {
+            RotateChildPoints();
+        }
+    }
+#else
+    private void Update()
+    {
+        if (rotatePoints)
+        {
+            RotateChildPoints();
         }
     }
 #endif
@@ -106,7 +131,7 @@ public class ClosedSplineLine : MonoBehaviour
                 float t = j / (float)segmentResolution;
 
                 Vector2 local2D = CatmullRom(p0, p1, p2, p3, t);
-                Vector3 local3D = new Vector3(local2D.x, local2D.y, 0f);
+                Vector3 local3D = new(local2D.x, local2D.y, 0f);
 
                 if (_positions.Count > 0)
                 {
@@ -130,9 +155,9 @@ public class ClosedSplineLine : MonoBehaviour
 
         _totalLength = acc;
 
-        // ローカル中心計算
+        // ローカル中心計算（閉じ点除外）
         _localCenter = Vector3.zero;
-        int n = Mathf.Max(1, _positions.Count - 1); // 閉じ点除外
+        int n = Mathf.Max(1, _positions.Count - 1);
         for (int i = 0; i < n; i++)
             _localCenter += _positions[i];
         _localCenter /= n;
@@ -142,7 +167,42 @@ public class ClosedSplineLine : MonoBehaviour
     }
 
     /* =====================================
-     * 距離API（Player等用）
+     * ポイント周回処理
+     * ===================================== */
+
+    private void RotateChildPoints()
+    {
+        if (_totalLength <= 0f)
+            return;
+
+        _distanceOffset += rotationSpeed * Time.deltaTime;
+        _distanceOffset = Mathf.Repeat(_distanceOffset, _totalLength);
+
+        int childCount = transform.childCount;
+        if (childCount == 0)
+            return;
+
+        for (int i = 0; i < childCount; i++)
+        {
+            Transform child = transform.GetChild(i);
+
+            var data = child.GetComponent<SplinePointData>();
+            if (data == null)
+                continue;
+
+            float d = data.BaseDistance + _distanceOffset;
+
+            Vector3 pos = EvaluateByDistance(d);
+            Vector3 normal = EvaluateNormalByDistance(d);
+
+            child.position = pos;
+            child.rotation =
+                Quaternion.FromToRotation(Vector3.up, normal);
+        }
+    }
+
+    /* =====================================
+     * 距離API
      * ===================================== */
 
     public float GetTotalLength()
@@ -230,15 +290,21 @@ public class ClosedSplineLine : MonoBehaviour
 
         Vector3 tangent = (lp1 - lp0).normalized;
 
-        Vector3 localNormal = new Vector3(-tangent.y, tangent.x, 0f).normalized;
+        Vector3 localNormal =
+            new Vector3(-tangent.y, tangent.x, 0f).normalized;
 
-        Vector3 worldNormal = transform.TransformDirection(localNormal).normalized;
+        Vector3 worldNormal =
+            transform.TransformDirection(localNormal).normalized;
 
         // 外側補正
-        Vector3 worldPos = transform.TransformPoint(EvaluateLocalByDistance(distance));
-        Vector3 worldCenter = transform.TransformPoint(_localCenter);
+        Vector3 worldPos =
+            transform.TransformPoint(EvaluateLocalByDistance(distance));
 
-        Vector3 toOutside = (worldPos - worldCenter).normalized;
+        Vector3 worldCenter =
+            transform.TransformPoint(_localCenter);
+
+        Vector3 toOutside =
+            (worldPos - worldCenter).normalized;
 
         if (Vector3.Dot(worldNormal, toOutside) < 0f)
             worldNormal = -worldNormal;
@@ -282,7 +348,6 @@ public class ClosedSplineLine : MonoBehaviour
 
         return nearestDistance;
     }
-
 
     /* =====================================
      * Catmull-Rom
