@@ -19,12 +19,12 @@ internal class PlayerSplineMover
 
     private ClosedSplineLine _currentSpline;
 
-    private readonly List<Vector3> _samples = new();
-    private readonly List<float> _cumLen = new();
+    //private readonly List<Vector3> _samples = new();
+    //private readonly List<float> _cumLen = new();
 
     private float _totalLen;
     private float _distance;
-    private Vector3 _center;
+    //private Vector3 _center;
 
     private bool _isAttaching;
     private float _attachT;
@@ -140,17 +140,17 @@ internal class PlayerSplineMover
         _view.SetSpline(newSpline);
         _currentSpline = newSpline;
 
-        RebuildTable();
+        _distance = _currentSpline.FindNearestDistance(playerWorldPos);
 
-        _distance = FindNearestDistance(playerWorldPos);
+        _totalLen = _currentSpline.GetTotalLength();
 
-        // ★ 吸着アニメーション準備
         _attachFrom = _view.transform.position;
-        _attachTo = EvaluateByDistance(_distance);
+        _attachTo = _currentSpline.EvaluateByDistance(_distance);
 
         _attachT = 0f;
         _isAttaching = true;
     }
+
 
     /* =========================
      * Spline Table
@@ -164,62 +164,17 @@ internal class PlayerSplineMover
             return;
         }
 
-        _samples.Clear();
-        _cumLen.Clear();
-
-        _samples.AddRange(_currentSpline.CollisionSamples);
-
-        if (_samples.Count < 3)
-        {
-            _totalLen = 0f;
-            return;
-        }
-
-        float acc = 0f;
-        _cumLen.Add(0f);
-
-        for (int i = 1; i < _samples.Count; i++)
-        {
-            acc += Vector3.Distance(_samples[i - 1], _samples[i]);
-            _cumLen.Add(acc);
-        }
-
-        _totalLen = acc;
-        _distance = Mathf.Repeat(_distance, Mathf.Max(_totalLen, 0.0001f));
-
-        _center = Vector3.zero;
-        foreach (var p in _samples)
-            _center += p;
-        _center /= _samples.Count;
+        _totalLen = _currentSpline.GetTotalLength();
     }
+
 
     private void ApplyPosition()
     {
-        _view.SetPosition(EvaluateByDistance(_distance));
+        Vector3 pos = _currentSpline.EvaluateByDistance(_distance);
+        _view.SetPosition(pos);
     }
 
-    private Vector3 EvaluateByDistance(float distance)
-    {
-        int lo = 0;
-        int hi = _cumLen.Count - 1;
 
-        while (lo < hi)
-        {
-            int mid = (lo + hi) >> 1;
-            if (_cumLen[mid] < distance) lo = mid + 1;
-            else hi = mid;
-        }
-
-        int i = Mathf.Clamp(lo, 1, _cumLen.Count - 1);
-
-        float l0 = _cumLen[i - 1];
-        float l1 = _cumLen[i];
-        float t = Mathf.Abs(l1 - l0) < 1e-6f
-            ? 0f
-            : Mathf.InverseLerp(l0, l1, distance);
-
-        return Vector3.LerpUnclamped(_samples[i - 1], _samples[i], t);
-    }
 
     /* =========================
      * 幾何
@@ -227,56 +182,37 @@ internal class PlayerSplineMover
 
     public Vector3 GetOuterNormal()
     {
-        const float epsilon = 0.01f;
-
-        float d0 = Mathf.Repeat(_distance - epsilon, _totalLen);
-        float d1 = Mathf.Repeat(_distance + epsilon, _totalLen);
-
-        Vector3 p0 = EvaluateByDistance(d0);
-        Vector3 p1 = EvaluateByDistance(d1);
-
-        Vector3 tangent = (p1 - p0).normalized;
-        Vector3 normal;
-
-        if (_view.UseLocalPlaneXY)
-            normal = new Vector3(-tangent.y, tangent.x, 0f);
-        else
-            normal = new Vector3(-tangent.z, 0f, tangent.x);
-
-        Vector3 toCenter = (_center - _view.transform.position).normalized;
-        if (Vector3.Dot(normal, toCenter) > 0f)
-            normal = -normal;
-
-        return normal.normalized;
+        return _currentSpline.EvaluateNormalByDistance(_distance);
     }
 
-    private float FindNearestDistance(Vector3 worldPos)
-    {
-        float minSqrDist = float.MaxValue;
-        float nearestDistance = 0f;
 
-        for (int i = 0; i < _samples.Count - 1; i++)
-        {
-            Vector3 a = _samples[i];
-            Vector3 b = _samples[i + 1];
+    //private float FindNearestDistance(Vector3 worldPos)
+    //{
+    //    float minSqrDist = float.MaxValue;
+    //    float nearestDistance = 0f;
 
-            Vector3 ab = b - a;
-            float abSqr = ab.sqrMagnitude;
-            if (abSqr < 1e-6f)
-                continue;
+    //    for (int i = 0; i < _samples.Count - 1; i++)
+    //    {
+    //        Vector3 a = _samples[i];
+    //        Vector3 b = _samples[i + 1];
 
-            float t = Vector3.Dot(worldPos - a, ab) / abSqr;
-            t = Mathf.Clamp01(t);
+    //        Vector3 ab = b - a;
+    //        float abSqr = ab.sqrMagnitude;
+    //        if (abSqr < 1e-6f)
+    //            continue;
 
-            float sqrDist = (worldPos - (a + ab * t)).sqrMagnitude;
+    //        float t = Vector3.Dot(worldPos - a, ab) / abSqr;
+    //        t = Mathf.Clamp01(t);
 
-            if (sqrDist < minSqrDist)
-            {
-                minSqrDist = sqrDist;
-                nearestDistance = _cumLen[i] + Mathf.Sqrt(abSqr) * t;
-            }
-        }
+    //        float sqrDist = (worldPos - (a + ab * t)).sqrMagnitude;
 
-        return nearestDistance;
-    }
+    //        if (sqrDist < minSqrDist)
+    //        {
+    //            minSqrDist = sqrDist;
+    //            nearestDistance = _cumLen[i] + Mathf.Sqrt(abSqr) * t;
+    //        }
+    //    }
+
+    //    return nearestDistance;
+    //}
 }

@@ -43,11 +43,13 @@ public class PlayerController : ITickable
         _playerExternalFacade.JumpReleasedSubscribe(() =>
         {
             if (_playerStateMachine.CurrentState is MoveState) return;
+            if (_playerStateMachine.CurrentState is JumpState) return;
             //Debug.Log("JumpReleased");
             _playerStateMachine.ChangeState(PlayerStateKey.Jump);
         });
         _playerExternalFacade.JumpPressedSubscribe(() =>
         {
+            if (_playerStateMachine.CurrentState is JumpState) return;
             //Debug.Log("JumpPressed");
             _playerStateMachine.ChangeState(PlayerStateKey.Charge);
         });
@@ -65,6 +67,8 @@ public class PlayerController : ITickable
 
     public void StartMove()
     {
+        _view.HideJumoNormalGuide();
+        _view.SetAuraColor(ChargeLevel.Normal);
         _mover.Initialize();
         _model.InitializeMoveSpeed();
     }
@@ -76,6 +80,7 @@ public class PlayerController : ITickable
 
     public void StartJump()
     {
+        _view.HideJumoNormalGuide();
         _mover.Jump();
         var normal = _mover.GetOuterNormal();
         _view.StartJump(_view.transform.position, normal, _model.CurrentJumpspeed);
@@ -83,7 +88,7 @@ public class PlayerController : ITickable
 
     public bool TickJump()
     {
-        _view.UpdateJump(Time.deltaTime);
+        _view.TickJump(Time.deltaTime);
         return _mover.TickJumpAndCheckAttach(_view.transform.position);
     }
 
@@ -95,10 +100,12 @@ public class PlayerController : ITickable
 
     public void TickCharge()
     {
-        Debug.Log(_model.CurrentMoveSpeed);
         _model.CurrentChargeDuaration += Time.deltaTime;
         _model.ApplyChargeJumpSpeed();
         _model.ApplyChargeMoveSpeed();
+
+        _view.SetAuraColor(_model.CurrentChargeLevel);
+        _view.ShowJumpNormalGuide(_mover.GetOuterNormal());
     }
 
 }

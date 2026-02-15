@@ -14,6 +14,7 @@ public class PlayerInstaller : MonoBehaviour, IInstaller
         // ControllerˆÈŠO’¼ÚQÆ‹Ö~
         builder.RegisterComponent(_playerView);
 
+
         builder.Register<PlayerFacade>(Lifetime.Singleton).As<IPlayerFacade>();
         builder.Register<PlayerExternalFacade>(Lifetime.Singleton).As<IPlayerExternalFacade>();
 

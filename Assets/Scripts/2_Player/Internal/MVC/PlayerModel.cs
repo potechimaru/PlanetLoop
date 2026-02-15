@@ -1,6 +1,13 @@
 using System;
 using UnityEngine;
 
+internal enum ChargeLevel
+{
+    Normal,
+    Charge1,
+    Charge2
+}
+
 internal class PlayerModel
 {
     public float CurrentMoveSpeed { get; set; } = 5f;
@@ -9,6 +16,17 @@ internal class PlayerModel
     public bool IsGameOver { get; set; } = false;
 
     public float CurrentChargeDuaration { get; set; } = 0f; 
+
+    public ChargeLevel CurrentChargeLevel
+    {
+        get
+        {
+            if (CurrentChargeDuaration <= _CHARGE_DUARATION_1) return ChargeLevel.Normal;
+            else if (CurrentChargeDuaration > _CHARGE_DUARATION_1 && CurrentChargeDuaration <= _CHARGE_DUARATION_2)
+                return ChargeLevel.Charge1;
+            else return ChargeLevel.Charge2;
+        }
+    }
 
     private readonly float _CHARGE_DUARATION_1 = 1f;
     private readonly float _CHARGE_DUARATION_2 = 2f;

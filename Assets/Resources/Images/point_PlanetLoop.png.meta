@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: fa06b0125ed89a64d90ea6cad4451e2b
+guid: a778f8413fffb1c4ab755067f42b8a8b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 227929793963185322
-    second: WhiteBack_0
+      213: 1242898985210466085
+    second: point_PlanetLoop_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -40,9 +40,9 @@ TextureImporter:
     filterMode: 1
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: WhiteBack_0
+      name: point_PlanetLoop_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 2
         y: 0
-        width: 500
-        height: 500
+        width: 816
+        height: 1024
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: aa457e2a0f4c92300800000000000000
-      internalID: 227929793963185322
+      spriteID: 52fc929ba0aaf3110800000000000000
+      internalID: 1242898985210466085
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      WhiteBack_0: 227929793963185322
+      point_PlanetLoop_0: 1242898985210466085
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

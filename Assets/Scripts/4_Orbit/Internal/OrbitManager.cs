@@ -9,9 +9,6 @@ public class OrbitManager
     public OrbitManager(IEnumerable<ClosedSplineLine> lines)
     {
         _lines = lines.ToList();
-
-        // デバッグ
-        Debug.Log($"[LineManager] Injected ClosedSplineLine count = {_lines.Count()}");
     }
 
     public bool TryFindTouchedSpline(
@@ -25,13 +22,9 @@ public class OrbitManager
             if (line == exclude)
                 continue;
 
-            if (OrbitDistanceEvaluator.IsTouching(
-                    line.CollisionSamples,
-                    pos,
-                    radius))
+            if (IsTouchingSpline(line, pos, radius))
             {
                 result = line;
-                //Debug.Log("TryFindTouchedSpline : true");
                 return true;
             }
         }
@@ -40,4 +33,27 @@ public class OrbitManager
         return false;
     }
 
+    private bool IsTouchingSpline(
+        ClosedSplineLine spline,
+        Vector3 worldPos,
+        float radius)
+    {
+        float totalLen = spline.GetTotalLength();
+
+        // サンプリング分割数（精度調整可能）
+        const int sampleCount = 128;
+
+        float step = totalLen / sampleCount;
+
+        for (int i = 0; i < sampleCount; i++)
+        {
+            float d = step * i;
+            Vector3 p = spline.EvaluateByDistance(d);
+
+            if ((p - worldPos).sqrMagnitude <= radius * radius)
+                return true;
+        }
+
+        return false;
+    }
 }

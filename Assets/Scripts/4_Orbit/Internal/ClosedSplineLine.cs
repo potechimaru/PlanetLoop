@@ -2,10 +2,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
+[ExecuteAlways]
 public class ClosedSplineLine : MonoBehaviour
 {
+    /* =====================================
+     * 基本設定
+     * ===================================== */
+
     [Header("Spline ID")]
-    [SerializeField, Min(1)] private int splineID = 1;
+    [SerializeField, Min(1)]
+    private int splineID = 1;
 
     [Header("Spline Control Points (Local Space)")]
     [SerializeField]
@@ -21,60 +27,72 @@ public class ClosedSplineLine : MonoBehaviour
     [SerializeField, Range(8, 256)]
     private int resolution = 64;
 
-    [Tooltip("Editor上で制御点編集時に毎フレーム更新するか")]
     [SerializeField]
-    private bool updateEveryFrameInEditor = true;
+    private bool updateInEditor = true;
 
-    [Header("Gizmos")]
-    [SerializeField]
-    private bool drawGizmos = true;
-
-    [SerializeField]
-    private float gizmoPointRadius = 0.05f;
+    /* =====================================
+     * 内部
+     * ===================================== */
 
     private LineRenderer _lineRenderer;
 
-    // 判定用サンプル（ワールド座標）
-    private readonly List<Vector3> _collisionSamples = new();
-    public IReadOnlyList<Vector3> CollisionSamples => _collisionSamples;
-
-
-
-    // 再利用バッファ（GC削減）
+    // ローカル座標サンプル
     private readonly List<Vector3> _positions = new();
 
-    private void Awake()
-    {
-        _lineRenderer = GetComponent<LineRenderer>();
-        _lineRenderer.loop = true;
-        _lineRenderer.useWorldSpace = false;
+    // 距離テーブル
+    private readonly List<float> _cumLen = new();
+    private float _totalLength;
 
-        UpdateLine(); // 初回のみ生成
+    // ローカル中心（外向き判定用）
+    private Vector3 _localCenter;
+
+    /* =====================================
+     * 初期化
+     * ===================================== */
+
+    private void OnEnable()
+    {
+        EnsureRenderer();
+        Rebuild();
     }
 
 #if UNITY_EDITOR
     private void Update()
     {
-        // Editor でのみ制御点編集に追従
-        if (!Application.isPlaying && updateEveryFrameInEditor)
+        if (!Application.isPlaying && updateInEditor)
         {
-            UpdateLine();
+            Rebuild();
         }
     }
 #endif
 
-    /// <summary>
-    /// スプライン形状を LineRenderer に反映
-    /// </summary>
-    private void UpdateLine()
+    private void EnsureRenderer()
+    {
+        if (_lineRenderer == null)
+            _lineRenderer = GetComponent<LineRenderer>();
+
+        _lineRenderer.loop = true;
+        _lineRenderer.useWorldSpace = false; // ローカル描画
+    }
+
+    /* =====================================
+     * スプライン再構築
+     * ===================================== */
+
+    public void Rebuild()
     {
         if (controlPoints == null || controlPoints.Count < 3)
             return;
 
+        EnsureRenderer();
+
         _positions.Clear();
+        _cumLen.Clear();
 
         int count = controlPoints.Count;
         int segmentResolution = Mathf.Max(1, resolution / count);
+
+        float acc = 0f;
 
         for (int i = 0; i < count; i++)
         {
@@ -86,26 +104,189 @@ public class ClosedSplineLine : MonoBehaviour
             for (int j = 0; j < segmentResolution; j++)
             {
                 float t = j / (float)segmentResolution;
-                Vector2 p = CatmullRom(p0, p1, p2, p3, t);
-                _positions.Add(p);
+
+                Vector2 local2D = CatmullRom(p0, p1, p2, p3, t);
+                Vector3 local3D = new Vector3(local2D.x, local2D.y, 0f);
+
+                if (_positions.Count > 0)
+                {
+                    acc += Vector3.Distance(
+                        _positions[_positions.Count - 1],
+                        local3D);
+                }
+
+                _positions.Add(local3D);
+                _cumLen.Add(acc);
             }
         }
 
-        _lineRenderer.positionCount = _positions.Count;
-        _lineRenderer.SetPositions(_positions.ToArray());
-
-        _collisionSamples.Clear();
-
-        foreach (var localPos in _positions)
+        // 閉じる
+        if (_positions.Count > 0)
         {
-            _collisionSamples.Add(transform.TransformPoint(localPos));
+            acc += Vector3.Distance(_positions[^1], _positions[0]);
+            _positions.Add(_positions[0]);
+            _cumLen.Add(acc);
         }
 
-        // 閉曲線を明示的に閉じる
-        if (_collisionSamples.Count > 0)
-            _collisionSamples.Add(_collisionSamples[0]);
+        _totalLength = acc;
 
+        // ローカル中心計算
+        _localCenter = Vector3.zero;
+        int n = Mathf.Max(1, _positions.Count - 1); // 閉じ点除外
+        for (int i = 0; i < n; i++)
+            _localCenter += _positions[i];
+        _localCenter /= n;
+
+        _lineRenderer.positionCount = _positions.Count;
+        _lineRenderer.SetPositions(_positions.ToArray());
     }
+
+    /* =====================================
+     * 距離API（Player等用）
+     * ===================================== */
+
+    public float GetTotalLength()
+    {
+        return _totalLength;
+    }
+
+    public Vector3 EvaluateByDistance(float distance)
+    {
+        if (_positions.Count < 2)
+            return transform.position;
+
+        distance = Mathf.Repeat(distance, _totalLength);
+
+        int lo = 0;
+        int hi = _cumLen.Count - 1;
+
+        while (lo < hi)
+        {
+            int mid = (lo + hi) >> 1;
+            if (_cumLen[mid] < distance)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        int i = Mathf.Clamp(lo, 1, _cumLen.Count - 1);
+
+        float l0 = _cumLen[i - 1];
+        float l1 = _cumLen[i];
+
+        float t = Mathf.Abs(l1 - l0) < 1e-6f
+            ? 0f
+            : Mathf.InverseLerp(l0, l1, distance);
+
+        Vector3 local =
+            Vector3.LerpUnclamped(_positions[i - 1], _positions[i], t);
+
+        return transform.TransformPoint(local);
+    }
+
+    private Vector3 EvaluateLocalByDistance(float distance)
+    {
+        if (_positions.Count < 2)
+            return Vector3.zero;
+
+        distance = Mathf.Repeat(distance, _totalLength);
+
+        int lo = 0;
+        int hi = _cumLen.Count - 1;
+
+        while (lo < hi)
+        {
+            int mid = (lo + hi) >> 1;
+            if (_cumLen[mid] < distance)
+                lo = mid + 1;
+            else
+                hi = mid;
+        }
+
+        int i = Mathf.Clamp(lo, 1, _cumLen.Count - 1);
+
+        float l0 = _cumLen[i - 1];
+        float l1 = _cumLen[i];
+
+        float t = Mathf.Abs(l1 - l0) < 1e-6f
+            ? 0f
+            : Mathf.InverseLerp(l0, l1, distance);
+
+        return Vector3.LerpUnclamped(
+            _positions[i - 1],
+            _positions[i],
+            t);
+    }
+
+    public Vector3 EvaluateNormalByDistance(float distance)
+    {
+        if (_positions.Count < 2 || _totalLength <= 1e-6f)
+            return transform.up;
+
+        float eps = Mathf.Max(0.001f, _totalLength * 0.001f);
+
+        Vector3 lp0 = EvaluateLocalByDistance(distance - eps);
+        Vector3 lp1 = EvaluateLocalByDistance(distance + eps);
+
+        Vector3 tangent = (lp1 - lp0).normalized;
+
+        Vector3 localNormal = new Vector3(-tangent.y, tangent.x, 0f).normalized;
+
+        Vector3 worldNormal = transform.TransformDirection(localNormal).normalized;
+
+        // 外側補正
+        Vector3 worldPos = transform.TransformPoint(EvaluateLocalByDistance(distance));
+        Vector3 worldCenter = transform.TransformPoint(_localCenter);
+
+        Vector3 toOutside = (worldPos - worldCenter).normalized;
+
+        if (Vector3.Dot(worldNormal, toOutside) < 0f)
+            worldNormal = -worldNormal;
+
+        return worldNormal;
+    }
+
+    public float FindNearestDistance(Vector3 worldPos)
+    {
+        if (_positions.Count < 2)
+            return 0f;
+
+        float minSqrDist = float.MaxValue;
+        float nearestDistance = 0f;
+
+        for (int i = 0; i < _positions.Count - 1; i++)
+        {
+            Vector3 a = transform.TransformPoint(_positions[i]);
+            Vector3 b = transform.TransformPoint(_positions[i + 1]);
+
+            Vector3 ab = b - a;
+            float abSqr = ab.sqrMagnitude;
+            if (abSqr < 1e-6f)
+                continue;
+
+            float t = Vector3.Dot(worldPos - a, ab) / abSqr;
+            t = Mathf.Clamp01(t);
+
+            float sqrDist = (worldPos - (a + ab * t)).sqrMagnitude;
+
+            if (sqrDist < minSqrDist)
+            {
+                minSqrDist = sqrDist;
+
+                float segLen = Mathf.Sqrt(abSqr);
+                float baseLen = _cumLen[i];
+
+                nearestDistance = baseLen + segLen * t;
+            }
+        }
+
+        return nearestDistance;
+    }
+
+
+    /* =====================================
+     * Catmull-Rom
+     * ===================================== */
 
     private Vector2 CatmullRom(
         Vector2 p0,
@@ -125,93 +306,13 @@ public class ClosedSplineLine : MonoBehaviour
         );
     }
 
-    /// <summary>
-    /// 判定・移動用：ワールド座標のサンプル点列を取得
-    /// </summary>
-    public List<Vector3> GetSampledWorldPoints(int sampleCount, bool useLocalPlaneXY)
+#if UNITY_EDITOR
+    [ContextMenu("Rebuild Spline")]
+    public void EditorRebuild()
     {
-        if (controlPoints == null || controlPoints.Count < 3 || sampleCount < 8)
-            return new List<Vector3>();
-
-        int count = controlPoints.Count;
-        int segRes = Mathf.Max(1, sampleCount / count);
-
-        var list = new List<Vector3>(count * segRes + 1);
-
-        for (int i = 0; i < count; i++)
-        {
-            Vector2 p0 = controlPoints[(i - 1 + count) % count];
-            Vector2 p1 = controlPoints[i];
-            Vector2 p2 = controlPoints[(i + 1) % count];
-            Vector2 p3 = controlPoints[(i + 2) % count];
-
-            for (int j = 0; j < segRes; j++)
-            {
-                float t = j / (float)segRes;
-                Vector2 p = CatmullRom(p0, p1, p2, p3, t);
-
-                Vector3 local = useLocalPlaneXY
-                    ? new Vector3(p.x, p.y, 0f)
-                    : new Vector3(p.x, 0f, p.y);
-
-                list.Add(transform.TransformPoint(local));
-            }
-        }
-
-        // 閉曲線を明示的に閉じる
-        if (list.Count > 0)
-            list.Add(list[0]);
-
-        return list;
+        Rebuild();
     }
+#endif
 
     public int SplineID => splineID;
-
-    private void OnDrawGizmos()
-    {
-        if (!drawGizmos || controlPoints == null || controlPoints.Count < 3)
-            return;
-
-        Gizmos.matrix = transform.localToWorldMatrix;
-
-        int count = controlPoints.Count;
-
-        // 制御点
-        Gizmos.color = Color.yellow;
-        for (int i = 0; i < count; i++)
-        {
-            Gizmos.DrawSphere(controlPoints[i], gizmoPointRadius);
-        }
-
-        // 補助線
-        Gizmos.color = Color.gray;
-        for (int i = 0; i < count; i++)
-        {
-            Vector2 a = controlPoints[i];
-            Vector2 b = controlPoints[(i + 1) % count];
-            Gizmos.DrawLine(a, b);
-        }
-
-        // スプライン表示
-        Gizmos.color = Color.cyan;
-
-        Vector2 prev = controlPoints[0];
-        int segmentResolution = Mathf.Max(1, resolution / count);
-
-        for (int i = 0; i < count; i++)
-        {
-            Vector2 p0 = controlPoints[(i - 1 + count) % count];
-            Vector2 p1 = controlPoints[i];
-            Vector2 p2 = controlPoints[(i + 1) % count];
-            Vector2 p3 = controlPoints[(i + 2) % count];
-
-            for (int j = 1; j <= segmentResolution; j++)
-            {
-                float t = j / (float)segmentResolution;
-                Vector2 cur = CatmullRom(p0, p1, p2, p3, t);
-                Gizmos.DrawLine(prev, cur);
-                prev = cur;
-            }
-        }
-    }
 }
