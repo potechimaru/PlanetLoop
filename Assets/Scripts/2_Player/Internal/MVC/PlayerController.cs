@@ -23,7 +23,7 @@ public class PlayerController : ITickable
         _mover = new PlayerSplineMover(
             _view,
             _model,
-            playerExternalFacade.TryFindTouchedSpline);
+            _playerExternalFacade);
 
         _playerExternalFacade.MoveSubscribe(() =>
         {
@@ -81,15 +81,12 @@ public class PlayerController : ITickable
     public void StartJump()
     {
         _view.HideJumoNormalGuide();
-        _mover.Jump();
-        var normal = _mover.GetOuterNormal();
-        _view.StartJump(_view.transform.position, normal, _model.CurrentJumpspeed);
+        _mover.StartJump();
     }
 
     public bool TickJump()
     {
-        _view.TickJump(Time.deltaTime);
-        return _mover.TickJumpAndCheckAttach(_view.transform.position);
+        return _mover.TickJump(Time.deltaTime);
     }
 
     public void StartCharge()

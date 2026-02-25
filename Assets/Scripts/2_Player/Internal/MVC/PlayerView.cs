@@ -14,12 +14,9 @@ public class PlayerView : MonoBehaviour
     public ClosedSplineLine Spline => _spline;
     public bool UseLocalPlaneXY => _useLocalPlaneXY;
 
-    // --- Jump state ---
-    private Vector3 _jumpDirection;
-    private float _jumpSpeed = 5f;
-
     public void SetPosition(Vector3 worldPos)
     {
+        // 既存仕様：少し手前に出す
         worldPos = new Vector3(worldPos.x, worldPos.y, worldPos.z - 0.01f);
         transform.position = worldPos;
     }
@@ -47,19 +44,6 @@ public class PlayerView : MonoBehaviour
         GetComponentInChildren<MeshRenderer>().material = material;
     }
 
-    public void StartJump(Vector3 startPos, Vector3 normal, float jumpSpeed)
-    {
-        transform.position = startPos;
-
-        _jumpDirection = normal.normalized;
-        _jumpSpeed = jumpSpeed;
-    }
-
-    public void TickJump(float deltaTime)
-    {
-        transform.position += _jumpDirection * _jumpSpeed * deltaTime;
-    }
-
     public void ShowJumpNormalGuide(Vector3 normal)
     {
         _jumpNormalGuide.Show(transform.position, normal);
@@ -70,8 +54,16 @@ public class PlayerView : MonoBehaviour
         _jumpNormalGuide.Hide();
     }
 
-    //public void ClearSpline()
-    //{
-    //    _spline = null;
-    //}
+    public void PlaySplineAttachFx(ClosedSplineLine spline, float distance, Vector3 hitWorldPos)
+    {
+        if (spline == null) return;
+
+        var emitter = spline.GetComponent<SplineBurstEmitter>();
+        if (emitter == null) return;
+
+        // 着地近く用 + Spline全体用（種類分け済みのEmitter想定）
+        emitter.BurstLocalAtDistance(distance);
+        emitter.ScatterGlobal();
+        // emitter.BurstAtWorldPos(hitWorldPos);
+    }
 }

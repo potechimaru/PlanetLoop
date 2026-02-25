@@ -1,45 +1,41 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-
-internal delegate bool TryFindTouchedSplineFunc(
-    Vector3 pos,
-    float radius,
-    ClosedSplineLine exclude,
-    out ClosedSplineLine result
-);
 
 internal class PlayerSplineMover
 {
     private const float AttachRadius = 0.1f;
+    private const float AttachDuration = 0.03f;
 
     private readonly PlayerView _view;
     private readonly PlayerModel _model;
-    private readonly TryFindTouchedSplineFunc _tryFindTouchedSpline;
+    private readonly IPlayerExternalFacade _playerExternalFacade;
 
     private ClosedSplineLine _currentSpline;
 
-    //private readonly List<Vector3> _samples = new();
-    //private readonly List<float> _cumLen = new();
-
+    // --- spline move ---
     private float _totalLen;
     private float _distance;
-    //private Vector3 _center;
 
+    // --- attach lerp ---
     private bool _isAttaching;
     private float _attachT;
     private Vector3 _attachFrom;
     private Vector3 _attachTo;
-    private const float AttachDuration = 0.03f;
+
+    // --- jump state (Mover側に集約) ---
+    private bool _isJumping;
+    private Vector3 _jumpDir;     // ワールド方向（正規化）
+    private float _jumpSpeed;     // 速度（一定で進む）
+    private Vector3 _jumpPos;     // ジャンプ中の計算用位置（Viewのtransform依存を減らす）
 
     internal PlayerSplineMover(
         PlayerView view,
         PlayerModel model,
-        TryFindTouchedSplineFunc tryFindTouchedSpline)
+        IPlayerExternalFacade playerExternalFacade)
     {
         _view = view;
         _model = model;
-        _tryFindTouchedSpline = tryFindTouchedSpline;
+        _playerExternalFacade = playerExternalFacade;
 
         _currentSpline = _view.Spline;
     }
@@ -50,8 +46,7 @@ internal class PlayerSplineMover
 
         if (_totalLen <= 0.0001f)
         {
-            Debug.LogError(
-                "[PlayerSplineMover] Initialize failed: spline samples are empty");
+            Debug.LogError("[PlayerSplineMover] Initialize failed: spline samples are empty");
         }
     }
 
@@ -64,7 +59,10 @@ internal class PlayerSplineMover
         if (_model.IsGameOver) return;
         if (_totalLen <= 0.0001f) return;
 
-        // ★ 吸着中はLerpで位置を寄せる
+        // ジャンプ中はTickJumpで処理する想定（StateMachine側で分岐）
+        if (_isJumping) return;
+
+        // 吸着中はLerpで位置を寄せる
         if (_isAttaching)
         {
             _attachT += deltaTime / AttachDuration;
@@ -89,59 +87,73 @@ internal class PlayerSplineMover
         ApplyPosition();
     }
 
-
     /* =========================
-     * Jump
+     * Jump（開始）
      * ========================= */
 
-    public void Jump()
+    public void StartJump()
     {
-        if (_model.IsGameOver)
-            return;
+        if (_model.IsGameOver) return;
 
-        Vector3 normal = GetOuterNormal();
+        // ジャンプ開始位置・方向・速度をMoverで確定
+        _isJumping = true;
 
-        _view.StartJump(
-            _view.transform.position,
-            normal,
-            _model.CurrentJumpspeed
-        );
+        _jumpPos = _view.transform.position;
+
+        // 既存仕様：Spline外向き法線方向へ射出
+        _jumpDir = GetOuterNormal().normalized;
+
+        // 既存仕様：チャージ等で決まったジャンプ速度を使う（開始時にスナップショット）
+        _jumpSpeed = _model.CurrentJumpspeed;
     }
 
-    public bool TickJumpAndCheckAttach(Vector3 playerWorldPos)
+    /* =========================
+     * Jump（更新＋吸着判定）
+     * ========================= */
+
+    public bool TickJump(float dt)
     {
-        //Debug.Log("TickJump");
+        if (_model.IsGameOver) return false;
+        if (!_isJumping) return false;
 
+        // ★ブラックホール重力：方向だけ曲げる（速度は変えない）
+        // Facadeから参照できる前提（nullなら何もしない）
+        if (_playerExternalFacade != null)
+        {
+            _jumpDir = _playerExternalFacade.BendDirection(_jumpPos, _jumpDir, dt);
+        }
 
-        //  OrbitManagerに他のOrbitに触れたか問い合わせる
-        if (_tryFindTouchedSpline(
-            playerWorldPos,
+        // 位置更新（速度一定）
+        _jumpPos += _jumpDir * _jumpSpeed * dt;
+        _view.SetPosition(_jumpPos);
+
+        // 他Splineに触れたか判定（更新後の位置で判定する）
+        if (_playerExternalFacade.TryFindTouchedSpline(
+            _jumpPos,
             AttachRadius,
             _currentSpline,
             out var touchedSpline))
         {
-            //Debug.Log("AttachToSpline");
-            //Debug.Log("TryFindTouchedSpline : true");
-            AttachToSpline(touchedSpline, playerWorldPos);
+            AttachToSpline(touchedSpline, _jumpPos);
+
+            // ジャンプ終了（吸着へ）
+            _isJumping = false;
             return true;
         }
-        return false;
 
+        return false;
     }
 
     /* =========================
      * 再吸着
      * ========================= */
 
-    private void AttachToSpline(
-    ClosedSplineLine newSpline,
-    Vector3 playerWorldPos)
+    private void AttachToSpline(ClosedSplineLine newSpline, Vector3 playerWorldPos)
     {
         _view.SetSpline(newSpline);
         _currentSpline = newSpline;
 
         _distance = _currentSpline.FindNearestDistance(playerWorldPos);
-
         _totalLen = _currentSpline.GetTotalLength();
 
         _attachFrom = _view.transform.position;
@@ -149,8 +161,10 @@ internal class PlayerSplineMover
 
         _attachT = 0f;
         _isAttaching = true;
-    }
 
+        // 着地演出（種類分け済み版が入っている想定）
+        _view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos);
+    }
 
     /* =========================
      * Spline Table
@@ -167,14 +181,11 @@ internal class PlayerSplineMover
         _totalLen = _currentSpline.GetTotalLength();
     }
 
-
     private void ApplyPosition()
     {
         Vector3 pos = _currentSpline.EvaluateByDistance(_distance);
         _view.SetPosition(pos);
     }
-
-
 
     /* =========================
      * 幾何
@@ -185,34 +196,6 @@ internal class PlayerSplineMover
         return _currentSpline.EvaluateNormalByDistance(_distance);
     }
 
-
-    //private float FindNearestDistance(Vector3 worldPos)
-    //{
-    //    float minSqrDist = float.MaxValue;
-    //    float nearestDistance = 0f;
-
-    //    for (int i = 0; i < _samples.Count - 1; i++)
-    //    {
-    //        Vector3 a = _samples[i];
-    //        Vector3 b = _samples[i + 1];
-
-    //        Vector3 ab = b - a;
-    //        float abSqr = ab.sqrMagnitude;
-    //        if (abSqr < 1e-6f)
-    //            continue;
-
-    //        float t = Vector3.Dot(worldPos - a, ab) / abSqr;
-    //        t = Mathf.Clamp01(t);
-
-    //        float sqrDist = (worldPos - (a + ab * t)).sqrMagnitude;
-
-    //        if (sqrDist < minSqrDist)
-    //        {
-    //            minSqrDist = sqrDist;
-    //            nearestDistance = _cumLen[i] + Mathf.Sqrt(abSqr) * t;
-    //        }
-    //    }
-
-    //    return nearestDistance;
-    //}
+    // 既存の外部からの互換用（必要なら）
+    public bool IsJumping => _isJumping;
 }

@@ -16,19 +16,26 @@ public interface IPlayerExternalFacade
         out ClosedSplineLine result
     );
 
+    // BlackHole
+    Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt);
+
 }
 
 public class PlayerExternalFacade : IPlayerExternalFacade
 {
     private readonly IInputFacade _inputFacade;
     private readonly IOrbitFacade _orbitFacade;
+    private readonly IBlackHoleFacade _blackHoleFacade;
 
     public PlayerExternalFacade(
         IInputFacade inputFacade,
-        IOrbitFacade orbitFacade)
+        IOrbitFacade orbitFacade,
+        IBlackHoleFacade blackHoleFacade)
     {
         _inputFacade = inputFacade;
         _orbitFacade = orbitFacade;
+        _blackHoleFacade = blackHoleFacade;
+
     }
 
     // Input
@@ -57,4 +64,11 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         return _orbitFacade.TryFindTouchedSpline(
             pos, radius, exclude, out result);
     }
+
+    // BlackHole
+    public Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt)
+    {
+        return _blackHoleFacade.BendDirection(worldPos, dir, dt);
+    }
+
 }

@@ -1,14 +1,11 @@
 {
-    "name": "Player.API.Out",
+    "name": "BalckHole.API.Out",
     "rootNamespace": "",
     "references": [
         "GUID:560b04d1a97f54a4e82edc0cbbb69285",
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
         "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
-        "GUID:ad737db14d067074a84f8b1e358ef337",
-        "GUID:768533b191be3d34d8338518c7776e6e",
-        "GUID:0789eb9edeca63f4d9b220d8222a40c5",
-        "GUID:af45c503be16c3345af28347046a3bda"
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

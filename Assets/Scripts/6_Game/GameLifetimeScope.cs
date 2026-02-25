@@ -10,6 +10,7 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private OrbitInstaller _orbitInstaller;
     [SerializeField] private UIInstaller _uiInstaller;
     [SerializeField] private InputInstaller _inputInstaller;
+    [SerializeField] private BlachHoleInstaller _blachHoleInstaller;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -18,6 +19,7 @@ public class GameLifetimeScope : LifetimeScope
         _orbitInstaller.Install(builder);
         _uiInstaller.Install(builder);
         _inputInstaller.Install(builder);
+        _blachHoleInstaller.Install(builder);
 
 
 
