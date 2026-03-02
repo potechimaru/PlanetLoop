@@ -40,6 +40,11 @@ public class ClosedSplineLine : MonoBehaviour
     [Tooltip("距離 / 秒")]
     [SerializeField] private float rotationSpeed = 1f;
 
+    [Header("Line Materials")]
+    [SerializeField] private Material normalMaterial;   // 通常時
+    [SerializeField] private Material landingMaterial;  // 着地時（発光）
+
+
     private float _distanceOffset = 0f;
 
     /* =====================================
@@ -58,6 +63,10 @@ public class ClosedSplineLine : MonoBehaviour
     // ローカル中心（外向き補正用）
     private Vector3 _localCenter;
 
+    public bool IsNewOrbit { get; set; } = true;
+
+    [SerializeField] private Transform _spawnParent;
+
     /* =====================================
      * 初期化
      * ===================================== */
@@ -65,6 +74,10 @@ public class ClosedSplineLine : MonoBehaviour
     private void OnEnable()
     {
         EnsureRenderer();
+        if (Application.isPlaying && normalMaterial == null)
+        {
+            normalMaterial = _lineRenderer.material;
+        }
         Rebuild();
     }
 
@@ -178,13 +191,16 @@ public class ClosedSplineLine : MonoBehaviour
         _distanceOffset += rotationSpeed * Time.deltaTime;
         _distanceOffset = Mathf.Repeat(_distanceOffset, _totalLength);
 
-        int childCount = transform.childCount;
+        // ★ここを変更
+        Transform parent = _spawnParent != null ? _spawnParent : transform;
+
+        int childCount = parent.childCount;
         if (childCount == 0)
             return;
 
         for (int i = 0; i < childCount; i++)
         {
-            Transform child = transform.GetChild(i);
+            Transform child = parent.GetChild(i);
 
             var data = child.GetComponent<SplinePointData>();
             if (data == null)
@@ -369,6 +385,21 @@ public class ClosedSplineLine : MonoBehaviour
             (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2 +
             (-p0 + 3f * p1 - 3f * p2 + p3) * t3
         );
+    }
+
+    public void FlashLandingMaterial()
+    {
+        if (!Application.isPlaying) return;
+        EnsureRenderer();
+
+        if (landingMaterial == null) return;
+
+        // 元が未保存なら保存
+        if (normalMaterial == null)
+            normalMaterial = _lineRenderer.material;
+
+        // 個別インスタンス側を差し替える
+        _lineRenderer.material = landingMaterial;
     }
 
 #if UNITY_EDITOR

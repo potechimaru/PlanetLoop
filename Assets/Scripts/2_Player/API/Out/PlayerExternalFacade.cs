@@ -19,6 +19,9 @@ public interface IPlayerExternalFacade
     // BlackHole
     Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt);
 
+    // UI
+    void AddScore(ScoreRuleType type);
+
 }
 
 public class PlayerExternalFacade : IPlayerExternalFacade
@@ -26,15 +29,23 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     private readonly IInputFacade _inputFacade;
     private readonly IOrbitFacade _orbitFacade;
     private readonly IBlackHoleFacade _blackHoleFacade;
+    private readonly IUIFacade _uiFacade;
+    private readonly IPointObjectFacade _pointObjectFacade;
+
 
     public PlayerExternalFacade(
         IInputFacade inputFacade,
         IOrbitFacade orbitFacade,
-        IBlackHoleFacade blackHoleFacade)
+        IBlackHoleFacade blackHoleFacade,
+        IUIFacade uiFacade,
+        IPointObjectFacade pointObjectFacade
+        )
     {
         _inputFacade = inputFacade;
         _orbitFacade = orbitFacade;
         _blackHoleFacade = blackHoleFacade;
+        _uiFacade = uiFacade;
+        _pointObjectFacade = pointObjectFacade;
 
     }
 
@@ -70,5 +81,13 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     {
         return _blackHoleFacade.BendDirection(worldPos, dir, dt);
     }
+
+    // UI
+    public void AddScore(ScoreRuleType type)
+    {
+        _uiFacade.AddScore(type);
+    }
+
+
 
 }

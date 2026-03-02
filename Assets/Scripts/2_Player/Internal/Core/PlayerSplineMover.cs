@@ -163,7 +163,15 @@ internal class PlayerSplineMover
         _isAttaching = true;
 
         // 着地演出（種類分け済み版が入っている想定）
-        _view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos);
+        if (_currentSpline.IsNewOrbit)
+        {
+            _currentSpline.FlashLandingMaterial();
+            _playerExternalFacade.AddScore(ScoreRuleType.NewOrbit);
+        }
+
+        _view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos); _view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos);
+
+        _currentSpline.IsNewOrbit = false; // 既存仕様：最初の着地でスコアを入れる想定（2回目以降はスコアなし）
     }
 
     /* =========================

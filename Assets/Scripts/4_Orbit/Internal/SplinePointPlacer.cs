@@ -14,6 +14,8 @@ public class SplinePointPlacer : MonoBehaviour
     [SerializeField] private GameObject pointPrefab;
     [SerializeField] private float normalOffset = 0.1f;
 
+    [SerializeField] private Transform spawnParent;
+
     [Header("Placement Mode")]
     [SerializeField] private PlacementMode mode = PlacementMode.ByInterval;
 
@@ -90,19 +92,21 @@ public class SplinePointPlacer : MonoBehaviour
 
         pos += normal * normalOffset;
 
+        var parent = (spawnParent != null) ? spawnParent : transform;
+
 #if UNITY_EDITOR
         GameObject go = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(
             pointPrefab,
-            transform);
+            parent);
 
         UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Bake Spline Point");
 #else
-        GameObject go = Instantiate(pointPrefab, transform);
+        GameObject go = Instantiate(pointPrefab, parent);
 #endif
 
+        // 位置・回転はワールドで合わせる（親がどこでもOK）
         go.transform.position = pos;
-        go.transform.rotation =
-            Quaternion.FromToRotation(Vector3.up, normal);
+        go.transform.rotation = Quaternion.FromToRotation(Vector3.up, normal);
 
         var data = go.GetComponent<SplinePointData>();
         if (data == null)
@@ -119,9 +123,11 @@ public class SplinePointPlacer : MonoBehaviour
 #if UNITY_EDITOR
     public void ClearImmediate()
     {
-        for (int i = transform.childCount - 1; i >= 0; i--)
+        var parent = (spawnParent != null) ? spawnParent : transform;
+
+        for (int i = parent.childCount - 1; i >= 0; i--)
         {
-            var child = transform.GetChild(i).gameObject;
+            var child = parent.GetChild(i).gameObject;
             UnityEditor.Undo.DestroyObjectImmediate(child);
         }
 

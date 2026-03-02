@@ -38,8 +38,8 @@ internal class PlayerModel
     private readonly float _CHARGE_JUMP_SPEED_2 = 20f;
 
     private readonly float _NORMAL_MOVE_SPEED = 5f;
-    private readonly float _CHARGE_MOVE_SPEED_1 = 3f;
-    private readonly float _CHARGE_MOVE_SPEED_2 = 1f;
+    private readonly float _CHARGE_MOVE_SPEED_1 = 3.5f;
+    private readonly float _CHARGE_MOVE_SPEED_2 = 2f;
 
     private float GetChargeJumpSpeed ()
     {

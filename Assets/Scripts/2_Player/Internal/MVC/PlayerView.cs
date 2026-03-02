@@ -16,7 +16,6 @@ public class PlayerView : MonoBehaviour
 
     public void SetPosition(Vector3 worldPos)
     {
-        // 既存仕様：少し手前に出す
         worldPos = new Vector3(worldPos.x, worldPos.y, worldPos.z - 0.01f);
         transform.position = worldPos;
     }
@@ -63,7 +62,9 @@ public class PlayerView : MonoBehaviour
 
         // 着地近く用 + Spline全体用（種類分け済みのEmitter想定）
         emitter.BurstLocalAtDistance(distance);
-        emitter.ScatterGlobal();
+
+        if (spline.IsNewOrbit)
+            emitter.ScatterGlobal();
         // emitter.BurstAtWorldPos(hitWorldPos);
     }
 }
