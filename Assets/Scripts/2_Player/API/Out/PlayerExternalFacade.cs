@@ -22,6 +22,8 @@ public interface IPlayerExternalFacade
     // UI
     void AddScore(ScoreRuleType type);
 
+    void SpawnNewOrbitPointUI(Vector3 displayPos);
+
 }
 
 public class PlayerExternalFacade : IPlayerExternalFacade
@@ -88,6 +90,10 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         _uiFacade.AddScore(type);
     }
 
+    public void SpawnNewOrbitPointUI(Vector3 displayPos)
+    {
+        _uiFacade.SpawnNewOrbitPointUI(displayPos);
+    }
 
 
 }

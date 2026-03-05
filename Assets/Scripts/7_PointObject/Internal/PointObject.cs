@@ -2,7 +2,6 @@ using System;
 using UniRx;
 using UnityEngine;
 
-[RequireComponent(typeof(PointCollectMover))]
 public class PointObject : MonoBehaviour
 {
     [SerializeField] private PointObjectType _type = PointObjectType.Normal;
@@ -12,7 +11,6 @@ public class PointObject : MonoBehaviour
 
     private bool _collected;
     private Collider2D _collider;
-    private PointCollectMover _mover;
 
     private void Awake()
     {

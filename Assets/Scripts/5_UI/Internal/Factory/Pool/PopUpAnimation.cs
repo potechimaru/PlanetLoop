@@ -1,6 +1,7 @@
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
+using Cysharp.Threading.Tasks;
 
 public class PopUpAnimation : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class PopUpAnimation : MonoBehaviour
         }
     }
 
-    public void Play()
+    public async UniTask Play()
     {
         _canvasGroup.alpha = 1f;
 
@@ -52,11 +53,7 @@ public class PopUpAnimation : MonoBehaviour
                 .DOFade(0f, _fadeDuration)
         );
 
-        _sequence.OnComplete(() =>
-        {
-            // ƒv[ƒ‹‚É–ß‚µ‚½‚¢‚ªˆê’U‚ÍSetActive(false)‚Å
-            gameObject.SetActive(false);
-        });
+        await _sequence.AsyncWaitForCompletion();
     }
 
     public void OnDestroy()

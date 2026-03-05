@@ -63,12 +63,12 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Emission: 5
+    - _Emission: 4
     - _MainTex: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Randomness: 50
-    - _Speed: 5
+    - _Speed: 3
     m_Colors: []
   m_BuildTextureStacks: []
   m_AllowLocking: 1

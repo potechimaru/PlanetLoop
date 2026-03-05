@@ -8,6 +8,7 @@ public class PlayerController : ITickable
     private readonly PlayerModel _model;
     private readonly PlayerView _view;
     private readonly PlayerSplineMover _mover;
+    private readonly AttachEvent _attachEvent;
 
     private readonly IPlayerExternalFacade _playerExternalFacade;
     private PlayerStateMachine _playerStateMachine;
@@ -19,10 +20,12 @@ public class PlayerController : ITickable
         _model = new PlayerModel();
         _view = view;
         _playerExternalFacade = playerExternalFacade;
+        _attachEvent = new AttachEvent(_view, _model, _playerExternalFacade);
 
         _mover = new PlayerSplineMover(
             _view,
             _model,
+            _attachEvent,
             _playerExternalFacade);
 
         _playerExternalFacade.MoveSubscribe(() =>

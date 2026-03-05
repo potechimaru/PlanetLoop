@@ -8,11 +8,20 @@ public sealed class NewOrbitScoreRule : IScoreRule
     public ScoreRuleType RuleType => ScoreRuleType.NewOrbit;
     public IObservable<ScoreRuleSignal> OnTriggered => _subject;
 
-    public void Trigger(in ScoreRuleSignal signal)
+    public void Evaluate(in ScoreEventContext ctx)
     {
-        // 型ガード（誤通知対策）
-        if (signal.Type != RuleType) return;
-        _subject.OnNext(signal);
+        if (ctx.Type != RuleType) return;
+        if (!ctx.IsFirstLanding) return;
+
+        // 演出をルール側でやるならここ（不要なら消してOK）
+        //ctx.ToSpline?.FlashLandingMaterial();
+
+        //_subject.OnNext(new ScoreRuleSignal(
+        //    type: RuleType,
+        //    amount: 1,
+        //    worldPos: ctx.WorldPos,
+        //    context: ctx.ToSpline
+        //));
     }
 
     public void Dispose() => _subject.Dispose();

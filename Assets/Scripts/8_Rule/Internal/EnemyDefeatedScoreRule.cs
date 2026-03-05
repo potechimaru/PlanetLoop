@@ -6,20 +6,22 @@ public sealed class EnemyDefeatedScoreRule : IScoreRule
     private readonly Subject<ScoreRuleSignal> _subject = new();
 
     public ScoreRuleType RuleType => ScoreRuleType.DefeatEnemy;
-
     public IObservable<ScoreRuleSignal> OnTriggered => _subject;
 
-    public void Trigger(in ScoreRuleSignal signal)
+    public void Evaluate(in ScoreEventContext ctx)
     {
-        // Œ^‚ªˆê’v‚·‚éê‡‚Ì‚Ý Publish
-        if (signal.Type != RuleType)
-            return;
+        if (ctx.Type != RuleType) return;
+        if (ctx.EnemyId == 0) return; // 0‚Í–³Œøˆµ‚¢i‰^—p‚Å•Ï‚¦‚ÄOKj
 
-        _subject.OnNext(signal);
+        int amount = ctx.WasCharged ? 3 : 1;
+
+        _subject.OnNext(new ScoreRuleSignal(
+            type: RuleType,
+            amount: amount,
+            worldPos: ctx.WorldPos,
+            context: ctx.EnemyId
+        ));
     }
 
-    public void Dispose()
-    {
-        _subject.Dispose();
-    }
+    public void Dispose() => _subject.Dispose();
 }

@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8355707826556336790}
   - component: {fileID: 5344664529417145914}
   - component: {fileID: 2871076250666975492}
+  - component: {fileID: -8312389509228618136}
   m_Layer: 0
   m_Name: NewOrbitPoint
   m_TagString: Untagged
@@ -28,7 +29,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 899039181378253055}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 87.11}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.009259259, y: 0.009259259, z: 0.009259259}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -36,7 +37,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -960, y: -537.61}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 600, y: 207.26}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6750048921993665657
@@ -151,7 +152,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveDistance: 0.01
-  duration: 1.2
+  duration: 0.8
   moveEase: 9
   _fadeDuration: 0.6
 --- !u!225 &2871076250666975492
@@ -166,3 +167,15 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &-8312389509228618136
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899039181378253055}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c22d0be74a91e6a4183440f8f101778c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

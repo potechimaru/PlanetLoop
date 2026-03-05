@@ -6,37 +6,26 @@ public sealed class ScoreRuleEngine : IDisposable
 {
     private readonly Dictionary<ScoreRuleType, IScoreRule> _rules;
 
-    public ScoreRuleEngine(
-        NewOrbitScoreRule newOrbit,
-        EnemyDefeatedScoreRule enemyDefeated,
-        PointObjectScoreRule pointObject)
+    public ScoreRuleEngine(IEnumerable<IScoreRule> rules)
     {
-        _rules = new Dictionary<ScoreRuleType, IScoreRule>
-        {
-            { ScoreRuleType.NewOrbit, newOrbit },
-            { ScoreRuleType.DefeatEnemy, enemyDefeated },
-            { ScoreRuleType.PointObject, pointObject },
-        };
+        _rules = new Dictionary<ScoreRuleType, IScoreRule>();
+        foreach (var r in rules) _rules[r.RuleType] = r;
     }
 
     public IObservable<ScoreRuleSignal> GetStream(ScoreRuleType type)
-    {
-        if (_rules.TryGetValue(type, out var rule))
-            return rule.OnTriggered;
+        => _rules.TryGetValue(type, out var r) ? r.OnTriggered : Observable.Empty<ScoreRuleSignal>();
 
-        // 未登録なら空ストリーム（Null回避）
-        return Observable.Empty<ScoreRuleSignal>();
-    }
-
-    public void Publish(in ScoreRuleSignal signal)
+    public void Evaluate(in ScoreEventContext ctx)
     {
-        if (_rules.TryGetValue(signal.Type, out var rule))
-            rule.Trigger(signal);
+        if (_rules.TryGetValue(ctx.Type, out var r))
+        {
+            r.Evaluate(ctx); // ★1個だけ
+        }
     }
 
     public void Dispose()
     {
-        foreach (var kv in _rules) kv.Value.Dispose();
+        foreach (var r in _rules.Values) r.Dispose();
         _rules.Clear();
     }
 }

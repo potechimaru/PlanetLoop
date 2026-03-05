@@ -9,6 +9,7 @@ internal class PlayerSplineMover
     private readonly PlayerView _view;
     private readonly PlayerModel _model;
     private readonly IPlayerExternalFacade _playerExternalFacade;
+    private readonly AttachEvent _attachEvent;
 
     private ClosedSplineLine _currentSpline;
 
@@ -31,10 +32,12 @@ internal class PlayerSplineMover
     internal PlayerSplineMover(
         PlayerView view,
         PlayerModel model,
+        AttachEvent attachEvent,
         IPlayerExternalFacade playerExternalFacade)
     {
         _view = view;
         _model = model;
+        _attachEvent = attachEvent;
         _playerExternalFacade = playerExternalFacade;
 
         _currentSpline = _view.Spline;
@@ -162,16 +165,18 @@ internal class PlayerSplineMover
         _attachT = 0f;
         _isAttaching = true;
 
-        // 着地演出（種類分け済み版が入っている想定）
-        if (_currentSpline.IsNewOrbit)
-        {
-            _currentSpline.FlashLandingMaterial();
-            _playerExternalFacade.AddScore(ScoreRuleType.NewOrbit);
-        }
+        _attachEvent.NewOrbitAttached(_currentSpline, _distance, playerWorldPos);
 
-        _view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos); _view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos);
+        //// 着地演出（種類分け済み版が入っている想定）
+        //if (_currentSpline.IsNewOrbit)
+        //{
+        //    _currentSpline.FlashLandingMaterial();
+        //    _playerExternalFacade.AddScore(ScoreRuleType.NewOrbit);
+        //}
 
-        _currentSpline.IsNewOrbit = false; // 既存仕様：最初の着地でスコアを入れる想定（2回目以降はスコアなし）
+        //_view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos); 
+
+        //_currentSpline.IsNewOrbit = false; // 既存仕様：最初の着地でスコアを入れる想定（2回目以降はスコアなし）
     }
 
     /* =========================

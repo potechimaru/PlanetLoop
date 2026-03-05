@@ -6,19 +6,19 @@ public sealed class PointObjectScoreRule : IScoreRule
     private readonly Subject<ScoreRuleSignal> _subject = new();
 
     public ScoreRuleType RuleType => ScoreRuleType.PointObject;
-
     public IObservable<ScoreRuleSignal> OnTriggered => _subject;
 
-    public void Trigger(in ScoreRuleSignal signal)
+    public void Evaluate(in ScoreEventContext ctx)
     {
-        if (signal.Type != RuleType)
-            return;
+        if (ctx.Type != RuleType) return;
+        if (ctx.PointValue <= 0) return;
 
-        _subject.OnNext(signal);
+        _subject.OnNext(new ScoreRuleSignal(
+            type: RuleType,
+            amount: ctx.PointValue,
+            worldPos: ctx.WorldPos
+        ));
     }
 
-    public void Dispose()
-    {
-        _subject.Dispose();
-    }
+    public void Dispose() => _subject.Dispose();
 }

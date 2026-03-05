@@ -14,6 +14,8 @@ public class UIInstaller : MonoBehaviour, IInstaller
         builder.Register<HUDPresenter>(Lifetime.Singleton);
         builder.RegisterComponent(_scoreView);
 
+        builder.Register<PlayUIFactory>(Lifetime.Singleton);
+
         // PlayUIFactoryˆÈŠO‚Í’¼Ú’“ü‚µ‚È‚¢
         builder.RegisterComponent(_newOrbitPointPool);
         builder.RegisterComponent(_enemyDefeatedPointPool);
