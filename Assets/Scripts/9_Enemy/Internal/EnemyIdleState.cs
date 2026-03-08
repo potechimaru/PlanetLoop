@@ -5,11 +5,11 @@ internal sealed class EnemyIdleState : IEnemyState
 {
     public ReactiveCommand<EnemyStateKey> NextState { get; } = new();
 
-    private readonly EnemyContext _ctx;
+    private readonly EnemyController _ctx;
     private readonly IDetectStrategy _detect;
     private readonly IMoveStrategy _move;
 
-    internal EnemyIdleState(EnemyContext ctx, IDetectStrategy detect, IMoveStrategy move)
+    internal EnemyIdleState(EnemyController ctx, IDetectStrategy detect, IMoveStrategy move)
     {
         _ctx = ctx;
         _detect = detect;
@@ -18,7 +18,8 @@ internal sealed class EnemyIdleState : IEnemyState
 
     public UniTask Enter()
     {
-        _ctx.View.HideTelegraph();
+        _ctx.HideTelegraph();
+        _ctx.RotateDecoration();
         return UniTask.CompletedTask;
     }
 

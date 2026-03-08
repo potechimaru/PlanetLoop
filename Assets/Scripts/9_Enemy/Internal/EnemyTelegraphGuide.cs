@@ -70,6 +70,8 @@ public class EnemyTelegraphGuide : MonoBehaviour
 
     public void Hide()
     {
+        if (_line == null) return;
+
         _blinkTween?.Kill();
         _blinkTween = null;
 

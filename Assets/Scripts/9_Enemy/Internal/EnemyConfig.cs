@@ -1,5 +1,5 @@
 [System.Serializable]
-public class EnemyCommonConfig
+public class EnemyConfig
 {
     public float DetectRadius = 6f;
     public float TelegraphTime = 0.9f;

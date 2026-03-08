@@ -2,9 +2,9 @@ using Cysharp.Threading.Tasks;
 
 public sealed class SingleShotAttackStrategy : IAttackStrategy
 {
-    private readonly EnemyContext _ctx;
+    private readonly EnemyController _ctx;
 
-    public SingleShotAttackStrategy(EnemyContext ctx) => _ctx = ctx;
+    public SingleShotAttackStrategy(EnemyController ctx) => _ctx = ctx;
 
     public UniTask OnEnterTelegraph()
     {
@@ -15,14 +15,14 @@ public sealed class SingleShotAttackStrategy : IAttackStrategy
     public void TickTelegraph()
     {
         var dir = _ctx.DirToPlayerNormalized();
-        _ctx.View.ShowTelegraph(dir);
+        _ctx.ShowTelegraph(dir);
     }
 
     public UniTask Fire()
     {
-        _ctx.View.HideTelegraph();
+        _ctx.HideTelegraph();
         var dir = _ctx.DirToPlayerNormalized();
-        _ctx.View.FireBullet(dir);
+        _ctx.FireBullet(dir);
         return UniTask.CompletedTask;
     }
 }

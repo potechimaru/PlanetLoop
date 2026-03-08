@@ -1,6 +1,7 @@
 using UnityEngine;
+using DG.Tweening;
 
-public class EnemyViewCommon : MonoBehaviour
+public class EnemyView : MonoBehaviour
 {
     [Header("Telegraph Guide")]
     [SerializeField] private EnemyTelegraphGuide telegraph;
@@ -10,9 +11,15 @@ public class EnemyViewCommon : MonoBehaviour
     [SerializeField] private Transform muzzle;
     [SerializeField] private float bulletSpeed = 6f;
 
+    [Header("Decoration")]
+    [SerializeField] private SpriteRenderer _aroundEnemy;
+
+    [SerializeField] private float _rotateSpeed = 120f;
+
+    private Tween _rotateTween;
+
     private void Awake()
     {
-        // Žè‚ÅŽh‚µ–Y‚ê‚Ä‚à“®‚­‚æ‚¤‚É•ÛŒ¯
         if (telegraph == null)
             telegraph = GetComponentInChildren<EnemyTelegraphGuide>();
     }
@@ -39,5 +46,30 @@ public class EnemyViewCommon : MonoBehaviour
         var spawnPos = GetMuzzlePosition();
         var b = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
         b.Launch(dirNormalized, bulletSpeed);
+    }
+
+    // ----------------------------
+    // Decoration Rotation
+    // ----------------------------
+
+    public void RotateDecoration()
+    {
+        if (_aroundEnemy == null) return;
+
+        _rotateTween?.Kill();
+
+        float duration = 360f / _rotateSpeed;
+
+        _rotateTween = _aroundEnemy.transform
+            .DORotate(new Vector3(0, 0, 360f), duration, RotateMode.FastBeyond360)
+            .SetRelative()
+            .SetEase(Ease.Linear)
+            .SetLoops(-1);
+    }
+
+    public void StopRotateDecoration()
+    {
+        _rotateTween?.Kill();
+        _rotateTween = null;
     }
 }

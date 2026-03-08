@@ -6,11 +6,11 @@ internal sealed class EnemyCooldownState : IEnemyState
 {
     public ReactiveCommand<EnemyStateKey> NextState { get; } = new();
 
-    private readonly EnemyContext _ctx;
+    private readonly EnemyController _ctx;
     private readonly IMoveStrategy _move;
     private readonly IAttackStrategy _attack;
 
-    internal EnemyCooldownState(EnemyContext ctx, IMoveStrategy move, IAttackStrategy attack)
+    internal EnemyCooldownState(EnemyController ctx, IMoveStrategy move, IAttackStrategy attack)
     {
         _ctx = ctx;
         _move = move;
@@ -19,10 +19,11 @@ internal sealed class EnemyCooldownState : IEnemyState
 
     public async UniTask Enter()
     {
-        // š‚±‚±‚Å•K‚¸”­ŽË‚ðawait‚µ‚Ä’¼—ñ‰»
         await _attack.Fire();
 
         _ctx.CooldownElapsed = 0f;
+
+        _ctx.RotateDecoration();
     }
 
     public UniTask Exit() => UniTask.CompletedTask;
@@ -32,7 +33,7 @@ internal sealed class EnemyCooldownState : IEnemyState
         _move.Tick();
 
         _ctx.CooldownElapsed += Time.deltaTime;
-        if (_ctx.CooldownElapsed >= _ctx.Config.CooldownTime)
+        if (_ctx.CooldownElapsed >= _ctx.CooldownTime)
             NextState.Execute(EnemyStateKey.Idle);
     }
 }

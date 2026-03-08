@@ -6,11 +6,11 @@ internal sealed class EnemyTelegraphState : IEnemyState
 {
     public ReactiveCommand<EnemyStateKey> NextState { get; } = new();
 
-    private readonly EnemyContext _ctx;
+    private readonly EnemyController _ctx;
     private readonly IMoveStrategy _move;
     private readonly IAttackStrategy _attack;
 
-    internal EnemyTelegraphState(EnemyContext ctx, IMoveStrategy move, IAttackStrategy attack)
+    internal EnemyTelegraphState(EnemyController ctx, IMoveStrategy move, IAttackStrategy attack)
     {
         _ctx = ctx;
         _move = move;
@@ -20,12 +20,13 @@ internal sealed class EnemyTelegraphState : IEnemyState
     public async UniTask Enter()
     {
         _ctx.TelegraphElapsed = 0f;
+        _ctx.StopRotateDecoration();
         await _attack.OnEnterTelegraph();
     }
 
     public UniTask Exit()
     {
-        _ctx.View.HideTelegraph();
+        _ctx.HideTelegraph();
         return UniTask.CompletedTask;
     }
 
@@ -36,7 +37,7 @@ internal sealed class EnemyTelegraphState : IEnemyState
         _ctx.TelegraphElapsed += Time.deltaTime;
         _attack.TickTelegraph();
 
-        if (_ctx.TelegraphElapsed >= _ctx.Config.TelegraphTime)
+        if (_ctx.TelegraphElapsed >= _ctx.TelegraphTime)
             NextState.Execute(EnemyStateKey.Cooldown);
     }
 }

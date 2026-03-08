@@ -1,9 +1,9 @@
 using UnityEngine;
 public sealed class WanderInCircleMoveStrategy : IMoveStrategy
 {
-    private readonly EnemyContext _ctx;
+    private readonly EnemyController _ctx;
 
-    public WanderInCircleMoveStrategy(EnemyContext ctx)
+    public WanderInCircleMoveStrategy(EnemyController ctx)
     {
         _ctx = ctx;
         PickNewTarget();
@@ -12,7 +12,7 @@ public sealed class WanderInCircleMoveStrategy : IMoveStrategy
     public void Tick()
     {
         var pos = _ctx.Self.position;
-        var next = Vector3.MoveTowards(pos, _ctx.WanderTarget, _ctx.Config.MoveSpeed * Time.deltaTime);
+        var next = Vector3.MoveTowards(pos, _ctx.WanderTarget, _ctx.MoveSpeed * Time.deltaTime);
         _ctx.Self.position = next;
 
         if ((next - _ctx.WanderTarget).sqrMagnitude < 0.01f)
@@ -21,7 +21,7 @@ public sealed class WanderInCircleMoveStrategy : IMoveStrategy
 
     private void PickNewTarget()
     {
-        var r = _ctx.Config.DetectRadius;
+        var r = _ctx.DetectRadius;
         var p = (Vector2)_ctx.Origin + Random.insideUnitCircle * (r * 0.9f);
         _ctx.WanderTarget = new Vector3(p.x, p.y, _ctx.Origin.z);
     }
