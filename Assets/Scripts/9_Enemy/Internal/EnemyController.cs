@@ -1,4 +1,7 @@
 using UnityEngine;
+using UniRx;
+using System;
+using Cysharp.Threading.Tasks;
 
 public sealed class EnemyController
 {
@@ -6,20 +9,29 @@ public sealed class EnemyController
     private readonly Transform _player;
     private readonly EnemyView _view;
     private readonly EnemyConfig _config;
+    private readonly EnemyBulletFactory _bulletFactory;
+    private readonly EnemyAttackType _enemyAttackType;
 
-    public float TelegraphElapsed; // 予告経過
-    public float CooldownElapsed;  // クール経過
+    public float TelegraphElapsed;
+    public float CooldownElapsed;
 
-    // Move用
     public readonly Vector3 Origin;
     public Vector3 WanderTarget;
 
-    public EnemyController(Transform self, Transform player, EnemyView view, EnemyConfig config)
+    public EnemyController(
+        Transform self,
+        Transform player,
+        EnemyView view,
+        EnemyConfig config,
+        EnemyBulletFactory bulletFactory,
+        EnemyAttackType enemyAttackType)
     {
         _self = self;
         _player = player;
         _view = view;
         _config = config;
+        _bulletFactory = bulletFactory;
+        _enemyAttackType = enemyAttackType;
 
         Origin = self.position;
         WanderTarget = Origin;
@@ -37,7 +49,6 @@ public sealed class EnemyController
     {
         if (_view == null) return;
         _view.StopRotateDecoration();
-
     }
 
     public void RotateDecoration()
@@ -61,17 +72,23 @@ public sealed class EnemyController
     public void FireBullet(Vector3 dirNormalized)
     {
         if (_view == null) return;
-        _view.FireBullet(dirNormalized);
+        _bulletFactory.Spawn(_enemyAttackType, _self.position, dirNormalized);
+    }
+
+    public async UniTask PlayDisappearAnimationAsync()
+    {
+        await _view.PlayDisappearAnimationAsync();
+    }
+
+    public async UniTask PlayDisappearParticleAsync()
+    {
+        await _view.PlayDisappearParticleAsync();
     }
 
     public Transform Self => _self;
     public Transform Player => _player;
-
     public float DetectRadius => _config.DetectRadius;
-
     public float TelegraphTime => _config.TelegraphTime;
-
     public float CooldownTime => _config.CooldownTime;
     public float MoveSpeed => _config.MoveSpeed;
-
 }

@@ -2,6 +2,8 @@ using UnityEngine;
 using DG.Tweening;
 using TMPro;
 using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
 
 public class PopUpAnimation : MonoBehaviour
 {
@@ -27,10 +29,12 @@ public class PopUpAnimation : MonoBehaviour
         }
     }
 
-    public async UniTask Play()
+    public async UniTask PlayAsync(CancellationToken cancellationToken = default)
     {
         _canvasGroup.alpha = 1f;
 
+        _sequence?.Kill();
+        _sequence = null;
         _sequence = DOTween.Sequence();
 
         // YŽ²‚ðˆêŽü‰ñ“]
@@ -52,8 +56,27 @@ public class PopUpAnimation : MonoBehaviour
             _canvasGroup
                 .DOFade(0f, _fadeDuration)
         );
+        try
+        {
+            await UniTask.WaitUntil(
+                () => _sequence == null || !_sequence.IsActive() || !_sequence.IsPlaying(), cancellationToken : cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            if (_sequence != null && _sequence.IsActive())
+            {
+                _sequence.Kill();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+        finally
+        {
+            _sequence = null;
+        }
 
-        await _sequence.AsyncWaitForCompletion();
     }
 
     public void OnDestroy()

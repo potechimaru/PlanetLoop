@@ -5,11 +5,31 @@ public class HUDModel
     private readonly ReactiveProperty<int> _score = new ReactiveProperty<int>(0);
     public IReadOnlyReactiveProperty<int> Score => _score;
 
+    private readonly ReactiveProperty<int> _defeatEnemyCount = new ReactiveProperty<int>(0);
+    public IReadOnlyReactiveProperty<int> DefeatEnemyCount => _defeatEnemyCount;
+
+    private readonly ReactiveProperty<int> _allEnemyCount = new ReactiveProperty<int>(0);
+    public IReadOnlyReactiveProperty<int> AllEnemyCount => _allEnemyCount;
+
+    private readonly ReactiveProperty<int> _allSplineCount = new ReactiveProperty<int>(0);
+    public IReadOnlyReactiveProperty<int> AllSplineCount => _allSplineCount;
+
+    private readonly ReactiveProperty<int> _visitedSplineCount = new ReactiveProperty<int>(0);
+    public IReadOnlyReactiveProperty<int> VisitedSplineCount => _visitedSplineCount;
+
+    private readonly ReactiveProperty<int> _longJumpedCount = new ReactiveProperty<int>(0);
+    public IReadOnlyReactiveProperty<int> LongJumpedCount => _longJumpedCount;
+
+    public  int MaxLongJumpedCount { get; private set; } = 3;
+
+
     private readonly int _NEW_ORBIT_SCORE = 100;
     private readonly int _DEFEAT_ENEMY_SCORE = 50;
 
     private readonly int _NORMAL_POINT_OBJECT_SCORE = 100;
     private readonly int _HIGH_POINT_OBJECT_SCORE = 200;
+
+    private readonly int _LONG_JUMP_SCORE = 150;
 
     public void SetScore(int value)
     {
@@ -26,24 +46,48 @@ public class HUDModel
         {
             _score.Value += _DEFEAT_ENEMY_SCORE;
         }
+        else if (type == ScoreRuleType.LongJumped)
+        {
+            _score.Value += _LONG_JUMP_SCORE;
+        }
     }
 
-    /// <summary>
-    /// PointObjectのスコアを追加する。
-    /// </summary>
-    /// <param name="type"></param>
-    /// <param name="pointObjectType"></param>
     public void AddScore(ScoreRuleType type, PointObjectType pointObjectType)
     {
         if (type != ScoreRuleType.PointObject) return;
+
         if (pointObjectType == PointObjectType.High)
         {
-            _score.Value += _HIGH_POINT_OBJECT_SCORE; // High point object score
+            _score.Value += _HIGH_POINT_OBJECT_SCORE;
         }
         else if (pointObjectType == PointObjectType.Normal)
         {
-            _score.Value += _NORMAL_POINT_OBJECT_SCORE; // Normal point object score
+            _score.Value += _NORMAL_POINT_OBJECT_SCORE;
         }
+    }
+
+    public void IncrementLongJumpedCount()
+    {
+        if (IsMaxLongJumpedCount())
+            return;
+        _longJumpedCount.Value += 1;
+    }
+
+    public void ReflectEnemyCount(int defeatEnemyCount, int allEnemyCount)
+    {
+        _defeatEnemyCount.Value = defeatEnemyCount;
+        _allEnemyCount.Value = allEnemyCount;
+    }
+
+    public void ReflectSplineCount(int visitedSplineCount, int allSplineCount)
+    {
+        _visitedSplineCount.Value = visitedSplineCount;
+        _allSplineCount.Value = allSplineCount;
+    }
+
+    public bool IsMaxLongJumpedCount()
+    {
+        return _longJumpedCount.Value >= MaxLongJumpedCount;
     }
 
     public void ResetScore()

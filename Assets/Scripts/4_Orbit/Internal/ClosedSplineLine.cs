@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
@@ -63,9 +65,28 @@ public class ClosedSplineLine : MonoBehaviour
     // ローカル中心（外向き補正用）
     private Vector3 _localCenter;
 
-    public bool IsNewOrbit { get; set; } = true;
+    private bool _isNewOrbit = true;
+    public bool IsNewOrbit
+    {
+        get => _isNewOrbit;
+        set
+        {
+            if (_isNewOrbit == value) return;
+
+            bool wasNewOrbit = _isNewOrbit;
+            _isNewOrbit = value;
+
+            if (wasNewOrbit && !_isNewOrbit)
+            {
+                _onPlayerLanded.OnNext(Unit.Default);
+            }
+        }
+    }
 
     [SerializeField] private Transform _spawnParent;
+
+    private Subject<Unit> _onPlayerLanded = new();
+    public IObservable<Unit> OnPlayerLanded => _onPlayerLanded;
 
     /* =====================================
      * 初期化
@@ -411,4 +432,145 @@ public class ClosedSplineLine : MonoBehaviour
 #endif
 
     public int SplineID => splineID;
+
+    public bool TrySweepHit(
+    Vector3 fromWorld,
+    Vector3 toWorld,
+    float radius,
+    out float hitDistanceOnSpline,
+    out Vector3 hitPointOnSpline)
+    {
+        hitDistanceOnSpline = 0f;
+        hitPointOnSpline = Vector3.zero;
+
+        if (_positions.Count < 2)
+            return false;
+
+        float radiusSqr = radius * radius;
+
+        bool found = false;
+        float bestMoveT = float.MaxValue;
+        float bestSplineT = 0f;
+        int bestSegIndex = -1;
+        Vector3 bestPointOnSpline = Vector3.zero;
+
+        for (int i = 0; i < _positions.Count - 1; i++)
+        {
+            Vector3 a = transform.TransformPoint(_positions[i]);
+            Vector3 b = transform.TransformPoint(_positions[i + 1]);
+
+            ClosestPtSegmentSegment(
+                fromWorld,
+                toWorld,
+                a,
+                b,
+                out float moveT,
+                out float splineT,
+                out Vector3 c1,
+                out Vector3 c2);
+
+            float sqrDist = (c1 - c2).sqrMagnitude;
+            if (sqrDist > radiusSqr)
+                continue;
+
+            // できるだけ移動の早い時点で当たったものを採用
+            if (!found || moveT < bestMoveT)
+            {
+                found = true;
+                bestMoveT = moveT;
+                bestSplineT = splineT;
+                bestSegIndex = i;
+                bestPointOnSpline = c2;
+            }
+        }
+
+        if (!found)
+            return false;
+
+        Vector3 segLocalA = _positions[bestSegIndex];
+        Vector3 segLocalB = _positions[bestSegIndex + 1];
+        float segLen = Vector3.Distance(segLocalA, segLocalB);
+
+        hitDistanceOnSpline = _cumLen[bestSegIndex] + segLen * bestSplineT;
+        hitPointOnSpline = bestPointOnSpline;
+        return true;
+    }
+
+    private static void ClosestPtSegmentSegment(
+    Vector3 p1,
+    Vector3 q1,
+    Vector3 p2,
+    Vector3 q2,
+    out float s,
+    out float t,
+    out Vector3 c1,
+    out Vector3 c2)
+    {
+        const float EPS = 1e-6f;
+
+        Vector3 d1 = q1 - p1;
+        Vector3 d2 = q2 - p2;
+        Vector3 r = p1 - p2;
+
+        float a = Vector3.Dot(d1, d1);
+        float e = Vector3.Dot(d2, d2);
+        float f = Vector3.Dot(d2, r);
+
+        if (a <= EPS && e <= EPS)
+        {
+            s = 0f;
+            t = 0f;
+            c1 = p1;
+            c2 = p2;
+            return;
+        }
+
+        if (a <= EPS)
+        {
+            s = 0f;
+            t = Mathf.Clamp01(f / e);
+        }
+        else
+        {
+            float c = Vector3.Dot(d1, r);
+
+            if (e <= EPS)
+            {
+                t = 0f;
+                s = Mathf.Clamp01(-c / a);
+            }
+            else
+            {
+                float b = Vector3.Dot(d1, d2);
+                float denom = a * e - b * b;
+
+                if (denom != 0f)
+                    s = Mathf.Clamp01((b * f - c * e) / denom);
+                else
+                    s = 0f;
+
+                float tNom = b * s + f;
+
+                if (tNom < 0f)
+                {
+                    t = 0f;
+                    s = Mathf.Clamp01(-c / a);
+                }
+                else if (tNom > e)
+                {
+                    t = 1f;
+                    s = Mathf.Clamp01((b - c) / a);
+                }
+                else
+                {
+                    t = tNom / e;
+                }
+            }
+        }
+
+        c1 = p1 + d1 * s;
+        c2 = p2 + d2 * t;
+    }
+
+
 }

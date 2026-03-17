@@ -1,4 +1,8 @@
+using Cysharp.Threading.Tasks;
+using System;
+using UniRx;
 using UnityEngine;
+using VContainer;
 
 public class Enemy : MonoBehaviour
 {
@@ -9,84 +13,126 @@ public class Enemy : MonoBehaviour
     [Header("Common Config")]
     [SerializeField] private EnemyConfig config = new();
 
-    //[Header("Strategy Select")]
-    //[SerializeField] private EnemyDetectType detectType = EnemyDetectType.Circle; // ‰º‚Å’è‹`
-    //[SerializeField] private EnemyMoveType moveType = EnemyMoveType.Fixed;
-    //[SerializeField] private EnemyAttackType attackType = EnemyAttackType.Single;
-
     [SerializeField] private EnemyType _enemyType = EnemyType.Enemy1;
 
-    private EnemyController _ctx;
-    private EnemyStateMachine _sm;
+    [Inject] private EnemyBulletFactory _bulletFactory;
 
-    // strategies
-    private IDetectStrategy _detect;
-    private IMoveStrategy _move;
-    private IAttackStrategy _attack;
+    protected EnemyController _enemyController;
+    protected EnemyStateMachine _sm;
 
-    private async void Awake()
+    protected IDetectStrategy _detect;
+    protected IMoveStrategy _move;
+    protected IAttackStrategy _attack;
+
+    private readonly CompositeDisposable _disposables = new();
+    private bool _isDead;
+
+    private Subject<Unit> _onDead = new();
+    public IObservable<Unit> OnPlayerHit => _onDead;
+
+    async void Start()
     {
-        if (view == null) view = GetComponentInChildren<EnemyView>();
 
-        _ctx = new EnemyController(transform, player, view, config);
+        if (view == null)
+            view = GetComponentInChildren<EnemyView>();
 
-        //_detect = CreateDetect(detectType, _ctx);
-        //_move = CreateMove(moveType, _ctx);
-        //_attack = CreateAttack(attackType, _ctx);
+        var attackType = GetAttackType(_enemyType);
 
-        _detect = CreateDetectStrategy(_enemyType, _ctx);
-        _move = CreateMoveStrategy(_enemyType, _ctx);
-        _attack = CreateAttackStrategy(_enemyType, _ctx);
+        _enemyController = new EnemyController(
+            transform,
+            player,
+            view,
+            config,
+            _bulletFactory,
+            attackType);
 
+        var strategies = EnemyStrategyFactory.Create(_enemyType, _enemyController);
+
+        _detect = strategies.Detect;
+        _move = strategies.Move;
+        _attack = strategies.Attack;
 
         _sm = new EnemyStateMachine();
         RegisterState();
 
-        await _sm.ChangeStateAsync(EnemyStateKey.Idle);
+        try
+        {
+            await _sm.ChangeStateAsync(EnemyStateKey.Idle);
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 
     protected virtual void RegisterState()
     {
-        _sm.RegisterState(EnemyStateKey.Idle, new EnemyIdleState(_ctx, _detect, _move));
-        _sm.RegisterState(EnemyStateKey.Telegraph, new EnemyTelegraphState(_ctx, _move, _attack));
-        _sm.RegisterState(EnemyStateKey.Cooldown, new EnemyCooldownState(_ctx, _move, _attack));
+        _sm.RegisterState(
+            EnemyStateKey.Idle,
+            new EnemyIdleState(_enemyController, _detect, _move));
+
+        _sm.RegisterState(
+            EnemyStateKey.Telegraph,
+            new EnemyTelegraphState(_enemyController, _move, _attack));
+
+        _sm.RegisterState(
+            EnemyStateKey.Cooldown,
+            new EnemyCooldownState(_enemyController, _move, _attack));
     }
 
-    private void Update()
+    void Update()
     {
+        if (_isDead) return;
         _sm?.Tick();
     }
 
-    private void OnDestroy()
+    public async UniTask DisableEnemy()
+    {
+        if (_isDead) return;
+        _isDead = true;
+
+        _sm?.Dispose();
+        _sm = null;
+
+        _enemyController?.StopRotateDecoration();
+        _enemyController?.HideTelegraph();
+
+
+        var controller = _enemyController;
+        if (controller == null) return;
+
+        await UniTask.WhenAll(
+            controller.PlayDisappearAnimationAsync(),
+            controller.PlayDisappearParticleAsync()
+        );
+
+        _enemyController = null;
+
+        _disposables.Dispose();
+
+        gameObject.SetActive(false);
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            _onDead.OnNext(Unit.Default);
+        }
+    }
+
+    void OnDestroy()
     {
         _sm?.Dispose();
+        _disposables.Dispose();
     }
 
-    private static IDetectStrategy CreateDetectStrategy(EnemyType enemyType, EnemyController ctx)
+    private static EnemyAttackType GetAttackType(EnemyType enemyType)
     {
         return enemyType switch
         {
-            EnemyType.Enemy1 => new CircleDetectStrategy(ctx),
-            _ => new CircleDetectStrategy(ctx)
-        };
-
-    }
-
-    private static IMoveStrategy CreateMoveStrategy(EnemyType enemyType, EnemyController ctx)
-    {
-        return enemyType switch
-        {
-            EnemyType.Enemy1 => new FixedMoveStrategy(),
-            _ => new WanderInCircleMoveStrategy(ctx)
-        };
-    }
-
-    private static IAttackStrategy CreateAttackStrategy(EnemyType enemyType, EnemyController ctx)
-    {
-        return enemyType switch
-        {
-            EnemyType.Enemy1 => new SingleShotAttackStrategy(ctx),
-            _ => new SingleShotAttackStrategy(ctx)
+            EnemyType.Enemy1 => EnemyAttackType.Single,
+            _ => EnemyAttackType.Single
         };
     }
 }

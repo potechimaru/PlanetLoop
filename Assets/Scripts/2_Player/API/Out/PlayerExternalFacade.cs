@@ -10,19 +10,17 @@ public interface IPlayerExternalFacade
 
     // Orbit
     bool TryFindTouchedSpline(
-        Vector3 pos,
-        float radius,
-        ClosedSplineLine exclude,
-        out ClosedSplineLine result
-    );
+    Vector3 from,
+    Vector3 to,
+    float radius,
+    ClosedSplineLine exclude,
+    out ClosedSplineLine touchedSpline,
+    out float hitDistanceOnSpline,
+    out Vector3 hitPointOnSpline);
 
     // BlackHole
     Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt);
 
-    // UI
-    void AddScore(ScoreRuleType type);
-
-    void SpawnNewOrbitPointUI(Vector3 displayPos);
 
 }
 
@@ -31,7 +29,6 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     private readonly IInputFacade _inputFacade;
     private readonly IOrbitFacade _orbitFacade;
     private readonly IBlackHoleFacade _blackHoleFacade;
-    private readonly IUIFacade _uiFacade;
     private readonly IPointObjectFacade _pointObjectFacade;
 
 
@@ -39,14 +36,12 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         IInputFacade inputFacade,
         IOrbitFacade orbitFacade,
         IBlackHoleFacade blackHoleFacade,
-        IUIFacade uiFacade,
         IPointObjectFacade pointObjectFacade
         )
     {
         _inputFacade = inputFacade;
         _orbitFacade = orbitFacade;
         _blackHoleFacade = blackHoleFacade;
-        _uiFacade = uiFacade;
         _pointObjectFacade = pointObjectFacade;
 
     }
@@ -69,30 +64,28 @@ public class PlayerExternalFacade : IPlayerExternalFacade
 
     // Orbit
     public bool TryFindTouchedSpline(
-        Vector3 pos,
-        float radius,
-        ClosedSplineLine exclude,
-        out ClosedSplineLine result)
+    Vector3 from,
+    Vector3 to,
+    float radius,
+    ClosedSplineLine exclude,
+    out ClosedSplineLine touchedSpline,
+    out float hitDistanceOnSpline,
+    out Vector3 hitPointOnSpline)
     {
         return _orbitFacade.TryFindTouchedSpline(
-            pos, radius, exclude, out result);
+            from,
+            to,
+            radius,
+            exclude,
+            out touchedSpline,
+            out hitDistanceOnSpline,
+            out hitPointOnSpline);
     }
 
     // BlackHole
     public Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt)
     {
         return _blackHoleFacade.BendDirection(worldPos, dir, dt);
-    }
-
-    // UI
-    public void AddScore(ScoreRuleType type)
-    {
-        _uiFacade.AddScore(type);
-    }
-
-    public void SpawnNewOrbitPointUI(Vector3 displayPos)
-    {
-        _uiFacade.SpawnNewOrbitPointUI(displayPos);
     }
 
 

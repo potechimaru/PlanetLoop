@@ -63,8 +63,8 @@ public class NewOrbitPointPool : MonoBehaviour, IPlayUIReturner
         rt.anchoredPosition = anchoredPos;
         item.gameObject.SetActive(true);
 
-        await item.GetComponent<PopUpAnimation>().Play();
-        item.GetComponent<PooledPlayUIItem>().ReturnToPool();
+        await item.GetComponent<PopUpAnimation>().PlayAsync();
+        item.GetComponent<PooledPlayUIItem>()?.ReturnToPool();
 
     }
 

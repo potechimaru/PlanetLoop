@@ -1,5 +1,5 @@
-using System.Runtime.InteropServices.WindowsRuntime;
-using UnityEditorInternal;
+using System;
+using UniRx;
 using UnityEngine;
 using VContainer.Unity;
 
@@ -9,18 +9,24 @@ public class PlayerController : ITickable
     private readonly PlayerView _view;
     private readonly PlayerSplineMover _mover;
     private readonly AttachEvent _attachEvent;
-
     private readonly IPlayerExternalFacade _playerExternalFacade;
+
     private PlayerStateMachine _playerStateMachine;
 
+    private Subject<Unit> _onLongJumped = new Subject<Unit>();
+    public IObservable<Unit> OnLongJumped => _onLongJumped;
+
+    private Subject<Vector3> _onNewOrbitAttached = new Subject<Vector3>();
+    public IObservable<Vector3> OnNewOrbitAttached => _onNewOrbitAttached;
+
     public PlayerController(
-    PlayerView view,
-    IPlayerExternalFacade playerExternalFacade)
+        PlayerView view,
+        IPlayerExternalFacade playerExternalFacade)
     {
         _model = new PlayerModel();
         _view = view;
         _playerExternalFacade = playerExternalFacade;
-        _attachEvent = new AttachEvent(_view, _model, _playerExternalFacade);
+        _attachEvent = new AttachEvent(_view, _model,_onLongJumped, _onNewOrbitAttached);
 
         _mover = new PlayerSplineMover(
             _view,
@@ -28,34 +34,43 @@ public class PlayerController : ITickable
             _attachEvent,
             _playerExternalFacade);
 
+        RegisterInputSubscriptions();
+    }
+
+    private void RegisterInputSubscriptions()
+    {
         _playerExternalFacade.MoveSubscribe(() =>
         {
-            // ジャンプチャージ中は反転キャンセル
             if (_playerStateMachine.CurrentState is ChargeState)
             {
-                _model.InitializeMoveSpeed();
-                _model.InitializeJumpSpeed();
-                _playerStateMachine.ChangeState(PlayerStateKey.Move);
+                CancelChargeAndReturnMove();
+                return;
             }
-            // 通常は移動方向反転
-            else
-            {
-                _model.Clockwise = !_model.Clockwise;
-            }
+
+            _model.Clockwise = !_model.Clockwise;
         });
+
         _playerExternalFacade.JumpReleasedSubscribe(() =>
         {
             if (_playerStateMachine.CurrentState is MoveState) return;
             if (_playerStateMachine.CurrentState is JumpState) return;
-            //Debug.Log("JumpReleased");
+
             _playerStateMachine.ChangeState(PlayerStateKey.Jump);
         });
+
         _playerExternalFacade.JumpPressedSubscribe(() =>
         {
             if (_playerStateMachine.CurrentState is JumpState) return;
-            //Debug.Log("JumpPressed");
+
             _playerStateMachine.ChangeState(PlayerStateKey.Charge);
         });
+    }
+
+    private void CancelChargeAndReturnMove()
+    {
+        _model.InitializeMoveSpeed();
+        _model.InitializeJumpSpeed();
+        _playerStateMachine.ChangeState(PlayerStateKey.Move);
     }
 
     public void SetPlayerStateMachine(PlayerStateMachine playerStateMachine)
@@ -95,7 +110,6 @@ public class PlayerController : ITickable
     public void StartCharge()
     {
         _model.CurrentChargeDuaration = 0f;
-
     }
 
     public void TickCharge()
@@ -107,5 +121,4 @@ public class PlayerController : ITickable
         _view.SetAuraColor(_model.CurrentChargeLevel);
         _view.ShowJumpNormalGuide(_mover.GetOuterNormal());
     }
-
 }

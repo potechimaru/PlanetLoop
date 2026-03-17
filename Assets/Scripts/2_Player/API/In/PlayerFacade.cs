@@ -1,8 +1,13 @@
+using System;
+using UniRx;
 using UnityEngine;
 
 public interface IPlayerFacade
 {
     void StartMove();
+
+    IObservable<Vector3> OnNewOrbitAttached { get; }
+    IObservable<Unit> OnLongJumped { get; }
 
 }
 
@@ -22,4 +27,10 @@ public class PlayerFacade : IPlayerFacade
     {
         _playerStateMachine.StartMove();
     }
+
+    public IObservable<Vector3> OnNewOrbitAttached => _playerController.OnNewOrbitAttached;
+
+    public IObservable<Unit> OnLongJumped => _playerController.OnLongJumped;
+
+
 }

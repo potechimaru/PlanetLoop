@@ -1,37 +1,57 @@
+using System;
+using UniRx;
 using UnityEngine;
 
 public class AttachEvent
 {
-    private PlayerView _playerView;
-    private PlayerModel _playerModel;
-    private IPlayerExternalFacade _playerExternalFacade;
+    private readonly PlayerView _playerView;
+    private readonly PlayerModel _playerModel;
 
-    private float _newOrbitPointUIPosOffsetY = 1.5f;
+    private readonly Subject<Unit> _onLongJumped;
+    private readonly Subject<Vector3> _onNewOrbitAttached;
 
 
-    internal AttachEvent(PlayerView playerView, PlayerModel playerModel, IPlayerExternalFacade playerExternalFacade)
+    internal AttachEvent(
+        PlayerView playerView,
+        PlayerModel playerModel,
+        Subject<Unit> onLongJumped,
+        Subject<Vector3> onNewOrbitAttached)
     {
         _playerModel = playerModel;
         _playerView = playerView;
-        _playerExternalFacade = playerExternalFacade;
+        _onLongJumped = onLongJumped;
+        _onNewOrbitAttached = onNewOrbitAttached;
 
     }
 
-    internal void NewOrbitAttached(ClosedSplineLine currentSpline, float distance, Vector3 playerWorldPos)
+    internal void OnSplineAttached(
+        ClosedSplineLine currentSpline,
+        float distance,
+        Vector3 playerWorldPos)
     {
-
-        if (currentSpline.IsNewOrbit)
-        {
-            currentSpline.FlashLandingMaterial();
-            _playerExternalFacade.AddScore(ScoreRuleType.NewOrbit);
-            _playerExternalFacade.SpawnNewOrbitPointUI(new Vector3 (playerWorldPos.x, playerWorldPos.y + _newOrbitPointUIPosOffsetY, playerWorldPos.z));
-        }
+        CheckNewOrbitAttached(currentSpline, playerWorldPos);
 
         _playerView.PlaySplineAttachFx(currentSpline, distance, playerWorldPos);
 
         currentSpline.IsNewOrbit = false;
-
     }
 
+    internal void CheckLongJumped(float jumpDistance)
+    {
+        if (jumpDistance >= _playerModel.LongJumpDistanceThreshold)
+        {
+            Debug.Log($"Long Jumped! Distance: {jumpDistance}");
+            _onLongJumped.OnNext(Unit.Default);
+        }
+    }
 
+    private void CheckNewOrbitAttached(
+        ClosedSplineLine currentSpline,
+        Vector3 playerWorldPos)
+    {
+        if (!currentSpline.IsNewOrbit) return;
+
+        currentSpline.FlashLandingMaterial();
+        _onNewOrbitAttached.OnNext(playerWorldPos);
+    }
 }

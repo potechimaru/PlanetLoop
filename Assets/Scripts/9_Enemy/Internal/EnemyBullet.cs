@@ -1,14 +1,33 @@
+using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
 {
     [SerializeField] private float lifeTime = 8f;
+    [SerializeField] private float bulletSpeed = 6f;
     private Vector3 _vel;
 
-    public void Launch(Vector3 dirNormalized, float speed)
+    private CancellationToken _cancellationToken;
+
+    public async UniTask Launch(Vector3 dirNormalized)
     {
-        _vel = dirNormalized * speed;
-        Destroy(gameObject, lifeTime);
+        _vel = dirNormalized * bulletSpeed;
+         
+        try 
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(lifeTime), cancellationToken: _cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            // ÉLÉÉÉìÉZÉãÇ≥ÇÍÇΩèÍçáÇÕâΩÇ‡ÇµÇ»Ç¢
+        }
+        finally
+        {
+            gameObject.GetComponent<PooledBulletObject>()?.ReturnToPool();
+        }
     }
 
     private void Update()

@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 internal enum ChargeLevel
@@ -14,17 +13,17 @@ internal class PlayerModel
     public float CurrentJumpspeed { get; set; } = 5f;
     public bool Clockwise { get; set; } = false;
     public bool IsGameOver { get; set; } = false;
+    public float CurrentChargeDuaration { get; set; } = 0f;
 
-    public float CurrentChargeDuaration { get; set; } = 0f; 
+    public float LongJumpDistanceThreshold => _LONG_JUMP_DISTANCE;
 
     public ChargeLevel CurrentChargeLevel
     {
         get
         {
             if (CurrentChargeDuaration <= _CHARGE_DUARATION_1) return ChargeLevel.Normal;
-            else if (CurrentChargeDuaration > _CHARGE_DUARATION_1 && CurrentChargeDuaration <= _CHARGE_DUARATION_2)
-                return ChargeLevel.Charge1;
-            else return ChargeLevel.Charge2;
+            if (CurrentChargeDuaration <= _CHARGE_DUARATION_2) return ChargeLevel.Charge1;
+            return ChargeLevel.Charge2;
         }
     }
 
@@ -32,31 +31,27 @@ internal class PlayerModel
     private readonly float _CHARGE_DUARATION_2 = 2f;
 
     private readonly float _NORMAL_JUMP_SPEED = 5f;
-
     private readonly float _CHARGE_JUMP_SPEED_1 = 10f;
-
     private readonly float _CHARGE_JUMP_SPEED_2 = 20f;
 
     private readonly float _NORMAL_MOVE_SPEED = 5f;
     private readonly float _CHARGE_MOVE_SPEED_1 = 3.5f;
     private readonly float _CHARGE_MOVE_SPEED_2 = 2f;
 
-    private float GetChargeJumpSpeed ()
+    private readonly float _LONG_JUMP_DISTANCE = 1f;
+
+    private float GetChargeJumpSpeed()
     {
         if (CurrentChargeDuaration <= _CHARGE_DUARATION_1) return _NORMAL_JUMP_SPEED;
-        else if (CurrentChargeDuaration > _CHARGE_DUARATION_1 && CurrentChargeDuaration <= _CHARGE_DUARATION_2)
-            return _CHARGE_JUMP_SPEED_1;
-        else return _CHARGE_JUMP_SPEED_2;
-
+        if (CurrentChargeDuaration <= _CHARGE_DUARATION_2) return _CHARGE_JUMP_SPEED_1;
+        return _CHARGE_JUMP_SPEED_2;
     }
 
     private float GetMoveSpeed()
     {
-
         if (CurrentChargeDuaration <= _CHARGE_DUARATION_1) return _NORMAL_MOVE_SPEED;
-        else if (CurrentChargeDuaration > _CHARGE_DUARATION_1 && CurrentChargeDuaration <= _CHARGE_DUARATION_2)
-            return _CHARGE_MOVE_SPEED_1;
-        else return _CHARGE_MOVE_SPEED_2;
+        if (CurrentChargeDuaration <= _CHARGE_DUARATION_2) return _CHARGE_MOVE_SPEED_1;
+        return _CHARGE_MOVE_SPEED_2;
     }
 
     public void ApplyChargeJumpSpeed()
@@ -77,15 +72,5 @@ internal class PlayerModel
     public void InitializeJumpSpeed()
     {
         CurrentJumpspeed = _NORMAL_JUMP_SPEED;
-    }
-
-    public bool IsChargeNormal()
-    {
-        return Mathf.Approximately(CurrentJumpspeed, _NORMAL_JUMP_SPEED);
-    }
-
-    public bool IsCharge1()
-    {
-        return Mathf.Approximately(CurrentJumpspeed, _CHARGE_JUMP_SPEED_1);
     }
 }

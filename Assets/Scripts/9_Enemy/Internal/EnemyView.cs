@@ -1,5 +1,8 @@
 using UnityEngine;
 using DG.Tweening;
+using UniRx;
+using System;
+using Cysharp.Threading.Tasks;
 
 public class EnemyView : MonoBehaviour
 {
@@ -8,13 +11,15 @@ public class EnemyView : MonoBehaviour
 
     [Header("Bullet")]
     [SerializeField] private EnemyBullet bulletPrefab;
-    [SerializeField] private Transform muzzle;
-    [SerializeField] private float bulletSpeed = 6f;
 
     [Header("Decoration")]
     [SerializeField] private SpriteRenderer _aroundEnemy;
 
     [SerializeField] private float _rotateSpeed = 120f;
+
+    [SerializeField] private EnemyDisappearAnimation _disappearAnimation;
+
+    [SerializeField] private ParticleSystem _particleSystem;
 
     private Tween _rotateTween;
 
@@ -24,13 +29,10 @@ public class EnemyView : MonoBehaviour
             telegraph = GetComponentInChildren<EnemyTelegraphGuide>();
     }
 
-    public Vector3 GetMuzzlePosition()
-        => muzzle != null ? muzzle.position : transform.position;
-
     public void ShowTelegraph(Vector3 dirNormalized)
     {
         if (telegraph == null) return;
-        telegraph.Show(GetMuzzlePosition(), dirNormalized);
+        telegraph.Show(transform.position, dirNormalized);
     }
 
     public void HideTelegraph()
@@ -39,14 +41,13 @@ public class EnemyView : MonoBehaviour
         telegraph.Hide();
     }
 
-    public void FireBullet(Vector3 dirNormalized)
-    {
-        if (bulletPrefab == null) return;
+    //public void FireBullet(Vector3 dirNormalized)
+    //{
+    //    if (bulletPrefab == null) return;
 
-        var spawnPos = GetMuzzlePosition();
-        var b = Instantiate(bulletPrefab, spawnPos, Quaternion.identity);
-        b.Launch(dirNormalized, bulletSpeed);
-    }
+    //    var b = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+    //    b.Launch(dirNormalized, bulletSpeed);
+    //}
 
     // ----------------------------
     // Decoration Rotation
@@ -71,5 +72,22 @@ public class EnemyView : MonoBehaviour
     {
         _rotateTween?.Kill();
         _rotateTween = null;
+    }
+
+    public async UniTask PlayDisappearParticleAsync()
+    {
+        if (_particleSystem == null) return;
+
+        _particleSystem.Play();
+
+        await UniTask.WaitUntil(() =>
+            !_particleSystem.IsAlive(true)
+        );
+    }
+
+    public async UniTask PlayDisappearAnimationAsync()
+    {
+        if (_disappearAnimation == null) return;
+        await _disappearAnimation.PlayAsync();
     }
 }

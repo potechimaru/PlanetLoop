@@ -1,16 +1,22 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using UniRx;
 using UnityEngine;
 
 
 public interface IOrbitFacade
 {
     bool TryFindTouchedSpline(
-        Vector3 pos, 
-        float radius, 
-        ClosedSplineLine exclude, 
-        out ClosedSplineLine result
-        );
+    Vector3 from,
+    Vector3 to,
+    float radius,
+    ClosedSplineLine exclude,
+    out ClosedSplineLine touchedSpline,
+    out float hitDistanceOnSpline,
+    out Vector3 hitPointOnSpline);
+
+    IReadOnlyReactiveProperty<(int visitedCount, int allCount)> OnSplineCountChanged { get; }
 
 }
 public class OrbitFacade : IOrbitFacade
@@ -21,10 +27,26 @@ public class OrbitFacade : IOrbitFacade
         _orbitManager = orbitManager;
     }
 
-    public bool TryFindTouchedSpline(Vector3 pos, float radius, ClosedSplineLine exclude, out ClosedSplineLine result)
+    public bool TryFindTouchedSpline(
+    Vector3 from,
+    Vector3 to,
+    float radius,
+    ClosedSplineLine exclude,
+    out ClosedSplineLine touchedSpline,
+    out float hitDistanceOnSpline,
+    out Vector3 hitPointOnSpline)
     {
-        return _orbitManager.TryFindTouchedSpline(pos, radius, exclude, out result);
+        return _orbitManager.TryFindTouchedSpline(
+            from,
+            to,
+            radius,
+            exclude,
+            out touchedSpline,
+            out hitDistanceOnSpline,
+            out hitPointOnSpline);
     }
+
+    public IReadOnlyReactiveProperty<(int visitedCount, int allCount)> OnSplineCountChanged => _orbitManager.SplineCount;
 
 
 

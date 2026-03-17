@@ -8,7 +8,6 @@ public sealed class SingleShotAttackStrategy : IAttackStrategy
 
     public UniTask OnEnterTelegraph()
     {
-        // 必要ならここでSEや予告開始演出
         return UniTask.CompletedTask;
     }
 

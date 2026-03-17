@@ -12,6 +12,7 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private InputInstaller _inputInstaller;
     [SerializeField] private BlachHoleInstaller _blachHoleInstaller;
     [SerializeField] private PointObjectInstaller _pointObjectInstaller;
+    [SerializeField] private EnemyInstaller _enemyInstaller;
 
     protected override void Configure(IContainerBuilder builder)
     {
@@ -22,9 +23,7 @@ public class GameLifetimeScope : LifetimeScope
         _inputInstaller.Install(builder);
         _blachHoleInstaller.Install(builder);
         _pointObjectInstaller.Install(builder);
-
-
-
+        _enemyInstaller.Install(builder);
 
 
     }

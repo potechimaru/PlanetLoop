@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 internal class PlayerSplineMover
@@ -13,21 +12,20 @@ internal class PlayerSplineMover
 
     private ClosedSplineLine _currentSpline;
 
-    // --- spline move ---
     private float _totalLen;
     private float _distance;
 
-    // --- attach lerp ---
     private bool _isAttaching;
     private float _attachT;
     private Vector3 _attachFrom;
     private Vector3 _attachTo;
 
-    // --- jump state (Mover側に集約) ---
     private bool _isJumping;
-    private Vector3 _jumpDir;     // ワールド方向（正規化）
-    private float _jumpSpeed;     // 速度（一定で進む）
-    private Vector3 _jumpPos;     // ジャンプ中の計算用位置（Viewのtransform依存を減らす）
+    private Vector3 _jumpDir;
+    private float _jumpSpeed;
+    private Vector3 _jumpPos;
+
+    private Vector3 _jumpStartPos;
 
     internal PlayerSplineMover(
         PlayerView view,
@@ -53,110 +51,104 @@ internal class PlayerSplineMover
         }
     }
 
-    /* =========================
-     * 通常周回
-     * ========================= */
-
     public void Tick(float deltaTime)
     {
         if (_model.IsGameOver) return;
         if (_totalLen <= 0.0001f) return;
-
-        // ジャンプ中はTickJumpで処理する想定（StateMachine側で分岐）
         if (_isJumping) return;
 
-        // 吸着中はLerpで位置を寄せる
         if (_isAttaching)
         {
-            _attachT += deltaTime / AttachDuration;
-            float t = Mathf.SmoothStep(0f, 1f, _attachT);
-
-            Vector3 pos = Vector3.Lerp(_attachFrom, _attachTo, t);
-            _view.SetPosition(pos);
-
-            if (_attachT >= 1f)
-            {
-                _isAttaching = false;
-            }
+            TickAttach(deltaTime);
             return;
         }
 
-        float dir = _model.Clockwise ? -1f : 1f;
-        _distance = Mathf.Repeat(
-            _distance + dir * _model.CurrentMoveSpeed * deltaTime,
-            _totalLen
-        );
-
-        ApplyPosition();
+        TickSplineMove(deltaTime);
     }
-
-    /* =========================
-     * Jump（開始）
-     * ========================= */
 
     public void StartJump()
     {
         if (_model.IsGameOver) return;
 
-        // ジャンプ開始位置・方向・速度をMoverで確定
         _isJumping = true;
-
         _jumpPos = _view.transform.position;
-
-        // 既存仕様：Spline外向き法線方向へ射出
+        _jumpStartPos = _jumpPos;
         _jumpDir = GetOuterNormal().normalized;
-
-        // 既存仕様：チャージ等で決まったジャンプ速度を使う（開始時にスナップショット）
         _jumpSpeed = _model.CurrentJumpspeed;
     }
-
-    /* =========================
-     * Jump（更新＋吸着判定）
-     * ========================= */
 
     public bool TickJump(float dt)
     {
         if (_model.IsGameOver) return false;
         if (!_isJumping) return false;
 
-        // ★ブラックホール重力：方向だけ曲げる（速度は変えない）
-        // Facadeから参照できる前提（nullなら何もしない）
-        if (_playerExternalFacade != null)
-        {
-            _jumpDir = _playerExternalFacade.BendDirection(_jumpPos, _jumpDir, dt);
-        }
+        BendJumpDirection(dt);
 
-        // 位置更新（速度一定）
+        Vector3 prevPos = _jumpPos;
         _jumpPos += _jumpDir * _jumpSpeed * dt;
         _view.SetPosition(_jumpPos);
 
-        // 他Splineに触れたか判定（更新後の位置で判定する）
-        if (_playerExternalFacade.TryFindTouchedSpline(
-            _jumpPos,
-            AttachRadius,
-            _currentSpline,
-            out var touchedSpline))
+        if (!_playerExternalFacade.TryFindTouchedSpline(
+                prevPos,
+                _jumpPos,
+                AttachRadius,
+                _currentSpline,
+                out var touchedSpline,
+                out float hitDistanceOnSpline,
+                out Vector3 hitPointOnSpline))
         {
-            AttachToSpline(touchedSpline, _jumpPos);
-
-            // ジャンプ終了（吸着へ）
-            _isJumping = false;
-            return true;
+            return false;
         }
 
-        return false;
+        float jumpDistance = Vector3.Distance(_jumpStartPos, hitPointOnSpline);
+
+        AttachToSpline(touchedSpline, hitDistanceOnSpline, hitPointOnSpline);
+        _attachEvent.CheckLongJumped(jumpDistance);
+
+        _isJumping = false;
+        return true;
     }
 
-    /* =========================
-     * 再吸着
-     * ========================= */
 
-    private void AttachToSpline(ClosedSplineLine newSpline, Vector3 playerWorldPos)
+    private void TickAttach(float deltaTime)
+    {
+        _attachT += deltaTime / AttachDuration;
+        float t = Mathf.SmoothStep(0f, 1f, _attachT);
+
+        Vector3 pos = Vector3.Lerp(_attachFrom, _attachTo, t);
+        _view.SetPosition(pos);
+
+        if (_attachT >= 1f)
+        {
+            _isAttaching = false;
+        }
+    }
+
+    private void TickSplineMove(float deltaTime)
+    {
+        float dir = _model.Clockwise ? -1f : 1f;
+        _distance = Mathf.Repeat(
+            _distance + dir * _model.CurrentMoveSpeed * deltaTime,
+            _totalLen);
+
+        ApplyPosition();
+    }
+
+    private void BendJumpDirection(float dt)
+    {
+        if (_playerExternalFacade == null) return;
+        _jumpDir = _playerExternalFacade.BendDirection(_jumpPos, _jumpDir, dt);
+    }
+
+    private void AttachToSpline(
+    ClosedSplineLine newSpline,
+    float hitDistanceOnSpline,
+    Vector3 hitPointWorld)
     {
         _view.SetSpline(newSpline);
         _currentSpline = newSpline;
 
-        _distance = _currentSpline.FindNearestDistance(playerWorldPos);
+        _distance = hitDistanceOnSpline;
         _totalLen = _currentSpline.GetTotalLength();
 
         _attachFrom = _view.transform.position;
@@ -165,23 +157,8 @@ internal class PlayerSplineMover
         _attachT = 0f;
         _isAttaching = true;
 
-        _attachEvent.NewOrbitAttached(_currentSpline, _distance, playerWorldPos);
-
-        //// 着地演出（種類分け済み版が入っている想定）
-        //if (_currentSpline.IsNewOrbit)
-        //{
-        //    _currentSpline.FlashLandingMaterial();
-        //    _playerExternalFacade.AddScore(ScoreRuleType.NewOrbit);
-        //}
-
-        //_view.PlaySplineAttachFx(_currentSpline, _distance, playerWorldPos); 
-
-        //_currentSpline.IsNewOrbit = false; // 既存仕様：最初の着地でスコアを入れる想定（2回目以降はスコアなし）
+        _attachEvent.OnSplineAttached(_currentSpline, _distance, hitPointWorld);
     }
-
-    /* =========================
-     * Spline Table
-     * ========================= */
 
     private void RebuildTable()
     {
@@ -200,15 +177,10 @@ internal class PlayerSplineMover
         _view.SetPosition(pos);
     }
 
-    /* =========================
-     * 幾何
-     * ========================= */
-
     public Vector3 GetOuterNormal()
     {
         return _currentSpline.EvaluateNormalByDistance(_distance);
     }
 
-    // 既存の外部からの互換用（必要なら）
     public bool IsJumping => _isJumping;
 }

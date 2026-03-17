@@ -1,17 +1,27 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UniRx;
 
 public sealed class PlayUIFactory
 {
     [Header("Pools")]
     private EnemyDefeatedPointPool _enemyDefeatedPointPool;
     private NewOrbitPointPool _newOrbitPointPool;
+    
+    private IUIExternalFacade _uIExternalFacade;
 
-    public PlayUIFactory(EnemyDefeatedPointPool enemyDefeatedPointPool, NewOrbitPointPool newOrbitPointPool) 
+    private float _offsetY = 1.5f; // UIのYオフセット（例: 敵撃破ポイントがキャラクターの頭上に表示されるように）
+
+    public PlayUIFactory(EnemyDefeatedPointPool enemyDefeatedPointPool, NewOrbitPointPool newOrbitPointPool, IUIExternalFacade uIExternalFacade) 
     {
         _enemyDefeatedPointPool = enemyDefeatedPointPool;
         _newOrbitPointPool = newOrbitPointPool;
+        _uIExternalFacade = uIExternalFacade;
 
+        _uIExternalFacade.OnNewOrbitAttached
+            .Subscribe(pos => Spawn(PlayUIType.NewOrbitPoint, new Vector2(pos.x, pos.y + _offsetY)));
+
+        Debug.Log("PlayUIFactory initialized and subscribed to OnNewOrbitAttached event.");
     }
 
     /// <summary>

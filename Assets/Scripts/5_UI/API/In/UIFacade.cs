@@ -3,6 +3,7 @@ using UnityEngine;
 public interface IUIFacade
 {
     void AddScore(ScoreRuleType type);
+    bool IsMaxLongJumpedCount();
     void SpawnNewOrbitPointUI(Vector3 displayPos);
 
 }
@@ -22,6 +23,11 @@ public class UIFacade : IUIFacade
     public void AddScore(ScoreRuleType type)
     {
         _hudPresenter.AddScore(type);
+    }
+
+    public bool IsMaxLongJumpedCount()
+    {
+        return _hudPresenter.IsMaxLongJumpedCount();
     }
 
     public void SpawnNewOrbitPointUI(Vector3 displayPos)
