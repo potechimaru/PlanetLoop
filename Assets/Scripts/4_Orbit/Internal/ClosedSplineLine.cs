@@ -25,6 +25,13 @@ public class ClosedSplineLine : MonoBehaviour
         new Vector2( 0f, -1f),
     };
 
+    [Header("Auto Shape")]
+    [SerializeField] private bool useAutoGenerateShape = false;
+    [SerializeField] private AutoShapeType autoShapeType = AutoShapeType.Circle;
+    [SerializeField, Min(3)] private int autoControlPointCount = 8;
+    [SerializeField, Min(0.01f)] private float circleRadius = 3f;
+    [SerializeField] private Vector2 ellipseRadius = new Vector2(4f, 2f);
+
     [Header("Rendering")]
     [SerializeField, Range(8, 256)]
     private int resolution = 64;
@@ -43,9 +50,8 @@ public class ClosedSplineLine : MonoBehaviour
     [SerializeField] private float rotationSpeed = 1f;
 
     [Header("Line Materials")]
-    [SerializeField] private Material normalMaterial;   // 通常時
-    [SerializeField] private Material landingMaterial;  // 着地時（発光）
-
+    [SerializeField] private Material normalMaterial;
+    [SerializeField] private Material landingMaterial;
 
     private float _distanceOffset = 0f;
 
@@ -55,14 +61,10 @@ public class ClosedSplineLine : MonoBehaviour
 
     private LineRenderer _lineRenderer;
 
-    // ローカルサンプル点
     private readonly List<Vector3> _positions = new();
-
-    // 距離テーブル
     private readonly List<float> _cumLen = new();
     private float _totalLength;
 
-    // ローカル中心（外向き補正用）
     private Vector3 _localCenter;
 
     private bool _isNewOrbit = true;
@@ -87,6 +89,12 @@ public class ClosedSplineLine : MonoBehaviour
 
     private Subject<Unit> _onPlayerLanded = new();
     public IObservable<Unit> OnPlayerLanded => _onPlayerLanded;
+
+    private enum AutoShapeType
+    {
+        Circle,
+        Ellipse
+    }
 
     /* =====================================
      * 初期化
@@ -131,7 +139,48 @@ public class ClosedSplineLine : MonoBehaviour
             _lineRenderer = GetComponent<LineRenderer>();
 
         _lineRenderer.loop = true;
-        _lineRenderer.useWorldSpace = false; // ローカル描画
+        _lineRenderer.useWorldSpace = false;
+    }
+
+    /* =====================================
+     * 自動形状生成
+     * ===================================== */
+
+    private void GenerateAutoControlPoints()
+    {
+        int count = Mathf.Max(3, autoControlPointCount);
+
+        if (controlPoints == null)
+            controlPoints = new List<Vector2>();
+        else
+            controlPoints.Clear();
+
+        for (int i = 0; i < count; i++)
+        {
+            float angle = (Mathf.PI * 2f * i) / count;
+            float x;
+            float y;
+
+            switch (autoShapeType)
+            {
+                case AutoShapeType.Circle:
+                    x = Mathf.Cos(angle) * circleRadius;
+                    y = Mathf.Sin(angle) * circleRadius;
+                    break;
+
+                case AutoShapeType.Ellipse:
+                    x = Mathf.Cos(angle) * ellipseRadius.x;
+                    y = Mathf.Sin(angle) * ellipseRadius.y;
+                    break;
+
+                default:
+                    x = Mathf.Cos(angle) * circleRadius;
+                    y = Mathf.Sin(angle) * circleRadius;
+                    break;
+            }
+
+            controlPoints.Add(new Vector2(x, y));
+        }
     }
 
     /* =====================================
@@ -140,6 +189,11 @@ public class ClosedSplineLine : MonoBehaviour
 
     public void Rebuild()
     {
+        if (useAutoGenerateShape)
+        {
+            GenerateAutoControlPoints();
+        }
+
         if (controlPoints == null || controlPoints.Count < 3)
             return;
 
@@ -179,7 +233,6 @@ public class ClosedSplineLine : MonoBehaviour
             }
         }
 
-        // 閉じる
         if (_positions.Count > 0)
         {
             acc += Vector3.Distance(_positions[^1], _positions[0]);
@@ -189,7 +242,6 @@ public class ClosedSplineLine : MonoBehaviour
 
         _totalLength = acc;
 
-        // ローカル中心計算（閉じ点除外）
         _localCenter = Vector3.zero;
         int n = Mathf.Max(1, _positions.Count - 1);
         for (int i = 0; i < n; i++)
@@ -212,7 +264,6 @@ public class ClosedSplineLine : MonoBehaviour
         _distanceOffset += rotationSpeed * Time.deltaTime;
         _distanceOffset = Mathf.Repeat(_distanceOffset, _totalLength);
 
-        // ★ここを変更
         Transform parent = _spawnParent != null ? _spawnParent : transform;
 
         int childCount = parent.childCount;
@@ -233,8 +284,7 @@ public class ClosedSplineLine : MonoBehaviour
             Vector3 normal = EvaluateNormalByDistance(d);
 
             child.position = pos;
-            child.rotation =
-                Quaternion.FromToRotation(Vector3.up, normal);
+            child.rotation = Quaternion.FromToRotation(Vector3.up, normal);
         }
     }
 
@@ -333,7 +383,6 @@ public class ClosedSplineLine : MonoBehaviour
         Vector3 worldNormal =
             transform.TransformDirection(localNormal).normalized;
 
-        // 外側補正
         Vector3 worldPos =
             transform.TransformPoint(EvaluateLocalByDistance(distance));
 
@@ -415,11 +464,9 @@ public class ClosedSplineLine : MonoBehaviour
 
         if (landingMaterial == null) return;
 
-        // 元が未保存なら保存
         if (normalMaterial == null)
             normalMaterial = _lineRenderer.material;
 
-        // 個別インスタンス側を差し替える
         _lineRenderer.material = landingMaterial;
     }
 
@@ -429,16 +476,32 @@ public class ClosedSplineLine : MonoBehaviour
     {
         Rebuild();
     }
+
+    [ContextMenu("Generate Circle Control Points")]
+    private void EditorGenerateCircle()
+    {
+        autoShapeType = AutoShapeType.Circle;
+        GenerateAutoControlPoints();
+        Rebuild();
+    }
+
+    [ContextMenu("Generate Ellipse Control Points")]
+    private void EditorGenerateEllipse()
+    {
+        autoShapeType = AutoShapeType.Ellipse;
+        GenerateAutoControlPoints();
+        Rebuild();
+    }
 #endif
 
     public int SplineID => splineID;
 
     public bool TrySweepHit(
-    Vector3 fromWorld,
-    Vector3 toWorld,
-    float radius,
-    out float hitDistanceOnSpline,
-    out Vector3 hitPointOnSpline)
+        Vector3 fromWorld,
+        Vector3 toWorld,
+        float radius,
+        out float hitDistanceOnSpline,
+        out Vector3 hitPointOnSpline)
     {
         hitDistanceOnSpline = 0f;
         hitPointOnSpline = Vector3.zero;
@@ -473,7 +536,6 @@ public class ClosedSplineLine : MonoBehaviour
             if (sqrDist > radiusSqr)
                 continue;
 
-            // できるだけ移動の早い時点で当たったものを採用
             if (!found || moveT < bestMoveT)
             {
                 found = true;
@@ -497,14 +559,14 @@ public class ClosedSplineLine : MonoBehaviour
     }
 
     private static void ClosestPtSegmentSegment(
-    Vector3 p1,
-    Vector3 q1,
-    Vector3 p2,
-    Vector3 q2,
-    out float s,
-    out float t,
-    out Vector3 c1,
-    out Vector3 c2)
+        Vector3 p1,
+        Vector3 q1,
+        Vector3 p2,
+        Vector3 q2,
+        out float s,
+        out float t,
+        out Vector3 c1,
+        out Vector3 c2)
     {
         const float EPS = 1e-6f;
 
@@ -571,6 +633,4 @@ public class ClosedSplineLine : MonoBehaviour
         c1 = p1 + d1 * s;
         c2 = p2 + d2 * t;
     }
-
-
 }

@@ -42,14 +42,14 @@ public class SplineBurstEmitter : MonoBehaviour
             sampleRangeDistance, spawnOffsetLocal,
             speedMinLocal, speedMaxLocal, spreadLocal,
             sizeMinLocal, sizeMaxLocal, lifeMinLocal, lifeMaxLocal,
-            bothSides: false); // 近くは外側だけ、など好みで
+            bothSides: false);
 
     public void ScatterGlobal()
         => EmitWhole(psGlobal, globalCount,
             spawnOffsetGlobal,
             speedMinGlobal, speedMaxGlobal, spreadGlobal,
             sizeMinGlobal, sizeMaxGlobal, lifeMinGlobal, lifeMaxGlobal,
-            bothSides: true); // 全体は両側に散らす、など
+            bothSides: true); // 全体は両側に散らす
 
     private void EmitNearDistance(
         ParticleSystem ps,
