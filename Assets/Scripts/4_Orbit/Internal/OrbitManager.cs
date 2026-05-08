@@ -9,11 +9,17 @@ public class OrbitManager : IDisposable
     private readonly IReadOnlyList<ClosedSplineLine> _lines;
     private readonly CompositeDisposable _disposables = new();
 
-    private int AllSplineCount => _lines.Count;
-    private int VisitedSplineCount => _lines.Count(line => !line.IsNewOrbit);
+    private IEnumerable<ClosedSplineLine> TargetSplines
+    => _lines.Where(line => line.SplineID != 1);
+
+    private int AllSplineCount => TargetSplines.Count();
+
+    private int VisitedSplineCount
+        => TargetSplines.Count(line => !line.IsNewOrbit);
 
     private readonly ReactiveProperty<(int visitedCount, int allCount)> _splineCount = new();
     public IReadOnlyReactiveProperty<(int visitedCount, int allCount)> SplineCount => _splineCount;
+
 
     public OrbitManager(IEnumerable<ClosedSplineLine> lines)
     {

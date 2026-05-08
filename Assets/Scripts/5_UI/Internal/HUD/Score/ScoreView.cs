@@ -11,7 +11,7 @@ public class ScoreView : MonoBehaviour
     public void SetScore(int score)
     {
         if (_scoreText == null) return;
-        Debug.Log($"ScoreView.SetScore({score})");
+        //Debug.Log($"ScoreView.SetScore({score})");
         _scoreText.text = $"{Prefix}{score}";
     }
 }

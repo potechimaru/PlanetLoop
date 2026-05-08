@@ -4,12 +4,20 @@ using VContainer.Unity;
 
 public class GameStateInstaller : MonoBehaviour, IInstaller
 {
+    [SerializeField] private GameUIManager _gameUIManager;
     public void Install(IContainerBuilder builder)
     {
         builder.RegisterEntryPoint<GameStateMachine>(Lifetime.Singleton);
         builder.Register<OpeningState>(Lifetime.Singleton);
         builder.Register<PlayState>(Lifetime.Singleton);
         builder.Register<ResultState>(Lifetime.Singleton);
+
+        builder.Register<GameStateExternalFacade>(Lifetime.Singleton).As<IGameStateExternalFacade>();
+        builder.Register<GameStateFacade>(Lifetime.Singleton).As<IGameStateFacade>();
+
+        builder.Register<GameStateRequestHub>(Lifetime.Singleton).As<IGameStateChangeRequester>().As<IGameStateChangeRequestSource>();
+
+        builder.RegisterComponent(_gameUIManager);
 
     }
 }

@@ -1,32 +1,49 @@
-using Cysharp.Threading.Tasks;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+using UniRx;
 using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
 {
     [SerializeField] private float lifeTime = 8f;
     [SerializeField] private float bulletSpeed = 6f;
-    private Vector3 _vel;
 
-    private CancellationToken _cancellationToken;
+    private readonly Subject<Unit> _onHitPlayer = new();
+
+    private Vector3 _vel;
+    private bool _isReturned;
+
+    public IObservable<Unit> OnHitPlayer => _onHitPlayer;
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!collision.CompareTag("Player")) return;
+        if (_isReturned) return;
+
+        Debug.Log("Player hit!");
+
+        _onHitPlayer.OnNext(Unit.Default);
+
+        ReturnToPool();
+    }
 
     public async UniTask Launch(Vector3 dirNormalized)
     {
-        _vel = dirNormalized * bulletSpeed;
-         
-        try 
+        _isReturned = false;
+        _vel = dirNormalized.normalized * bulletSpeed;
+
+        try
         {
-            await UniTask.Delay(TimeSpan.FromSeconds(lifeTime), cancellationToken: _cancellationToken);
+            await UniTask.Delay(
+                TimeSpan.FromSeconds(lifeTime),
+                cancellationToken: this.GetCancellationTokenOnDestroy()
+            );
+
+            ReturnToPool();
         }
         catch (OperationCanceledException)
         {
-            // キャンセルされた場合は何もしない
-        }
-        finally
-        {
-            gameObject.GetComponent<PooledBulletObject>()?.ReturnToPool();
+            // Destroy時など。基本的に何もしない
         }
     }
 
@@ -35,5 +52,18 @@ public class EnemyBullet : MonoBehaviour
         transform.position += _vel * Time.deltaTime;
     }
 
-    // ここでPlayerに当たったら即死、などはプロジェクト側のルールに合わせて実装
+    private void ReturnToPool()
+    {
+        if (_isReturned) return;
+
+        _isReturned = true;
+        _vel = Vector3.zero;
+
+        GetComponent<PooledBulletObject>()?.ReturnToPool();
+    }
+
+    private void OnDestroy()
+    {
+        _onHitPlayer.Dispose();
+    }
 }

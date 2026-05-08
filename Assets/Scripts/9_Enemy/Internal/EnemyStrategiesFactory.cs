@@ -12,9 +12,15 @@ public static class EnemyStrategyFactory
                 new SingleShotAttackStrategy(enemyController)
             ),
 
+            EnemyType.Enemy2 => new EnemyStrategies(
+                new CircleDetectStrategy(enemyController),
+                new FixedMoveStrategy(),
+                new ThreeWayAttackStrategy(enemyController, 25f)
+            ),
+
             _ => new EnemyStrategies(
                 new CircleDetectStrategy(enemyController),
-                new WanderInCircleMoveStrategy(enemyController),
+                new FixedMoveStrategy(),
                 new SingleShotAttackStrategy(enemyController)
             )
         };

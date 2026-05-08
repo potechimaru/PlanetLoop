@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using UniRx;
 using UnityEngine;
@@ -34,13 +35,13 @@ public class PlayerController : ITickable
             _attachEvent,
             _playerExternalFacade);
 
-        RegisterInputSubscriptions();
     }
 
-    private void RegisterInputSubscriptions()
+    public void RegisterInputSubscriptions()
     {
         _playerExternalFacade.MoveSubscribe(() =>
         {
+            if (_playerStateMachine.CurrentState is GameOverState) return;
             if (_playerStateMachine.CurrentState is ChargeState)
             {
                 CancelChargeAndReturnMove();
@@ -54,6 +55,7 @@ public class PlayerController : ITickable
         {
             if (_playerStateMachine.CurrentState is MoveState) return;
             if (_playerStateMachine.CurrentState is JumpState) return;
+            if (_playerStateMachine.CurrentState is GameOverState) return;
 
             _playerStateMachine.ChangeState(PlayerStateKey.Jump);
         });
@@ -61,9 +63,31 @@ public class PlayerController : ITickable
         _playerExternalFacade.JumpPressedSubscribe(() =>
         {
             if (_playerStateMachine.CurrentState is JumpState) return;
+            if (_playerStateMachine.CurrentState is GameOverState) return;
 
             _playerStateMachine.ChangeState(PlayerStateKey.Charge);
         });
+
+        
+    }
+
+    public void RegisterPlayerSubscriptions()
+    {
+        _playerExternalFacade.OnPlayerHitByEnemyBullet.Subscribe(_ =>
+        {
+            _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
+        });
+
+        _playerExternalFacade.OnPlayerEnteredBlackHole.Subscribe(_ =>
+        {
+            _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
+        });
+
+        _playerExternalFacade.OnPlayerExitedOuterLimit.Subscribe(_ =>
+        {
+            _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
+        });
+
     }
 
     private void CancelChargeAndReturnMove()
@@ -83,11 +107,16 @@ public class PlayerController : ITickable
         _playerStateMachine?.Tick();
     }
 
+    public void SetPlayer()
+    {
+        _mover.SetPlayer(_view.Spline, 0f);
+    }
+
     public void StartMove()
     {
-        _view.HideJumoNormalGuide();
+        _view.HideJumpNormalGuide();
         _view.SetAuraColor(ChargeLevel.Normal);
-        _mover.Initialize();
+        _mover.InitializeMove();
         _model.InitializeMoveSpeed();
     }
 
@@ -98,7 +127,7 @@ public class PlayerController : ITickable
 
     public void StartJump()
     {
-        _view.HideJumoNormalGuide();
+        _view.HideJumpNormalGuide();
         _mover.StartJump();
     }
 
@@ -120,5 +149,10 @@ public class PlayerController : ITickable
 
         _view.SetAuraColor(_model.CurrentChargeLevel);
         _view.ShowJumpNormalGuide(_mover.GetOuterNormal());
+    }
+
+    public void Dead()
+    {
+        _view.PlayDeadEffect().Forget();
     }
 }

@@ -1,7 +1,8 @@
-using UnityEngine;
-using UniRx;
-using System;
 using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using UniRx;
+using UnityEngine;
 
 public sealed class EnemyController
 {
@@ -67,6 +68,18 @@ public sealed class EnemyController
     {
         if (_view == null) return;
         _view.HideTelegraph();
+    }
+
+    public void ShowTelegraphs(IReadOnlyList<Vector3> directions)
+    {
+        if (_view == null) return;
+        _view.ShowTelegraphs(directions);
+    }
+
+    public void HideTelegraphs()
+    {
+        if (_view == null) return;
+        _view.HideTelegraphs();
     }
 
     public void FireBullet(Vector3 dirNormalized)

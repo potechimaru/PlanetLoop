@@ -11,7 +11,8 @@ public enum PlayerStateKey
     Idle,
     Move,
     Charge,
-    Jump
+    Jump,
+    GameOver
 }
 
 public class PlayerStateMachine : IDisposable
@@ -32,6 +33,8 @@ public class PlayerStateMachine : IDisposable
         RegisterState(PlayerStateKey.Move, new MoveState(_playerController));
         RegisterState(PlayerStateKey.Jump, new JumpState(_playerController));
         RegisterState(PlayerStateKey.Charge, new ChargeState(_playerController));
+        RegisterState(PlayerStateKey.GameOver, new GameOverState(_playerController));
+
 
         ChangeState(PlayerStateKey.Idle);
         _playerController.SetPlayerStateMachine(this);

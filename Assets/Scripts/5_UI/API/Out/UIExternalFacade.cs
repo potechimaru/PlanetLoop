@@ -4,6 +4,7 @@ using UniRx;
 
 public interface IUIExternalFacade
 {
+
     //Player
     IObservable<Vector3> OnNewOrbitAttached { get; }
     IObservable<Unit> OnLongJumped { get; }
@@ -24,13 +25,15 @@ public class UIExternalFacade : IUIExternalFacade
     private readonly IOrbitFacade _orbitFacade;
     private readonly IEnemyFacade _enemyFacade;
     private readonly IPlayerFacade _playerFacade;
+    private readonly IGameStateFacade _gameStateFacade;
 
-    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade)
+    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade, IGameStateFacade gameStateFacade)
     {
         _pointObjectFacade = pointObjectFacade;
         _orbitFacade = orbitFacade;
         _enemyFacade = enemyFacade;
         _playerFacade = playerFacade;
+        _gameStateFacade = gameStateFacade;
     }
 
     // Player

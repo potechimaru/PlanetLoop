@@ -1,4 +1,5 @@
 using System;
+using UniRx;
 using UnityEngine;
 public interface IPlayerExternalFacade
 {
@@ -21,6 +22,12 @@ public interface IPlayerExternalFacade
     // BlackHole
     Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt);
 
+    IObservable<Unit> OnPlayerEnteredBlackHole { get; }
+    IObservable<Unit> OnPlayerExitedOuterLimit { get; }
+
+    // Enemy
+    public IObservable<Unit> OnPlayerHitByEnemyBullet { get; }
+
 
 }
 
@@ -30,19 +37,23 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     private readonly IOrbitFacade _orbitFacade;
     private readonly IBlackHoleFacade _blackHoleFacade;
     private readonly IPointObjectFacade _pointObjectFacade;
+    private readonly IEnemyFacade _enemyFacade;
 
 
     public PlayerExternalFacade(
         IInputFacade inputFacade,
         IOrbitFacade orbitFacade,
         IBlackHoleFacade blackHoleFacade,
-        IPointObjectFacade pointObjectFacade
+        IPointObjectFacade pointObjectFacade,
+        IEnemyFacade enemyFacade
         )
     {
         _inputFacade = inputFacade;
         _orbitFacade = orbitFacade;
         _blackHoleFacade = blackHoleFacade;
         _pointObjectFacade = pointObjectFacade;
+        _enemyFacade = enemyFacade;
+
 
     }
 
@@ -88,5 +99,14 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         return _blackHoleFacade.BendDirection(worldPos, dir, dt);
     }
 
+    public IObservable<Unit> OnPlayerEnteredBlackHole
+        => _blackHoleFacade.OnPlayerEnteredBlackHole;
+
+    public IObservable<Unit> OnPlayerExitedOuterLimit
+        => _blackHoleFacade.OnPlayerExitedOuterLimit;
+
+    // Enemy
+    public IObservable<Unit> OnPlayerHitByEnemyBullet
+        => _enemyFacade.OnPlayerHitByEnemyBullet;
 
 }

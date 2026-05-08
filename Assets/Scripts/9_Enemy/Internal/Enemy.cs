@@ -33,6 +33,7 @@ public class Enemy : MonoBehaviour
     async void Start()
     {
 
+
         if (view == null)
             view = GetComponentInChildren<EnemyView>();
 

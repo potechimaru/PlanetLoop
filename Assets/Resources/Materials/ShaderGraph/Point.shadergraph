@@ -86,9 +86,6 @@
         },
         {
             "m_Id": "6b86a55bba0342a890818e962d17cc77"
-        },
-        {
-            "m_Id": "6b1ee3c99135410ba8c1dfd5f38af82c"
         }
     ],
     "m_GroupDatas": [],
@@ -148,20 +145,6 @@
                     "m_Id": "8e483e13504641519b884266fde651e9"
                 },
                 "m_SlotId": 1
-            }
-        },
-        {
-            "m_OutputSlot": {
-                "m_Node": {
-                    "m_Id": "6b1ee3c99135410ba8c1dfd5f38af82c"
-                },
-                "m_SlotId": 0
-            },
-            "m_InputSlot": {
-                "m_Node": {
-                    "m_Id": "6b86a55bba0342a890818e962d17cc77"
-                },
-                "m_SlotId": 0
             }
         },
         {
@@ -828,31 +811,6 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
-    "m_ObjectId": "4617e1785aee4dceb3305bc5665fe9ff",
-    "m_Id": 0,
-    "m_DisplayName": "Emission",
-    "m_SlotType": 1,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "Out",
-    "m_StageCapability": 3,
-    "m_Value": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_DefaultValue": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0,
-        "w": 0.0
-    },
-    "m_Labels": []
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector4MaterialSlot",
     "m_ObjectId": "49dc78e0ffd544ada97db6e66d897ad0",
     "m_Id": 2,
     "m_DisplayName": "Out",
@@ -1054,42 +1012,6 @@
         "m_SerializableColors": []
     },
     "m_SerializedDescriptor": "SurfaceDescription.BaseColor"
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
-    "m_ObjectId": "6b1ee3c99135410ba8c1dfd5f38af82c",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "Property",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 1100.0,
-            "y": 323.9999694824219,
-            "width": 123.0001220703125,
-            "height": 34.000030517578128
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "4617e1785aee4dceb3305bc5665fe9ff"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_DismissedVersion": 0,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_Property": {
-        "m_Id": "b2bbe86ab390464d9d8292a69a0f4381"
-    }
 }
 
 {

@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
+using VContainer;
 public class SingleBulletPool : MonoBehaviour, IBulletReturner
 {
     [Header("Prefab / Parent")]
@@ -10,6 +11,8 @@ public class SingleBulletPool : MonoBehaviour, IBulletReturner
     [Header("Pooling")]
     [SerializeField, Min(0)] private int prewarmCount = 10;
     [SerializeField] private bool setInactiveOnReturn = true;
+
+    [Inject] private EnemyBulletManager _enemyBulletManager;
 
     private readonly Stack<PooledBulletObject> _pool = new();
     private readonly HashSet<PooledBulletObject> _rented = new();
@@ -51,6 +54,8 @@ public class SingleBulletPool : MonoBehaviour, IBulletReturner
         if (item == null) return;
 
         _rented.Add(item);
+
+        _enemyBulletManager.RegisterBullet(item.GetComponent<EnemyBullet>());
 
         var rt = (RectTransform)item.transform;
 

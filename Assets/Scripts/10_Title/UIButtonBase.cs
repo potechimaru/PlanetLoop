@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using UniRx;
+using System;
 
 public abstract class UIButtonBase : MonoBehaviour,
     IPointerEnterHandler,
@@ -14,9 +16,13 @@ public abstract class UIButtonBase : MonoBehaviour,
     protected bool IsPointerInside => _isPointerInside;
     protected bool IsHoverActive => _isHoverActive;
 
+    public IObservable<Unit> OnClicked => _onClicked;
+
     private Tween _hoverStateTween;
     private bool _isPointerInside;
     private bool _isHoverActive;
+
+    private readonly Subject<Unit> _onClicked = new();
 
     protected virtual void Awake()
     {
@@ -37,6 +43,7 @@ public abstract class UIButtonBase : MonoBehaviour,
     public void OnPointerClick(PointerEventData eventData)
     {
         HandleClick(eventData);
+        _onClicked.OnNext(Unit.Default);
     }
 
     private void ScheduleHoverEnter()
@@ -92,5 +99,7 @@ public abstract class UIButtonBase : MonoBehaviour,
     protected virtual void OnDestroy()
     {
         _hoverStateTween?.Kill();
+        _onClicked.OnCompleted();
+        _onClicked.Dispose();
     }
 }

@@ -6,17 +6,17 @@ public class PlayState : IGameState
 {
     public ReactiveCommand<GameStateKey> NextState { get; } = new();
 
-    private readonly IPlayerFacade _playerFacade;
+    private readonly IGameStateExternalFacade _gameStateExternalFacade;
 
-    public PlayState(IPlayerFacade playerFacade)
+    public PlayState(IGameStateExternalFacade gameStateExternalFacade)
     {
-        _playerFacade = playerFacade;
+        _gameStateExternalFacade = gameStateExternalFacade;
     }
 
     public async UniTask Enter()
     {
-        Debug.Log("Enter Play State");
-        _playerFacade.StartMove();
+        _gameStateExternalFacade.RegisterInputSubscriptions();
+        _gameStateExternalFacade.StartMove();
         await UniTask.CompletedTask;
     }
     public async UniTask Exit()

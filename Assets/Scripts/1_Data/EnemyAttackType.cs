@@ -1,5 +1,6 @@
 public enum EnemyAttackType
 {
-    Single
+    Single,
+    Spread,
     // Fan3, Laser, LaneBlock ‚È‚Ç‚ÍŒã‚Å’Ç‰Á
 }

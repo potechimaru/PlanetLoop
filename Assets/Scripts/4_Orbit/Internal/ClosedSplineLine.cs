@@ -102,6 +102,10 @@ public class ClosedSplineLine : MonoBehaviour
 
     private void OnEnable()
     {
+        if (splineID == 1)
+        {
+            IsNewOrbit = false;
+        }
         EnsureRenderer();
         if (Application.isPlaying && normalMaterial == null)
         {
@@ -459,6 +463,7 @@ public class ClosedSplineLine : MonoBehaviour
 
     public void FlashLandingMaterial()
     {
+        if (splineID == 1) return; // スタート地点はフラッシュさせない
         if (!Application.isPlaying) return;
         EnsureRenderer();
 

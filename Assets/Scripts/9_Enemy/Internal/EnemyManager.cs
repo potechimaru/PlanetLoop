@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UniRx;
 using UnityEngine;
+using VContainer;
 
 public class EnemyManager : IDisposable
 {
+    private readonly IObjectResolver _resolver;
     private readonly CompositeDisposable _disposables = new();
 
     private readonly HashSet<Enemy> _enemySet = new();
-    private IEnumerable<Enemy> _enemies;
 
     private readonly ReactiveProperty<(int defeatedCount, int totalEnemyCount)> _enemyCount = new();
     public IReadOnlyReactiveProperty<(int defeatedCount, int totalEnemyCount)> EnemyCount => _enemyCount;
@@ -18,19 +19,20 @@ public class EnemyManager : IDisposable
     private int _defeatedCount = 0;
     private int _totalEnemyCount = 0;
 
-    public EnemyManager(IEnumerable<Enemy> enemies)
+    public EnemyManager(
+        IObjectResolver resolver,
+        IEnumerable<Enemy> enemies)
     {
-        _enemies = _enemySet;
+        _resolver = resolver;
 
-        if (enemies == null)
+        if (enemies != null)
         {
-            NotifyEnemyCountChanged();
-            return;
-        }
+            foreach (var enemy in enemies)
+            {
+                _resolver.Inject(enemy);
 
-        foreach (var enemy in enemies)
-        {
-            Register(enemy);
+                Register(enemy);
+            }
         }
 
         _totalEnemyCount = _enemySet.Count;
@@ -74,7 +76,7 @@ public class EnemyManager : IDisposable
 
     public IReadOnlyList<Enemy> GetAll()
     {
-        return _enemies.ToList();
+        return _enemySet.ToList();
     }
 
     public void ResetDefeatedCount()

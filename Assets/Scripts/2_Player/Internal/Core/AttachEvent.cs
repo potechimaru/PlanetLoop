@@ -29,6 +29,7 @@ public class AttachEvent
         float distance,
         Vector3 playerWorldPos)
     {
+        if (!(currentSpline.SplineID == 1))
         CheckNewOrbitAttached(currentSpline, playerWorldPos);
 
         _playerView.PlaySplineAttachFx(currentSpline, distance, playerWorldPos);
@@ -40,7 +41,7 @@ public class AttachEvent
     {
         if (jumpDistance >= _playerModel.LongJumpDistanceThreshold)
         {
-            Debug.Log($"Long Jumped! Distance: {jumpDistance}");
+            //Debug.Log($"Long Jumped! Distance: {jumpDistance}");
             _onLongJumped.OnNext(Unit.Default);
         }
     }
@@ -49,9 +50,11 @@ public class AttachEvent
         ClosedSplineLine currentSpline,
         Vector3 playerWorldPos)
     {
+        //Debug.Log($"Checking New Orbit Attached... SplineID: {currentSpline.SplineID}, IsNewOrbit: {currentSpline.IsNewOrbit}");
         if (!currentSpline.IsNewOrbit) return;
 
         currentSpline.FlashLandingMaterial();
         _onNewOrbitAttached.OnNext(playerWorldPos);
+        //Debug.Log("New Orbit Attached!");
     }
 }

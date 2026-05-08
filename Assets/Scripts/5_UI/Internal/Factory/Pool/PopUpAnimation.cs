@@ -1,6 +1,5 @@
 using UnityEngine;
 using DG.Tweening;
-using TMPro;
 using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
@@ -15,7 +14,6 @@ public class PopUpAnimation : MonoBehaviour
 
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
-
     private Sequence _sequence;
 
     private void Awake()
@@ -24,63 +22,65 @@ public class PopUpAnimation : MonoBehaviour
         _canvasGroup = GetComponent<CanvasGroup>();
 
         if (_canvasGroup == null)
-        {
             _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
     }
 
     public async UniTask PlayAsync(CancellationToken cancellationToken = default)
     {
-        _canvasGroup.alpha = 1f;
+        if (_rectTransform == null || _canvasGroup == null) return;
 
         _sequence?.Kill();
         _sequence = null;
-        _sequence = DOTween.Sequence();
 
-        // Y軸を一周回転
+        _canvasGroup.alpha = 1f;
+
+        var startPos = _rectTransform.anchoredPosition;
+
+        _sequence = DOTween.Sequence()
+            .SetLink(gameObject, LinkBehaviour.KillOnDisable);
+
         _sequence.Join(
             _rectTransform
                 .DORotate(new Vector3(0f, 360f, 0f), duration, RotateMode.FastBeyond360)
                 .SetEase(Ease.OutQuad)
         );
 
-        // 上方向へ移動
         _sequence.Join(
             _rectTransform
-                .DOAnchorPosY(_rectTransform.anchoredPosition.y + moveDistance * 100f, duration)
+                .DOAnchorPosY(startPos.y + moveDistance * 100f, duration)
                 .SetEase(moveEase)
         );
 
-        // フェードアウト
         _sequence.Append(
-            _canvasGroup
-                .DOFade(0f, _fadeDuration)
+            _canvasGroup.DOFade(0f, _fadeDuration)
         );
+
         try
         {
-            await UniTask.WaitUntil(
-                () => _sequence == null || !_sequence.IsActive() || !_sequence.IsPlaying(), cancellationToken : cancellationToken);
+            await _sequence.AsyncWaitForCompletion();
         }
         catch (OperationCanceledException)
         {
-            if (_sequence != null && _sequence.IsActive())
-            {
-                _sequence.Kill();
-            }
+            // キャンセル時は無視
         }
         catch (Exception ex)
         {
+            if (_sequence == null || !_sequence.IsActive())
+                return;
+
             Debug.LogException(ex);
         }
-        finally
-        {
-            _sequence = null;
-        }
-
     }
 
-    public void OnDestroy()
+    private void OnDisable()
     {
         _sequence?.Kill();
+        _sequence = null;
+    }
+
+    private void OnDestroy()
+    {
+        _sequence?.Kill();
+        _sequence = null;
     }
 }

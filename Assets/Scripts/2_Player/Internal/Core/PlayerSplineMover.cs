@@ -43,17 +43,11 @@ internal class PlayerSplineMover
 
     public void Initialize()
     {
-        RebuildTable();
-
-        if (_totalLen <= 0.0001f)
-        {
-            Debug.LogError("[PlayerSplineMover] Initialize failed: spline samples are empty");
-        }
+        InitializeMove();
     }
 
     public void Tick(float deltaTime)
     {
-        if (_model.IsGameOver) return;
         if (_totalLen <= 0.0001f) return;
         if (_isJumping) return;
 
@@ -66,9 +60,45 @@ internal class PlayerSplineMover
         TickSplineMove(deltaTime);
     }
 
+    public void SetPlayer(ClosedSplineLine spline, float distance = 0f)
+    {
+        if (spline == null)
+        {
+            Debug.LogError("[PlayerSplineMover] SetPlayer failed: spline is null");
+            return;
+        }
+
+        _currentSpline = spline;
+        _view.SetSpline(spline);
+
+        _totalLen = _currentSpline.GetTotalLength();
+
+        if (_totalLen <= 0.0001f)
+        {
+            Debug.LogError("[PlayerSplineMover] SetPlayer failed: spline length is invalid");
+            return;
+        }
+
+        _distance = Mathf.Repeat(distance, _totalLen);
+
+        _isJumping = false;
+        _isAttaching = false;
+
+        ApplyPosition();
+    }
+
+    public void InitializeMove()
+    {
+        RebuildTable();
+
+        if (_totalLen <= 0.0001f)
+        {
+            Debug.LogError("[PlayerSplineMover] InitializeMove failed: spline samples are empty");
+        }
+    }
+
     public void StartJump()
     {
-        if (_model.IsGameOver) return;
 
         _isJumping = true;
         _jumpPos = _view.transform.position;
@@ -79,7 +109,6 @@ internal class PlayerSplineMover
 
     public bool TickJump(float dt)
     {
-        if (_model.IsGameOver) return false;
         if (!_isJumping) return false;
 
         BendJumpDirection(dt);

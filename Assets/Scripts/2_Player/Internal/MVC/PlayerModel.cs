@@ -12,7 +12,6 @@ internal class PlayerModel
     public float CurrentMoveSpeed { get; set; } = 5f;
     public float CurrentJumpspeed { get; set; } = 5f;
     public bool Clockwise { get; set; } = false;
-    public bool IsGameOver { get; set; } = false;
     public float CurrentChargeDuaration { get; set; } = 0f;
 
     public float LongJumpDistanceThreshold => _LONG_JUMP_DISTANCE;

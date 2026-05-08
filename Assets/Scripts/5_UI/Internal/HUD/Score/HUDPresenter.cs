@@ -46,14 +46,17 @@ public class HUDPresenter : IDisposable
             .AddTo(_disposables);
 
         _uiExternalFacade.OnNewOrbitAttached
-            .Subscribe(_ => AddScore(ScoreRuleType.NewOrbit))
+            .Subscribe(_ => {
+                AddScore(ScoreRuleType.NewOrbit);
+                //UnityEngine.Debug.Log("HUDPresenter: New orbit attached, score updated");
+                }
+            )
             .AddTo(_disposables);
 
         _uiExternalFacade.OnLongJumped
             .Subscribe(_ =>
             {
                 IncrementLongJumpedCount();
-                AddScore(ScoreRuleType.LongJumped);
             })
             .AddTo(_disposables);
 
@@ -108,7 +111,10 @@ public class HUDPresenter : IDisposable
 
     public void IncrementLongJumpedCount()
     {
+        if (_model.IsMaxLongJumpedCount())
+            return;
         _model.IncrementLongJumpedCount();
+        AddScore(ScoreRuleType.LongJumped);
     }
 
     public bool IsMaxLongJumpedCount()

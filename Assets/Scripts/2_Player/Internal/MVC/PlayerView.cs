@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class PlayerView : MonoBehaviour
@@ -10,6 +11,9 @@ public class PlayerView : MonoBehaviour
     [SerializeField] private Material _auraMaterialBlue;
     [SerializeField] private Material _auraMaterialOrange;
     [SerializeField] private Material _auraMaterialRed;
+
+    [SerializeField] private ParticleSystem _deadEffect;
+    [SerializeField] private PlayerDisappearAnimation _playerDisappearAnimation;
 
     public ClosedSplineLine Spline => _spline;
     public bool UseLocalPlaneXY => _useLocalPlaneXY;
@@ -48,7 +52,7 @@ public class PlayerView : MonoBehaviour
         _jumpNormalGuide.Show(transform.position, normal);
     }
 
-    public void HideJumoNormalGuide()
+    public void HideJumpNormalGuide()
     {
         _jumpNormalGuide.Hide();
     }
@@ -66,5 +70,20 @@ public class PlayerView : MonoBehaviour
         if (spline.IsNewOrbit)
             emitter.ScatterGlobal();
         // emitter.BurstAtWorldPos(hitWorldPos);
+    }
+
+    public async UniTask PlayDeadEffect()
+    {
+        if (_deadEffect == null) return;
+
+        _deadEffect.Play();
+
+        await _playerDisappearAnimation.PlayAsync();
+
+        await UniTask.WaitUntil(() =>
+            !_deadEffect.IsAlive(true)
+        );
+        
+        gameObject.SetActive(false);
     }
 }

@@ -10,7 +10,7 @@ public class VisitedSplineCountView : MonoBehaviour
     public void SetSplineCount(int visitedSplineCount, int allSplineCount)
     {
         if (_splineCountText == null) return;
-        Debug.Log($"VisitedSplineCountView.SetSplineCount called with visitedSplineCount: {visitedSplineCount}, allSplineCount: {allSplineCount}");
+        //Debug.Log($"VisitedSplineCountView.SetSplineCount called with visitedSplineCount: {visitedSplineCount}, allSplineCount: {allSplineCount}");
         _splineCountText.text = $"{visitedSplineCount}/{allSplineCount}";
     }
 

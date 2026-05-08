@@ -6,11 +6,11 @@ public class ChargeState
 {
     public ReactiveCommand<GameStateKey> NextState { get; } = new();
 
-    private readonly IPlayerFacade _playerFacade;
+    private readonly IGameStateExternalFacade _gameStateExternalFacade;
 
-    public ChargeState(IPlayerFacade playerFacade)
+    public ChargeState(IGameStateExternalFacade gameStateExternalFacade)
     {
-        _playerFacade = playerFacade;
+        _gameStateExternalFacade = gameStateExternalFacade;
     }
 
     public async UniTask Enter()

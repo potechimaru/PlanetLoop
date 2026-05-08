@@ -1,57 +1,73 @@
 using UnityEngine;
 using DG.Tweening;
-using UniRx;
-using System;
+using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
 public class EnemyView : MonoBehaviour
 {
-    [Header("Telegraph Guide")]
-    [SerializeField] private EnemyTelegraphGuide telegraph;
-
-    [Header("Bullet")]
-    [SerializeField] private EnemyBullet bulletPrefab;
+    [Header("Telegraph Guides")]
+    [SerializeField] private List<EnemyTelegraphGuide> telegraphs = new();
 
     [Header("Decoration")]
     [SerializeField] private SpriteRenderer _aroundEnemy;
 
     [SerializeField] private float _rotateSpeed = 120f;
-
     [SerializeField] private EnemyDisappearAnimation _disappearAnimation;
-
     [SerializeField] private ParticleSystem _particleSystem;
 
     private Tween _rotateTween;
 
     private void Awake()
     {
-        if (telegraph == null)
-            telegraph = GetComponentInChildren<EnemyTelegraphGuide>();
+        if (telegraphs == null || telegraphs.Count == 0)
+        {
+            telegraphs = new List<EnemyTelegraphGuide>(
+                GetComponentsInChildren<EnemyTelegraphGuide>(true)
+            );
+        }
+
+        HideTelegraphs();
     }
 
     public void ShowTelegraph(Vector3 dirNormalized)
     {
-        if (telegraph == null) return;
-        telegraph.Show(transform.position, dirNormalized);
+        ShowTelegraphs(new[] { dirNormalized });
+    }
+
+    public void ShowTelegraphs(IReadOnlyList<Vector3> directions)
+    {
+        if (telegraphs == null) return;
+
+        for (int i = 0; i < telegraphs.Count; i++)
+        {
+            if (telegraphs[i] == null) continue;
+
+            if (i < directions.Count)
+            {
+                telegraphs[i].Show(transform.position, directions[i]);
+            }
+            else
+            {
+                telegraphs[i].Hide();
+            }
+        }
     }
 
     public void HideTelegraph()
     {
-        if (telegraph == null) return;
-        telegraph.Hide();
+        HideTelegraphs();
     }
 
-    //public void FireBullet(Vector3 dirNormalized)
-    //{
-    //    if (bulletPrefab == null) return;
+    public void HideTelegraphs()
+    {
+        if (telegraphs == null) return;
 
-    //    var b = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
-    //    b.Launch(dirNormalized, bulletSpeed);
-    //}
-
-    // ----------------------------
-    // Decoration Rotation
-    // ----------------------------
+        foreach (var telegraph in telegraphs)
+        {
+            if (telegraph == null) continue;
+            telegraph.Hide();
+        }
+    }
 
     public void RotateDecoration()
     {

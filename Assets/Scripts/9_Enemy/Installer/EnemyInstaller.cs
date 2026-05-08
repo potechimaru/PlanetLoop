@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -16,20 +17,13 @@ public class EnemyInstaller : MonoBehaviour, IInstaller
             builder.RegisterComponent(_singleBulletPool);
         }
 
-        if (_enemyRoot != null)
-        {
-            var enemies = _enemyRoot.GetComponentsInChildren<Enemy>(true);
+        var enemies = _enemyRoot.GetComponentsInChildren<Enemy>();
 
-            foreach (var enemy in enemies)
-            {
-                if (enemy != null)
-                {
-                    builder.RegisterComponent(enemy);
-                }
-            }
-        }
+        builder.Register<EnemyManager>(Lifetime.Singleton)
+               .AsSelf()
+               .WithParameter<IEnumerable<Enemy>>(enemies);
 
-        builder.Register<EnemyManager>(Lifetime.Singleton);
+        builder.Register<EnemyBulletManager>(Lifetime.Singleton);
 
         builder.Register<EnemyFacade>(Lifetime.Singleton).As<IEnemyFacade>();
         builder.Register<EnemyExternalFacade>(Lifetime.Singleton).As<IEnemyExternalFacade>();

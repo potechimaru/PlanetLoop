@@ -68,8 +68,6 @@ public class HUDModel
 
     public void IncrementLongJumpedCount()
     {
-        if (IsMaxLongJumpedCount())
-            return;
         _longJumpedCount.Value += 1;
     }
 

@@ -1,5 +1,8 @@
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -54,7 +57,6 @@ public class NewOrbitPointPool : MonoBehaviour, IPlayUIReturner
         PooledPlayUIItem item = _pool.Count > 0 ? _pool.Pop() : CreateNew(p);
         if (item == null) return;
 
-
         _rented.Add(item);
 
         var rt = (RectTransform)item.transform;
@@ -63,9 +65,27 @@ public class NewOrbitPointPool : MonoBehaviour, IPlayUIReturner
         rt.anchoredPosition = anchoredPos;
         item.gameObject.SetActive(true);
 
-        await item.GetComponent<PopUpAnimation>().PlayAsync();
-        item.GetComponent<PooledPlayUIItem>()?.ReturnToPool();
+        try
+        {
+            var anim = item.GetComponent<PopUpAnimation>();
+            if (anim != null)
+            {
+                await anim.PlayAsync(item.GetCancellationTokenOnDestroy());
+            }
 
+            if (item != null && item.gameObject.activeInHierarchy)
+            {
+                item.ReturnToPool();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // í èÌèIóπàµÇ¢
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
     public void Return(PooledPlayUIItem item)
