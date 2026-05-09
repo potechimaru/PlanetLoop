@@ -15,7 +15,9 @@ public class ClosedSplineLine : MonoBehaviour
     [SerializeField, Min(1)]
     private int splineID = 1;
 
-    [Header("Spline Control Points (Local Space)")]
+    public bool IsStartSpline{get; set; } = false;
+
+[Header("Spline Control Points (Local Space)")]
     [SerializeField]
     private List<Vector2> controlPoints = new()
     {
@@ -52,6 +54,7 @@ public class ClosedSplineLine : MonoBehaviour
     [Header("Line Materials")]
     [SerializeField] private Material normalMaterial;
     [SerializeField] private Material landingMaterial;
+    [SerializeField] private Material startSplineMaterial;
 
     private float _distanceOffset = 0f;
 
@@ -102,10 +105,6 @@ public class ClosedSplineLine : MonoBehaviour
 
     private void OnEnable()
     {
-        if (splineID == 1)
-        {
-            IsNewOrbit = false;
-        }
         EnsureRenderer();
         if (Application.isPlaying && normalMaterial == null)
         {
@@ -144,6 +143,16 @@ public class ClosedSplineLine : MonoBehaviour
 
         _lineRenderer.loop = true;
         _lineRenderer.useWorldSpace = false;
+    }
+
+    public void ApplyStartSplineMaterial()
+    {
+        EnsureRenderer();
+
+        if (startSplineMaterial == null)
+            return;
+
+        _lineRenderer.material = startSplineMaterial;
     }
 
     /* =====================================

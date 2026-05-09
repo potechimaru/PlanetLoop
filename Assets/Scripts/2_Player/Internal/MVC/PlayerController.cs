@@ -109,7 +109,7 @@ public class PlayerController : ITickable
 
     public void SetPlayer()
     {
-        _mover.SetPlayer(_view.Spline, 0f);
+        _mover.SetPlayer(_playerExternalFacade.StartSpline, 0f);
     }
 
     public void StartMove()

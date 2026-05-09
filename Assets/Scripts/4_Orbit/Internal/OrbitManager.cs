@@ -9,8 +9,10 @@ public class OrbitManager : IDisposable
     private readonly IReadOnlyList<ClosedSplineLine> _lines;
     private readonly CompositeDisposable _disposables = new();
 
+    private ClosedSplineLine _startSpline;
+
     private IEnumerable<ClosedSplineLine> TargetSplines
-    => _lines.Where(line => line.SplineID != 1);
+        => _lines.Where(line => !line.IsStartSpline);
 
     private int AllSplineCount => TargetSplines.Count();
 
@@ -18,12 +20,18 @@ public class OrbitManager : IDisposable
         => TargetSplines.Count(line => !line.IsNewOrbit);
 
     private readonly ReactiveProperty<(int visitedCount, int allCount)> _splineCount = new();
-    public IReadOnlyReactiveProperty<(int visitedCount, int allCount)> SplineCount => _splineCount;
 
+    public IReadOnlyReactiveProperty<(int visitedCount, int allCount)> SplineCount
+        => _splineCount;
+
+    public ClosedSplineLine StartSpline => _startSpline;
 
     public OrbitManager(IEnumerable<ClosedSplineLine> lines)
     {
         _lines = lines.ToList();
+
+        SetupRandomStartSpline();
+        NotifySplineCount();
 
         foreach (var line in _lines)
         {
@@ -35,31 +43,56 @@ public class OrbitManager : IDisposable
                 .AddTo(_disposables);
         }
 
-        NotifySplineCount();
+        
+    }
+
+    private void SetupRandomStartSpline()
+    {
+        if (_lines == null || _lines.Count == 0)
+        {
+            Debug.LogWarning("[OrbitManager] No spline lines found.");
+            return;
+        }
+
+        foreach (var line in _lines)
+        {
+            line.IsStartSpline = false;
+        }
+
+        int randomIndex =
+            UnityEngine.Random.Range(0, _lines.Count);
+
+        _startSpline = _lines[randomIndex];
+
+        _startSpline.IsStartSpline = true;
+
+        _startSpline.ApplyStartSplineMaterial();
+
+        Debug.Log(
+            $"[OrbitManager] Start spline selected : " +
+            $"{_startSpline.SplineID}"
+        );
     }
 
     private void HandlePlayerLanded(ClosedSplineLine line)
     {
-        //Debug.Log($"Player landed on spline {line.SplineID}");
-        //Debug.Log($"Visited {VisitedSplineCount} / {AllSplineCount}");
-
         NotifySplineCount();
     }
 
     private void NotifySplineCount()
     {
-        Debug.Log($"NotifySplineCount called. Visited: {VisitedSplineCount}, All: {AllSplineCount}");
-        _splineCount.Value = (VisitedSplineCount, AllSplineCount);
+        _splineCount.Value =
+            (VisitedSplineCount, AllSplineCount);
     }
 
     public bool TryFindTouchedSpline(
-    Vector3 from,
-    Vector3 to,
-    float radius,
-    ClosedSplineLine exclude,
-    out ClosedSplineLine result,
-    out float hitDistanceOnSpline,
-    out Vector3 hitPointOnSpline)
+        Vector3 from,
+        Vector3 to,
+        float radius,
+        ClosedSplineLine exclude,
+        out ClosedSplineLine result,
+        out float hitDistanceOnSpline,
+        out Vector3 hitPointOnSpline)
     {
         result = null;
         hitDistanceOnSpline = 0f;
@@ -73,14 +106,22 @@ public class OrbitManager : IDisposable
             if (line == exclude)
                 continue;
 
-            if (!line.TrySweepHit(from, to, radius, out float distOnSpline, out Vector3 pointOnSpline))
+            if (!line.TrySweepHit(
+                    from,
+                    to,
+                    radius,
+                    out float distOnSpline,
+                    out Vector3 pointOnSpline))
                 continue;
 
-            float sqr = (from - pointOnSpline).sqrMagnitude;
+            float sqr =
+                (from - pointOnSpline).sqrMagnitude;
+
             if (!found || sqr < bestMoveSqr)
             {
                 found = true;
                 bestMoveSqr = sqr;
+
                 result = line;
                 hitDistanceOnSpline = distOnSpline;
                 hitPointOnSpline = pointOnSpline;
@@ -88,29 +129,6 @@ public class OrbitManager : IDisposable
         }
 
         return found;
-    }
-
-
-    private bool IsTouchingSpline(
-        ClosedSplineLine spline,
-        Vector3 worldPos,
-        float radius)
-    {
-        float totalLen = spline.GetTotalLength();
-
-        const int sampleCount = 128;
-        float step = totalLen / sampleCount;
-
-        for (int i = 0; i < sampleCount; i++)
-        {
-            float d = step * i;
-            Vector3 p = spline.EvaluateByDistance(d);
-
-            if ((p - worldPos).sqrMagnitude <= radius * radius)
-                return true;
-        }
-
-        return false;
     }
 
     public void Dispose()

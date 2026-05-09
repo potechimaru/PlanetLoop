@@ -19,6 +19,8 @@ public interface IPlayerExternalFacade
     out float hitDistanceOnSpline,
     out Vector3 hitPointOnSpline);
 
+    ClosedSplineLine StartSpline { get; }
+
     // BlackHole
     Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt);
 
@@ -92,6 +94,8 @@ public class PlayerExternalFacade : IPlayerExternalFacade
             out hitDistanceOnSpline,
             out hitPointOnSpline);
     }
+
+    public ClosedSplineLine StartSpline => _orbitFacade.StartSpline;
 
     // BlackHole
     public Vector3 BendDirection(Vector3 worldPos, Vector3 dir, float dt)

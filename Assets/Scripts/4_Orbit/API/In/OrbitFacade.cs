@@ -18,6 +18,8 @@ public interface IOrbitFacade
 
     IReadOnlyReactiveProperty<(int visitedCount, int allCount)> OnSplineCountChanged { get; }
 
+    ClosedSplineLine StartSpline { get; }
+
 }
 public class OrbitFacade : IOrbitFacade
 {
@@ -47,6 +49,8 @@ public class OrbitFacade : IOrbitFacade
     }
 
     public IReadOnlyReactiveProperty<(int visitedCount, int allCount)> OnSplineCountChanged => _orbitManager.SplineCount;
+
+    public ClosedSplineLine StartSpline => _orbitManager.StartSpline;
 
 
 

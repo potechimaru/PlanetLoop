@@ -37,10 +37,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AspectRatio: 1.7777778
     - _CustomTime: 1
     - _GritchStrength: 1
     - _NoiseAmount: 0
+    - _OuterLimitRedStrength: 0.71
+    - _OuterLimitScreenRadius: 2.2497697
+    - _OuterLimitSoftness: 0.79
     - _ScanLinesStrength: 1
-    m_Colors: []
+    m_Colors:
+    - _AspectRatio: {r: 1, g: 1, b: 0, a: 0}
+    - _BlackHoleScreenCenter: {r: -1.1962019, g: 0.1819256, b: 0, a: 0}
+    - _OuterLimitReaColor: {r: 0, g: 0, b: 0, a: 0}
+    - _OuterLimitRedColor: {r: 1, g: 0.18396229, b: 0.18396229, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

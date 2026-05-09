@@ -29,7 +29,7 @@ public class AttachEvent
         float distance,
         Vector3 playerWorldPos)
     {
-        if (!(currentSpline.SplineID == 1))
+        if (!currentSpline.IsStartSpline)
         CheckNewOrbitAttached(currentSpline, playerWorldPos);
 
         _playerView.PlaySplineAttachFx(currentSpline, distance, playerWorldPos);
