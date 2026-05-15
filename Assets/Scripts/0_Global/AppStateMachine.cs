@@ -7,7 +7,7 @@ public enum AppStateKey
 {
     Title,
     ModeSelectState,
-    EndlessMode,
+    Game,
 }
 
 public interface IAppStateChangeNotifier
@@ -25,12 +25,12 @@ public class AppStateMachine : IStartable, IDisposable
     public AppStateMachine(
         TitleState titleState,
         ModeSelectState modeSelectState,
-        EndlessModeState endlessModeState,
+        GameState gameState,
         IAppStateChangeRequestSource requestSource)
     {
         RegisterState(AppStateKey.Title, titleState);
         RegisterState(AppStateKey.ModeSelectState, modeSelectState);
-        RegisterState(AppStateKey.EndlessMode, endlessModeState);
+        RegisterState(AppStateKey.Game, gameState);
 
         requestSource.OnRequestChangeState
             .Subscribe(ChangeState)

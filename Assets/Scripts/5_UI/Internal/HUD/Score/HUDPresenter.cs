@@ -100,7 +100,7 @@ public class HUDPresenter : IDisposable
 
     public void ReflectEnemyCount(int defeatEnemyCount, int allEnemyCount)
     {
-        UnityEngine.Debug.Log($"HUDPresenter.ReflectEnemyCount called with defeatEnemyCount: {defeatEnemyCount}, allEnemyCount: {allEnemyCount}");
+        //UnityEngine.Debug.Log($"HUDPresenter.ReflectEnemyCount called with defeatEnemyCount: {defeatEnemyCount}, allEnemyCount: {allEnemyCount}");
         _model.ReflectEnemyCount(defeatEnemyCount, allEnemyCount);
     }
 

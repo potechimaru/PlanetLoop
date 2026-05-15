@@ -106,4 +106,9 @@ public class EnemyView : MonoBehaviour
         if (_disappearAnimation == null) return;
         await _disappearAnimation.PlayAsync();
     }
+
+    private void OnDestroy()
+    {
+        _rotateTween?.Kill();
+    }
 }

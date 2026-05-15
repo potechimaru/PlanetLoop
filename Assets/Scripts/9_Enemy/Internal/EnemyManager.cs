@@ -37,7 +37,7 @@ public class EnemyManager : IDisposable
 
         _totalEnemyCount = _enemySet.Count;
 
-        Debug.Log($"Enemy Total : {_totalEnemyCount}");
+        //Debug.Log($"Enemy Total : {_totalEnemyCount}");
 
         NotifyEnemyCountChanged();
     }
@@ -63,14 +63,14 @@ public class EnemyManager : IDisposable
 
         _defeatedCount++;
 
-        Debug.Log($"Enemy Defeated! {_defeatedCount} / {_totalEnemyCount}");
+        //Debug.Log($"Enemy Defeated! {_defeatedCount} / {_totalEnemyCount}");
 
         NotifyEnemyCountChanged();
     }
 
     private void NotifyEnemyCountChanged()
     {
-        Debug.Log($"Enemy Count Changed! Defeated: {_defeatedCount}, Total: {_totalEnemyCount}");
+        //Debug.Log($"Enemy Count Changed! Defeated: {_defeatedCount}, Total: {_totalEnemyCount}");
         _enemyCount.Value = (_defeatedCount, _totalEnemyCount);
     }
 

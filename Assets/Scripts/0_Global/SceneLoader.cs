@@ -4,25 +4,52 @@ using VContainer.Unity;
 
 public class SceneLoader
 {
-    private readonly TitleLifetimeScope _globalScope;
+    private readonly RootLifetimeScope _globalScope;
     private readonly SceneLoadRequest _sceneLoadRequest;
+    private readonly IGameModeSelectionReader _gameModeSelectionReader;
+    private readonly IAppStateChangeRequester _appStateChangeRequester;
 
     private const string LoadingSceneName = "LoadingScene";
 
     public SceneLoader(
-        TitleLifetimeScope globalScope,
-        SceneLoadRequest sceneLoadRequest)
+        RootLifetimeScope globalScope,
+        SceneLoadRequest sceneLoadRequest,
+        IGameModeSelectionReader gameModeSelectionReader,
+        IAppStateChangeRequester appStateChangeRequester)
     {
         _globalScope = globalScope;
         _sceneLoadRequest = sceneLoadRequest;
+        _gameModeSelectionReader = gameModeSelectionReader;
+        _appStateChangeRequester = appStateChangeRequester;
     }
 
-    public async UniTask LoadGameSceneAsync(GameModeType gameModeType)
+    public async UniTask LoadGameSceneAsync()
     {
-        string nextSceneName = GetSceneName(gameModeType);
+        string nextSceneName = GetSceneName(_gameModeSelectionReader.CurrentSelectedMode);
 
         _sceneLoadRequest.SetNextScene(nextSceneName);
 
+        using (LifetimeScope.EnqueueParent(_globalScope))
+        {
+            await SceneManager.LoadSceneAsync(LoadingSceneName).ToUniTask();
+        }
+    }
+
+    public async UniTask LoadTitleSceneAsync()
+    {
+        _sceneLoadRequest.SetNextScene("TitleÅïSelectScene");
+
+        using (LifetimeScope.EnqueueParent(_globalScope))
+        {
+            await SceneManager.LoadSceneAsync(LoadingSceneName).ToUniTask();
+        }
+
+    }
+
+    public async UniTask RetryGameAsync()
+    {
+        string currentSceneName = GetSceneName(_gameModeSelectionReader.CurrentSelectedMode);
+        _sceneLoadRequest.SetNextScene(currentSceneName);
         using (LifetimeScope.EnqueueParent(_globalScope))
         {
             await SceneManager.LoadSceneAsync(LoadingSceneName).ToUniTask();

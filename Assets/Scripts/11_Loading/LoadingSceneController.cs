@@ -2,10 +2,14 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VContainer;
+using VContainer.Unity;
 
 public class LoadingSceneController : MonoBehaviour
 {
     [Inject] private SceneLoadRequest _sceneLoadRequest;
+    [Inject] private RootLifetimeScope _rootLifetimeScope;
+    [Inject] private IAppStateChangeRequester _appStateChangeRequester;
+
     [SerializeField] private LoadingProgressView _loadingView;
     [SerializeField] private CanvasGroupFader _blackBack;
 
@@ -24,29 +28,43 @@ public class LoadingSceneController : MonoBehaviour
             return;
         }
 
-        AsyncOperation operation = SceneManager.LoadSceneAsync(nextSceneName);
-        operation.allowSceneActivation = false;
+        AsyncOperation operation;
 
-        // ここで最低表示時間を入れると画面が一瞬で消えない
-        float minimumLoadingTime = 2.0f;
-        float elapsed = 0f;
-
-        while (operation.progress < 0.9f || elapsed < minimumLoadingTime)
+        using (LifetimeScope.EnqueueParent(_rootLifetimeScope))
         {
-            elapsed += Time.deltaTime;
+            operation = SceneManager.LoadSceneAsync(nextSceneName);
+            operation.allowSceneActivation = false;
 
-            // progressは0〜0.9まで進む
-            float progress = Mathf.Clamp01(operation.progress / 0.9f);
+            float minimumLoadingTime = 2.0f;
+            float elapsed = 0f;
 
-            // ここでProgressBarに反映できる
-            _loadingView.SetProgress(progress);
+            while (operation.progress < 0.9f || elapsed < minimumLoadingTime)
+            {
+                elapsed += Time.deltaTime;
 
-            await UniTask.Yield();
+                float progress = Mathf.Clamp01(operation.progress / 0.9f);
+                _loadingView.SetProgress(progress);
+
+                await UniTask.Yield();
+            }
+
+            _blackBack.gameObject.SetActive(true);
+            await _blackBack.FadeInAsync();
+
+            operation.allowSceneActivation = true;
+
+            await UniTask.WaitUntil(() => operation.isDone);
         }
 
-        _blackBack.gameObject.SetActive(true);
-        await _blackBack.FadeInAsync();
+        await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
 
-        operation.allowSceneActivation = true;
+        if (nextSceneName == "Title＆SelectScene")
+        {
+            _appStateChangeRequester.Request(AppStateKey.Title);
+        }
+        else
+        {
+            _appStateChangeRequester.Request(AppStateKey.Game);
+        }
     }
 }

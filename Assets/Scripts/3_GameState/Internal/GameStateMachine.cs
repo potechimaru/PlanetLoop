@@ -15,9 +15,10 @@ public class GameStateMachine : IStartable, ITickable, IDisposable
         OpeningState openingState,
         PlayState playState,
         ResultState resultState,
-        IGameStateChangeRequestSource requestSource)
+        IGameStateChangeRequestSource requestSource,
+        IGameStateExternalFacade gameStateExternalFacade)
     {
-        Debug.Log("GameStateMachine Constructor");
+        //Debug.Log("GameStateMachine Constructor");
 
         RegisterState(GameStateKey.Opening, openingState);
         RegisterState(GameStateKey.Play, playState);
@@ -26,11 +27,16 @@ public class GameStateMachine : IStartable, ITickable, IDisposable
         requestSource.OnRequestChangeState
             .Subscribe(ChangeState)
             .AddTo(_disposables);
+
+        gameStateExternalFacade.OnPlayerDead
+            .Subscribe(_ => ChangeState(GameStateKey.Result))
+            .AddTo(_disposables);
+
     }
 
     public void Start()
     {
-        Debug.Log("GameStateMachine Start");
+        //Debug.Log("GameStateMachine Start");
         ChangeState(GameStateKey.Opening);
     }
 

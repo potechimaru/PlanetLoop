@@ -10,7 +10,7 @@ public class LongJumpedCountView : MonoBehaviour
     public void SetLongJumpedCount(int longJumpedCount, int maxJumpedCount)
     {
         if (_longJumpedCountText == null) return;
-        Debug.Log($"LongJumpedCountView.SetLongJumpedCount called with longJumpedCount: {longJumpedCount}, maxJumpedCount: {maxJumpedCount}");
+        //Debug.Log($"LongJumpedCountView.SetLongJumpedCount called with longJumpedCount: {longJumpedCount}, maxJumpedCount: {maxJumpedCount}");
         _longJumpedCountText.text = $"{longJumpedCount}/{maxJumpedCount}";
     }
 

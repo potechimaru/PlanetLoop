@@ -48,6 +48,7 @@ public class OrbitManager : IDisposable
 
     private void SetupRandomStartSpline()
     {
+        Debug.Log($"[OrbitManager] Created / SetupRandomStartSpline hash={GetHashCode()}");
         if (_lines == null || _lines.Count == 0)
         {
             Debug.LogWarning("[OrbitManager] No spline lines found.");
@@ -66,12 +67,21 @@ public class OrbitManager : IDisposable
 
         _startSpline.IsStartSpline = true;
 
+        _startSpline.IsNewOrbit = false;
+
         _startSpline.ApplyStartSplineMaterial();
 
+        //Debug.Log(
+        //    $"[OrbitManager] Start spline selected : " +
+        //    $"{_startSpline.SplineID}"
+        //);
+
         Debug.Log(
-            $"[OrbitManager] Start spline selected : " +
-            $"{_startSpline.SplineID}"
-        );
+        $"[OrbitManager] start name={_startSpline.name}, " +
+        $"id={_startSpline.SplineID}, " +
+        $"isStart={_startSpline.IsStartSpline}, " +
+        $"instance={_startSpline.GetInstanceID()}"
+    );
     }
 
     private void HandlePlayerLanded(ClosedSplineLine line)

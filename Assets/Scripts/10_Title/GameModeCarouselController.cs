@@ -12,22 +12,18 @@ public class GameModeCarouselController : MonoBehaviour
     [SerializeField] private List<GameModeSlotView> _slotViews = new();
 
     private IGameModeManager _gameModeManager;
+
     private bool _isAnimating;
     private int _slotOffset = 0;
 
     [Inject]
     public void Construct(IGameModeManager gameModeManager)
     {
-        _gameModeManager = gameModeManager;
-    }
+        Debug.Log("[GameModeCarouselController] Construct called", this);
 
-    private void Start()
-    {
-        if (_gameModeManager == null)
-        {
-            Debug.LogError($"{nameof(GameModeCarouselController)}: GameModeManager ‚ª–¢’“ü‚Å‚·B");
-            return;
-        }
+        _gameModeManager = gameModeManager;
+
+        Debug.Log($"GameModeManager Null: {_gameModeManager == null}", this);
     }
 
     public async UniTask PlayFormationAsync(CancellationToken cancellationToken = default)
@@ -43,7 +39,7 @@ public class GameModeCarouselController : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError($"{nameof(GameModeCarouselController)} PlayFormationAsync Error: {ex}");
+            Debug.LogError($"{nameof(GameModeCarouselController)} PlayFormationAsync Error: {ex}", this);
         }
     }
 
@@ -61,7 +57,7 @@ public class GameModeCarouselController : MonoBehaviour
             int count = GetValidSlotCount();
             if (count > 0)
             {
-                _slotOffset = (_slotOffset - 1) % count;
+                _slotOffset = (_slotOffset - 1 + count) % count;
             }
 
             await PlayAssignmentsAsync(
@@ -70,7 +66,7 @@ public class GameModeCarouselController : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError($"{nameof(GameModeCarouselController)} RotateRightAsync Error: {ex}");
+            Debug.LogError($"{nameof(GameModeCarouselController)} RotateRightAsync Error: {ex}", this);
         }
         finally
         {
@@ -92,7 +88,7 @@ public class GameModeCarouselController : MonoBehaviour
             int count = GetValidSlotCount();
             if (count > 0)
             {
-                _slotOffset = (_slotOffset + 1 + count) % count;
+                _slotOffset = (_slotOffset + 1) % count;
             }
 
             await PlayAssignmentsAsync(
@@ -101,7 +97,7 @@ public class GameModeCarouselController : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError($"{nameof(GameModeCarouselController)} RotateLeftAsync Error: {ex}");
+            Debug.LogError($"{nameof(GameModeCarouselController)} RotateLeftAsync Error: {ex}", this);
         }
         finally
         {
@@ -140,12 +136,15 @@ public class GameModeCarouselController : MonoBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogError($"{nameof(GameModeCarouselController)} RefreshImmediate Error: {ex}");
+            Debug.LogError($"{nameof(GameModeCarouselController)} RefreshImmediate Error: {ex}", this);
         }
     }
 
     public GameModeType GetCurrentSelectedMode()
     {
+        if (_gameModeManager == null)
+            return default;
+
         return _gameModeManager.CurrentSelectedMode;
     }
 
@@ -191,6 +190,9 @@ public class GameModeCarouselController : MonoBehaviour
 
     private List<GameModeAssignment> BuildAssignments()
     {
+        if (_gameModeManager == null)
+            return new List<GameModeAssignment>();
+
         var orderedEntries = _gameModeManager.Entries
             .Where(x => x != null)
             .OrderBy(x => x.Order)

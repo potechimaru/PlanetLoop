@@ -15,9 +15,14 @@ public class ClosedSplineLine : MonoBehaviour
     [SerializeField, Min(1)]
     private int splineID = 1;
 
-    public bool IsStartSpline{get; set; } = false;
+    [SerializeField] private bool _isStartSpline;
+    public bool IsStartSpline
+    {
+        get => _isStartSpline;
+        set => _isStartSpline = value;
+    }
 
-[Header("Spline Control Points (Local Space)")]
+    [Header("Spline Control Points (Local Space)")]
     [SerializeField]
     private List<Vector2> controlPoints = new()
     {

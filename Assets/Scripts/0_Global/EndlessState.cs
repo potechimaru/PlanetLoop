@@ -1,18 +1,22 @@
 using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
+using VContainer;
 
-public class EndlessModeState : IAppState
+public class GameState : IAppState
 {
     public ReactiveCommand<AppStateKey> NextState { get; } = new();
 
-    public EndlessModeState()
+    [Inject] private SceneLoader _sceneLoader;
+
+    public GameState()
     {
     }
 
     public async UniTask Enter()
     {
-        Debug.Log("Entering Endless State");
+        _sceneLoader.LoadGameSceneAsync().Forget();
+
         await UniTask.CompletedTask;
     }
 

@@ -18,10 +18,23 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private PopupTextAnimation _preGamePopupTextAnimation;
     [SerializeField] private List<UIBounceMoveAnimation> _preGameHUDAnimation;
 
+    [Header("Result")]
+    [SerializeField] private GameOverTextAnimation _gameOverTextAnimation;
+    [SerializeField] private UIFadeMoveAnimation _scoreFadeMoveAnimation;
+    [SerializeField] private UIFadeMoveAnimation _titleButtonFadeMoveAnimation;
+    [SerializeField] private UIFadeMoveAnimation _restartButtonFadeMoveAnimation;
+    [SerializeField] private CanvasGroupFader _resultCanvasGroupFader;
+    [SerializeField] private List<UnderLineAnimation> _resultUnderLineAnimations;
+    [SerializeField] private CanvasGroupFader _HUDCanvasGroupFader;
+
     [Header("ButtonSubscription")]
     [SerializeField] private ClickInputPublisher _clickInputPublisher;
+    [SerializeField] private ToTitleButton _toTitleButton;
+    [SerializeField] private RetryButton _retryButton;
 
     [Inject] private IGameStateChangeRequester _gameStateChangeRequester;
+    [Inject] private SceneLoader sceneLoader;
+    [Inject] private IAppStateChangeRequester appStateChangeRequester;
 
     private CompositeDisposable _disposables = new();
 
@@ -54,10 +67,6 @@ public class GameUIManager : MonoBehaviour
             await _gameOpeningVignetteAnimation.PlayAsync(ct);
 
             ct.ThrowIfCancellationRequested();
-
-            //_gameOpeningCanvasGroupFade.gameObject.SetActive(true);
-
-            //await _gameOpeningCanvasGroupFade.FadeToAsync(0.9f, 0.3f);
 
             await UniTask.Delay(
                 500,
@@ -106,6 +115,10 @@ public class GameUIManager : MonoBehaviour
 
         try
         {
+            _gameOpeningCanvasGroupFade.gameObject.SetActive(true);
+
+            await _gameOpeningCanvasGroupFade.FadeToAsync(0.3f, 0.3f, ct);
+
             _HUDCanvasGroup.alpha = 0f;
             _HUDCanvasGroup.interactable = false;
             _HUDCanvasGroup.blocksRaycasts = false;
@@ -166,16 +179,117 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
+    public async UniTask ShowGameOver()
+    {
+        var ct = _destroyCancellationToken;
+        try
+        {
+            _gameOpeningCanvasGroupFade.gameObject.SetActive(true);
+            await _gameOpeningCanvasGroupFade.FadeToAsync(0.9f, 0.3f, ct);
+
+            if (_gameOverTextAnimation != null)
+            {
+                _HUDCanvasGroupFader.gameObject.SetActive(true);
+                _HUDCanvasGroupFader.FadeOutAsync(0.8f, ct).Forget();
+                _gameOverTextAnimation.gameObject.SetActive(true);
+                _gameOverTextAnimation.ChangeActiveLetters();
+                await _gameOverTextAnimation.PlayAsync(ct);
+                _scoreFadeMoveAnimation.gameObject.SetActive(true);
+                await _scoreFadeMoveAnimation.PlayAsync(ct);
+                _titleButtonFadeMoveAnimation.gameObject.SetActive(true);
+                _restartButtonFadeMoveAnimation.gameObject.SetActive(true);
+                _titleButtonFadeMoveAnimation.PlayAsync(ct).Forget();
+                _restartButtonFadeMoveAnimation.PlayAsync(ct).Forget();
+                for (int i = 0; i < _resultUnderLineAnimations.Count; i++)
+                {
+                    var anim = _resultUnderLineAnimations[i];
+                    anim.gameObject.SetActive(true);
+                    anim.Play();
+                }
+                ResultClickSubscription();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[GameUIManager] ShowGameOver Error: {e}");
+        }
+    }
+
+    private async UniTask ChangeToTitleScene()
+    {
+        var ct = _destroyCancellationToken;
+
+        try
+        {
+            _resultCanvasGroupFader.gameObject.SetActive(true);
+            await _resultCanvasGroupFader.FadeOutAsync();
+            await sceneLoader.LoadTitleSceneAsync();
+            await UniTask.Yield();
+
+
+        }
+        catch (OperationCanceledException)
+        {
+
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[GameUIManager] ShowGameOver Error: {e}");
+        }
+
+    }
+
+    private async UniTask RetryGame()
+    {
+        var ct = _destroyCancellationToken;
+        try
+        {
+            _resultCanvasGroupFader.gameObject.SetActive(true);
+            await _resultCanvasGroupFader.FadeOutAsync();
+            await sceneLoader.RetryGameAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[GameUIManager] ShowGameOver Error: {e}");
+        }
+
+    }
+
     private void StartGameClickSubscription()
     {
+        _clickInputPublisher.gameObject.SetActive(true);
         _clickInputPublisher.OnClicked
             .Take(1) // 1回クリックされたら完了
             .Subscribe(_ =>
             {
                 ExitPreGame();
                 _gameStateChangeRequester.Request(GameStateKey.Play);
+                _clickInputPublisher.gameObject.SetActive(false);
             })
             .AddTo(_disposables);
+    }
+
+    private void ResultClickSubscription()
+    {
+        _toTitleButton.OnClicked
+            .Subscribe(_ =>
+            {
+                ChangeToTitleScene().Forget();
+            })
+            .AddTo(_disposables);
+        _retryButton.OnClicked
+            .Subscribe(_ =>
+            {
+                RetryGame().Forget();
+            })
+            .AddTo(_disposables);   
+
     }
 
     private void ExitPreGame()

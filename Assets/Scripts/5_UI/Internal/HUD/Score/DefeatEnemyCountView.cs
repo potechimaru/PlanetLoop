@@ -10,7 +10,7 @@ public class DefeatEnemyCountView : MonoBehaviour
     public void SetEnemyCount(int defeatEnemyCount, int allEnemyCount)
     {
         if (_defeatEnemyCountText == null) return;
-        Debug.Log($"DefeatEnemyCountView.SetEnemyCount called with defeatEnemyCount: {defeatEnemyCount}, allEnemyCount: {allEnemyCount}");
+        //Debug.Log($"DefeatEnemyCountView.SetEnemyCount called with defeatEnemyCount: {defeatEnemyCount}, allEnemyCount: {allEnemyCount}");
         _defeatEnemyCountText.text = $"{defeatEnemyCount}/{allEnemyCount}";
     }
 

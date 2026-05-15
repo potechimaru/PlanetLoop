@@ -70,7 +70,7 @@ public class BlackHoleDetector : MonoBehaviour
 
         if (sqrDistance > sqrLimit)
         {
-            Debug.Log("Player exited black hole outer limit.");
+            //Debug.Log("Player exited black hole outer limit.");
 
             _isGameOverNotified = true;
             _onPlayerExitedOuterLimit.OnNext(Unit.Default);
@@ -82,7 +82,7 @@ public class BlackHoleDetector : MonoBehaviour
         if (_isGameOverNotified) return;
         if (!collision.CompareTag("Player")) return;
 
-        Debug.Log("Player entered black hole.");
+        //Debug.Log("Player entered black hole.");
 
         _isGameOverNotified = true;
         _onPlayerEnteredBlackHole.OnNext(Unit.Default);

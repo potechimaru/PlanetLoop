@@ -67,7 +67,7 @@ public class PlayerView : MonoBehaviour
         // 着地近く用 + Spline全体用（種類分け済みのEmitter想定）
         emitter.BurstLocalAtDistance(distance);
 
-        if (spline.IsNewOrbit)
+        if (spline.IsNewOrbit && !spline.IsStartSpline)
             emitter.ScatterGlobal();
         // emitter.BurstAtWorldPos(hitWorldPos);
     }

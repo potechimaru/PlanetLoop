@@ -20,6 +20,9 @@ public class PlayerController : ITickable
     private Subject<Vector3> _onNewOrbitAttached = new Subject<Vector3>();
     public IObservable<Vector3> OnNewOrbitAttached => _onNewOrbitAttached;
 
+    private Subject<Unit> _onPlayerDead = new Subject<Unit>();
+    public IObservable<Unit> OnPlayerDead => _onPlayerDead;
+
     public PlayerController(
         PlayerView view,
         IPlayerExternalFacade playerExternalFacade)
@@ -153,6 +156,7 @@ public class PlayerController : ITickable
 
     public void Dead()
     {
+        _onPlayerDead.OnNext(Unit.Default);
         _view.PlayDeadEffect().Forget();
     }
 }

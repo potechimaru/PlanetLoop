@@ -9,9 +9,11 @@ public interface IPlayerFacade
 
     IObservable<Vector3> OnNewOrbitAttached { get; }
     IObservable<Unit> OnLongJumped { get; }
+    IObservable<Unit> OnPlayerDead { get; }
 
     void RegisterInputSubscriptions();
     void RegisterPlayerSubscriptions();
+
 
 }
 
@@ -50,6 +52,8 @@ public class PlayerFacade : IPlayerFacade
     public IObservable<Vector3> OnNewOrbitAttached => _playerController.OnNewOrbitAttached;
 
     public IObservable<Unit> OnLongJumped => _playerController.OnLongJumped;
+
+    public IObservable<Unit> OnPlayerDead => _playerController.OnPlayerDead;
 
 
 }

@@ -6,14 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/EndlessModeScene.unity
-    guid: 8c9cfa26abfee488c85f1582747f6a02
+    path: Assets/Scenes/BootScene.unity
+    guid: 72f99d7383137994fbb42f6f3966eb68
   - enabled: 1
     path: "Assets/Scenes/Title\uFF06SelectScene.unity"
     guid: afe02ceddcf2b044f9a9d2699b544fc6
   - enabled: 1
     path: Assets/Scenes/LoadingScene.unity
     guid: 8939d141eded63b44893e7f26cf8add9
+  - enabled: 1
+    path: Assets/Scenes/EndlessModeScene.unity
+    guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

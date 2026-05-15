@@ -15,6 +15,7 @@ internal class GameOverState : IPlayerState
     public async UniTask Enter()
     {
         _playerController.Dead();
+        
         await UniTask.CompletedTask;
     }
 

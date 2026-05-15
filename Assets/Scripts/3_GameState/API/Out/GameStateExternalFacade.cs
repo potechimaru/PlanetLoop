@@ -1,4 +1,6 @@
 using Cysharp.Threading.Tasks;
+using System;
+using UniRx;
 using UnityEngine;
 
 public interface IGameStateExternalFacade
@@ -7,6 +9,8 @@ public interface IGameStateExternalFacade
     void RegisterPlayerSubscriptions();
     void StartMove();
     void SetPlayer();
+
+    IObservable<Unit> OnPlayerDead { get; }
 
 }
 
@@ -38,4 +42,5 @@ public class GameStateExternalFacade: IGameStateExternalFacade
         _playerFacade.SetPlayer();
     }
 
+    public IObservable<Unit> OnPlayerDead => _playerFacade.OnPlayerDead;
 }

@@ -25,7 +25,7 @@ public class OpeningState : IGameState
     public async UniTask Exit()
     {
         Time.timeScale = 1f;
-        Debug.Log("Exiting Opening State");
+        //Debug.Log("Exiting Opening State");
         await UniTask.CompletedTask;
     }
     public async UniTask Tick()

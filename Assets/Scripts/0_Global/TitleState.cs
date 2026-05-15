@@ -6,7 +6,6 @@ using UnityEngine;
 public class TitleState : IAppState
 {
     public ReactiveCommand<AppStateKey> NextState { get; } = new();
-    private readonly ITitleUIManager _uIManager;
 
     private readonly Subject<Unit> _onEntered = new();
     private readonly Subject<Unit> _onExited = new();
