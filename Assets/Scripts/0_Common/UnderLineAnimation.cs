@@ -16,31 +16,55 @@ public class UnderLineAnimation : MonoBehaviour
     {
         if (_image == null)
             _image = GetComponent<Image>();
-
     }
 
     public void Play()
     {
-        _tween?.Kill();
+        if (_image == null) return;
+
+        KillTween();
 
         _image.fillAmount = 0f;
 
         _tween = DOTween.To(
-            () => _image.fillAmount,
-            x => _image.fillAmount = x,
-            1f,
-            duration
-        ).SetEase(ease);
+                () => _image != null ? _image.fillAmount : 0f,
+                x =>
+                {
+                    if (_image == null) return;
+                    _image.fillAmount = x;
+                },
+                1f,
+                duration
+            )
+            .SetEase(ease)
+            .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
 
     public void ResetState()
     {
-        _tween?.Kill();
-        _image.fillAmount = 0f;
+        KillTween();
+
+        if (_image != null)
+            _image.fillAmount = 0f;
     }
 
-    public void OnDestroy()
+    private void KillTween()
     {
-        _tween?.Kill();
+        if (_tween != null && _tween.IsActive())
+        {
+            _tween.Kill();
+        }
+
+        _tween = null;
+    }
+
+    private void OnDisable()
+    {
+        KillTween();
+    }
+
+    private void OnDestroy()
+    {
+        KillTween();
     }
 }

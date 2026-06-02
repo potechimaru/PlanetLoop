@@ -26,7 +26,7 @@ public class EnemyView : MonoBehaviour
             );
         }
 
-        HideTelegraphs();
+        HideTelegraph();
     }
 
     public void ShowTelegraph(Vector3 dirNormalized)

@@ -1,5 +1,7 @@
 public enum PointObjectType
 {
-    Normal,
+    Low,
+    Medium,
     High,
+    VeryHigh,
 }

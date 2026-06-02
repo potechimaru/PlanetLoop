@@ -17,6 +17,7 @@ public class SaveDataService
         {
             PlayerPrefs.SetInt(KEY_PREFIX + mode, score);
             PlayerPrefs.Save();
+            Debug.Log($"[Save] New high score for {mode}: {score}");
         }
     }
 

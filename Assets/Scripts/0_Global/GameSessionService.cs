@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class GameSessionService
 {
     public GameModeType CurrentMode { get; private set; }
@@ -11,18 +13,17 @@ public class GameSessionService
         CurrentScore = 0;
     }
 
-    public void AddScore(int value)
+    public void EndGame(int finalScore)
     {
-        CurrentScore += value;
-    }
+        CurrentScore = finalScore;
 
-    public void EndGame()
-    {
         LastResult = new LastResult
         {
             Mode = CurrentMode,
             Score = CurrentScore
         };
+
+        Debug.Log($"Game ended. Mode: {CurrentMode}, Score: {CurrentScore}");
     }
 }
 

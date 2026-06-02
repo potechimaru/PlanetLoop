@@ -1,11 +1,9 @@
 using System;
-using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
 public class EnemyBullet : MonoBehaviour
 {
-    [SerializeField] private float lifeTime = 8f;
     [SerializeField] private float bulletSpeed = 6f;
 
     private readonly Subject<Unit> _onHitPlayer = new();
@@ -13,43 +11,54 @@ public class EnemyBullet : MonoBehaviour
     private Vector3 _vel;
     private bool _isReturned;
 
+    private Transform _rangeCenter;
+    private float _activeRadiusSqr;
+
     public IObservable<Unit> OnHitPlayer => _onHitPlayer;
+
+    public void Launch(
+        Vector3 dirNormalized,
+        Transform rangeCenter,
+        float activeRadius)
+    {
+        _isReturned = false;
+
+        _rangeCenter = rangeCenter;
+        _activeRadiusSqr = activeRadius * activeRadius;
+
+        _vel = dirNormalized.normalized * bulletSpeed;
+    }
+
+    private void Update()
+    {
+        if (_isReturned) return;
+
+        transform.position += _vel * Time.deltaTime;
+
+        CheckOutOfRange();
+    }
+
+    private void CheckOutOfRange()
+    {
+        if (_rangeCenter == null) return;
+
+        float sqrDistance =
+            (transform.position - _rangeCenter.position).sqrMagnitude;
+
+        if (sqrDistance > _activeRadiusSqr)
+        {
+            ReturnToPool();
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;
         if (_isReturned) return;
 
-        Debug.Log("Player hit!");
-
         _onHitPlayer.OnNext(Unit.Default);
 
         ReturnToPool();
-    }
-
-    public async UniTask Launch(Vector3 dirNormalized)
-    {
-        _isReturned = false;
-        _vel = dirNormalized.normalized * bulletSpeed;
-
-        try
-        {
-            await UniTask.Delay(
-                TimeSpan.FromSeconds(lifeTime),
-                cancellationToken: this.GetCancellationTokenOnDestroy()
-            );
-
-            ReturnToPool();
-        }
-        catch (OperationCanceledException)
-        {
-            // DestroyéûÇ»Ç«ÅBäÓñ{ìIÇ…âΩÇ‡ÇµÇ»Ç¢
-        }
-    }
-
-    private void Update()
-    {
-        transform.position += _vel * Time.deltaTime;
     }
 
     private void ReturnToPool()
@@ -58,6 +67,7 @@ public class EnemyBullet : MonoBehaviour
 
         _isReturned = true;
         _vel = Vector3.zero;
+        _rangeCenter = null;
 
         GetComponent<PooledBulletObject>()?.ReturnToPool();
     }

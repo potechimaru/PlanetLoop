@@ -53,6 +53,8 @@ public class ClosedSplineLine : MonoBehaviour
     [Header("Point Rotation")]
     [SerializeField] private bool rotatePoints = false;
 
+    public bool IsPointRotationEnabled => rotatePoints;
+
     [Tooltip("‹——£ / •b")]
     [SerializeField] private float rotationSpeed = 1f;
 
@@ -304,6 +306,11 @@ public class ClosedSplineLine : MonoBehaviour
             child.position = pos;
             child.rotation = Quaternion.FromToRotation(Vector3.up, normal);
         }
+    }
+
+    public void SetPointRotationEnabled(bool enabled)
+    {
+        rotatePoints = enabled;
     }
 
     /* =====================================

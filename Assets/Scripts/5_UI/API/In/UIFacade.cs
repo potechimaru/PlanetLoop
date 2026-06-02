@@ -3,9 +3,8 @@ using UnityEngine;
 
 public interface IUIFacade
 {
-    void AddScore(ScoreRuleType type);
     bool IsMaxLongJumpedCount();
-    void SpawnNewOrbitPointUI(Vector3 displayPos);
+    int GetScore();
 
 }
 
@@ -14,16 +13,11 @@ public class UIFacade : IUIFacade
     private readonly HUDPresenter _hudPresenter;
     private readonly PlayUIFactory _playUIFactory;
 
-    public UIFacade( HUDPresenter hudPresenter, PlayUIFactory playUIFactory)
+    public UIFacade(HUDPresenter hudPresenter, PlayUIFactory playUIFactory)
     {
         _hudPresenter = hudPresenter;
         _playUIFactory = playUIFactory;
 
-    }
-
-    public void AddScore(ScoreRuleType type)
-    {
-        _hudPresenter.AddScore(type);
     }
 
     public bool IsMaxLongJumpedCount()
@@ -31,11 +25,9 @@ public class UIFacade : IUIFacade
         return _hudPresenter.IsMaxLongJumpedCount();
     }
 
-    public void SpawnNewOrbitPointUI(Vector3 displayPos)
+    public int GetScore()
     {
-        _playUIFactory.Spawn(PlayUIType.NewOrbitPoint, displayPos);
+        return _hudPresenter.GetScore();
     }
-
-
 
 }

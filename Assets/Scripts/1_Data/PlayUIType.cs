@@ -1,5 +1,10 @@
 public enum PlayUIType
 {
     NewOrbitPoint,
-    EnemyDefeated,
+    DefeatEnemyPoint,
+    LongJumpPoint,
+    PointVeryHigh,
+    PointHigh,
+    PointMedium,
+    PointLow,
 }

@@ -17,8 +17,8 @@ public class PlayerController : ITickable
     private Subject<Unit> _onLongJumped = new Subject<Unit>();
     public IObservable<Unit> OnLongJumped => _onLongJumped;
 
-    private Subject<Vector3> _onNewOrbitAttached = new Subject<Vector3>();
-    public IObservable<Vector3> OnNewOrbitAttached => _onNewOrbitAttached;
+    private Subject<Unit> _onNewOrbitAttached = new Subject<Unit>();
+    public IObservable<Unit> OnNewOrbitAttached => _onNewOrbitAttached;
 
     private Subject<Unit> _onPlayerDead = new Subject<Unit>();
     public IObservable<Unit> OnPlayerDead => _onPlayerDead;
@@ -52,6 +52,8 @@ public class PlayerController : ITickable
             }
 
             _model.Clockwise = !_model.Clockwise;
+            _view.FlipRotateUI();
+
         });
 
         _playerExternalFacade.JumpReleasedSubscribe(() =>
@@ -158,5 +160,6 @@ public class PlayerController : ITickable
     {
         _onPlayerDead.OnNext(Unit.Default);
         _view.PlayDeadEffect().Forget();
+        _view.HideJumpNormalGuide();
     }
 }

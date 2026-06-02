@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 
 public class PlayerView : MonoBehaviour
@@ -14,6 +15,8 @@ public class PlayerView : MonoBehaviour
 
     [SerializeField] private ParticleSystem _deadEffect;
     [SerializeField] private PlayerDisappearAnimation _playerDisappearAnimation;
+
+    [SerializeField] private ContinuousRotateAnimation _continuousRotateAnimation;
 
     public ClosedSplineLine Spline => _spline;
     public bool UseLocalPlaneXY => _useLocalPlaneXY;
@@ -74,16 +77,43 @@ public class PlayerView : MonoBehaviour
 
     public async UniTask PlayDeadEffect()
     {
-        if (_deadEffect == null) return;
+        var ct = this.GetCancellationTokenOnDestroy();
 
-        _deadEffect.Play();
+        try
+        {
+            if (this == null) return;
+            if (_deadEffect == null) return;
 
-        await _playerDisappearAnimation.PlayAsync();
+            _deadEffect.Play();
 
-        await UniTask.WaitUntil(() =>
-            !_deadEffect.IsAlive(true)
-        );
-        
-        gameObject.SetActive(false);
+            if (_playerDisappearAnimation != null)
+            {
+                await _playerDisappearAnimation
+                    .PlayAsync()
+                    .AttachExternalCancellation(ct);
+            }
+
+            await UniTask.WaitUntil(
+                () => _deadEffect == null || !_deadEffect.IsAlive(true),
+                cancellationToken: ct
+            );
+
+            if (this == null) return;
+
+            gameObject.SetActive(false);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+    }
+
+    public void FlipRotateUI()
+    {
+        _continuousRotateAnimation.FlipY();
+
     }
 }

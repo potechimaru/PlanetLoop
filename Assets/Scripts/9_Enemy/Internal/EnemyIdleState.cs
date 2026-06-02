@@ -29,6 +29,9 @@ internal sealed class EnemyIdleState : IEnemyState
     {
         _move.Tick();
 
+        if (!_ctx.IsDetectionEnabled)
+            return;
+
         if (_detect.IsDetected())
             NextState.Execute(EnemyStateKey.Telegraph);
     }

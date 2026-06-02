@@ -26,6 +26,8 @@ internal class PlayerSplineMover
     private Vector3 _jumpPos;
 
     private Vector3 _jumpStartPos;
+    private float _jumpTravelDistance;
+
 
     internal PlayerSplineMover(
         PlayerView view,
@@ -103,6 +105,8 @@ internal class PlayerSplineMover
         _isJumping = true;
         _jumpPos = _view.transform.position;
         _jumpStartPos = _jumpPos;
+        _jumpTravelDistance = 0f;
+
         _jumpDir = GetOuterNormal().normalized;
         _jumpSpeed = _model.CurrentJumpspeed;
     }
@@ -115,6 +119,9 @@ internal class PlayerSplineMover
 
         Vector3 prevPos = _jumpPos;
         _jumpPos += _jumpDir * _jumpSpeed * dt;
+
+        _jumpTravelDistance += Vector3.Distance(prevPos, _jumpPos);
+
         _view.SetPosition(_jumpPos);
 
         if (!_playerExternalFacade.TryFindTouchedSpline(
@@ -132,7 +139,7 @@ internal class PlayerSplineMover
         float jumpDistance = Vector3.Distance(_jumpStartPos, hitPointOnSpline);
 
         AttachToSpline(touchedSpline, hitDistanceOnSpline, hitPointOnSpline);
-        _attachEvent.CheckLongJumped(jumpDistance);
+        _attachEvent.CheckLongJumped(_jumpTravelDistance);
 
         _isJumping = false;
         return true;

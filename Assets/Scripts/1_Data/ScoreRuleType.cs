@@ -4,6 +4,9 @@ public enum ScoreRuleType
 {
     NewOrbit,
     DefeatEnemy,
-    PointObject,
-    LongJumped
+    LongJumped,
+    PointVeryHigh,
+    PointHigh,
+    PointMedium,
+    PointLow,
 }

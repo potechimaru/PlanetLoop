@@ -8,14 +8,16 @@ public class Enemy : MonoBehaviour
 {
     [Header("Refs")]
     [SerializeField] private EnemyView view;
-    [SerializeField] private Transform player;
 
     [Header("Common Config")]
     [SerializeField] private EnemyConfig config = new();
 
     [SerializeField] private EnemyType _enemyType = EnemyType.Enemy1;
+    public EnemyType EnemyType => _enemyType;
 
     [Inject] private EnemyBulletFactory _bulletFactory;
+
+    private Transform _playerTransform;
 
     protected EnemyController _enemyController;
     protected EnemyStateMachine _sm;
@@ -30,9 +32,15 @@ public class Enemy : MonoBehaviour
     private Subject<Unit> _onDead = new();
     public IObservable<Unit> OnPlayerHit => _onDead;
 
-    async void Start()
-    {
+    private EnemySpawnPoint _spawnPoint;
 
+    private bool _isSimulationEnabled = true;
+
+    public void InitializeForSpawn(Transform playerTransform)
+    {
+        _isDead = false;
+
+        _playerTransform = playerTransform;
 
         if (view == null)
             view = GetComponentInChildren<EnemyView>();
@@ -41,7 +49,7 @@ public class Enemy : MonoBehaviour
 
         _enemyController = new EnemyController(
             transform,
-            player,
+            _playerTransform,
             view,
             config,
             _bulletFactory,
@@ -56,16 +64,10 @@ public class Enemy : MonoBehaviour
         _sm = new EnemyStateMachine();
         RegisterState();
 
-        try
-        {
-            await _sm.ChangeStateAsync(EnemyStateKey.Idle);
-        }
-        catch (Exception e)
-        {
-            Debug.LogException(e);
-        }
-    }
+        _sm.ChangeStateAsync(EnemyStateKey.Idle).Forget();
 
+        _enemyController?.HideTelegraph();
+    }
     protected virtual void RegisterState()
     {
         _sm.RegisterState(
@@ -81,11 +83,24 @@ public class Enemy : MonoBehaviour
             new EnemyCooldownState(_enemyController, _move, _attack));
     }
 
-    void Update()
+    public void SetSimulationEnabled(bool enabled)
+    {
+        _isSimulationEnabled = enabled;
+
+        if (!enabled)
+        {
+            _enemyController?.HideTelegraph();
+        }
+    }
+
+    private void Update()
     {
         if (_isDead) return;
+        if (!_isSimulationEnabled) return;
+
         _sm?.Tick();
     }
+
 
     public async UniTask DisableEnemy()
     {
@@ -109,7 +124,8 @@ public class Enemy : MonoBehaviour
 
         _enemyController = null;
 
-        _disposables.Dispose();
+        _spawnPoint?.Release();
+        _spawnPoint = null;
 
         gameObject.SetActive(false);
     }
@@ -122,6 +138,17 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public void SetSpawnPoint(EnemySpawnPoint spawnPoint)
+    {
+        _spawnPoint = spawnPoint;
+    }
+
+    public void SetDetectionEnabled(bool enabled)
+    {
+        _enemyController?.SetDetectionEnabled(enabled);
+    }
+
+
     void OnDestroy()
     {
         _sm?.Dispose();
@@ -133,6 +160,7 @@ public class Enemy : MonoBehaviour
         return enemyType switch
         {
             EnemyType.Enemy1 => EnemyAttackType.Single,
+            EnemyType.Enemy2 => EnemyAttackType.Spread,
             _ => EnemyAttackType.Single
         };
     }

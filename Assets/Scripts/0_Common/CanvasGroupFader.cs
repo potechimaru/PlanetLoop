@@ -1,8 +1,8 @@
-using UnityEngine;
-using DG.Tweening;
-using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using UnityEngine;
 
 [RequireComponent(typeof(CanvasGroup))]
 public class CanvasGroupFader : MonoBehaviour
@@ -11,9 +11,10 @@ public class CanvasGroupFader : MonoBehaviour
     [SerializeField] private float defaultFadeInDuration = 0.5f;
     [SerializeField] private float defaultFadeOutDuration = 0.5f;
     [SerializeField] private Ease fadeEase = Ease.OutCubic;
+    [SerializeField] private bool useUnscaledTime = true;
 
     private CanvasGroup _canvasGroup;
-    private Sequence _sequence;
+    private Tween _tween;
 
     private void Awake()
     {
@@ -25,30 +26,25 @@ public class CanvasGroupFader : MonoBehaviour
         }
     }
 
-    // =========================
-    // Fade In
-    // =========================
     public async UniTask FadeInAsync(
         float? duration = null,
         CancellationToken cancellationToken = default)
     {
         float d = duration ?? defaultFadeInDuration;
 
-        _canvasGroup.alpha = 0f;
-
         try
         {
-            KillSequence();
+            KillTween();
 
-            _sequence = DOTween.Sequence();
+            _canvasGroup.alpha = 0f;
 
-            _sequence.Append(
-                _canvasGroup
-                    .DOFade(1f, d)
-                    .SetEase(fadeEase)
-            );
+            _tween = _canvasGroup
+                .DOFade(1f, d)
+                .SetEase(fadeEase)
+                .SetUpdate(useUnscaledTime);
 
-            await AwaitSequence(_sequence, cancellationToken);
+            await _tween
+                .AsyncWaitForCompletion();
         }
         catch (OperationCanceledException)
         {
@@ -57,32 +53,31 @@ public class CanvasGroupFader : MonoBehaviour
         {
             Debug.LogError($"FadeInAsync Error: {ex}");
         }
+        finally
+        {
+            _tween = null;
+        }
     }
 
-    // =========================
-    // Fade Out
-    // =========================
     public async UniTask FadeOutAsync(
         float? duration = null,
         CancellationToken cancellationToken = default)
     {
         float d = duration ?? defaultFadeOutDuration;
 
-        _canvasGroup.alpha = 1f;
-
         try
         {
-            KillSequence();
+            KillTween();
 
-            _sequence = DOTween.Sequence();
+            _canvasGroup.alpha = 1f;
 
-            _sequence.Append(
-                _canvasGroup
-                    .DOFade(0f, d)
-                    .SetEase(fadeEase)
-            );
+            _tween = _canvasGroup
+                .DOFade(0f, d)
+                .SetEase(fadeEase)
+                .SetUpdate(useUnscaledTime);
 
-            await AwaitSequence(_sequence, cancellationToken);
+            await _tween
+                .AsyncWaitForCompletion();
         }
         catch (OperationCanceledException)
         {
@@ -91,30 +86,28 @@ public class CanvasGroupFader : MonoBehaviour
         {
             Debug.LogError($"FadeOutAsync Error: {ex}");
         }
+        finally
+        {
+            _tween = null;
+        }
     }
 
-    // =========================
-    // Fade To
-    // =========================
     public async UniTask FadeToAsync(
-    float targetAlpha,
-    float duration,
-    CancellationToken cancellationToken = default)
+        float targetAlpha,
+        float duration,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            KillSequence();
+            KillTween();
 
-            _sequence = DOTween.Sequence()
-                .SetUpdate(true); // timeScale = 0 でも動く
+            _tween = _canvasGroup
+                .DOFade(targetAlpha, duration)
+                .SetEase(fadeEase)
+                .SetUpdate(useUnscaledTime);
 
-            _sequence.Append(
-                _canvasGroup
-                    .DOFade(targetAlpha, duration)
-                    .SetEase(fadeEase)
-            );
-
-            await AwaitSequence(_sequence, cancellationToken);
+            await _tween
+                .AsyncWaitForCompletion();
         }
         catch (OperationCanceledException)
         {
@@ -123,66 +116,49 @@ public class CanvasGroupFader : MonoBehaviour
         {
             Debug.LogError($"FadeToAsync Error: {ex}");
         }
+        finally
+        {
+            _tween = null;
+        }
     }
 
     public void ResetAlpha()
     {
-        KillSequence();
         SetAlpha(0f);
     }
 
     public void FullAlpha()
     {
-        KillSequence();
         SetAlpha(1f);
     }
 
-    // =========================
-    // 即時反映
-    // =========================
-    private void SetAlpha(float alpha)
+    public void SetAlpha(float alpha)
     {
-        KillSequence();
+        KillTween();
+
+        if (_canvasGroup == null)
+            _canvasGroup = GetComponent<CanvasGroup>();
+
         _canvasGroup.alpha = alpha;
     }
 
-    // =========================
-    // Sequence待機（重要）
-    // =========================
-    private async UniTask AwaitSequence(Sequence seq, CancellationToken ct)
+    public void Kill()
     {
-        var tcs = new UniTaskCompletionSource();
-
-        seq.OnComplete(() => tcs.TrySetResult());
-        seq.OnKill(() => tcs.TrySetCanceled());
-
-
-        using (ct.Register(() =>
-        {
-            if (seq.IsActive())
-            {
-                seq.Kill();
-            }
-        }))
-        {
-            await tcs.Task;
-        }
+        KillTween();
     }
 
-    // =========================
-    // Kill
-    // =========================
-    private void KillSequence()
+    private void KillTween()
     {
-        if (_sequence != null && _sequence.IsActive())
+        if (_tween != null && _tween.IsActive())
         {
-            _sequence.Kill();
-            _sequence = null;
+            _tween.Kill();
         }
+
+        _tween = null;
     }
 
     private void OnDestroy()
     {
-        KillSequence();
+        KillTween();
     }
 }

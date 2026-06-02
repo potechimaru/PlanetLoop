@@ -16,29 +16,34 @@ public class EnemyManager : IDisposable
     private readonly ReactiveProperty<(int defeatedCount, int totalEnemyCount)> _enemyCount = new();
     public IReadOnlyReactiveProperty<(int defeatedCount, int totalEnemyCount)> EnemyCount => _enemyCount;
 
+    private readonly Subject<Unit> _onEnemyDefeated = new();
+    public IObservable<Unit> OnEnemyDefeated => _onEnemyDefeated;
+
     private int _defeatedCount = 0;
     private int _totalEnemyCount = 0;
 
+    private readonly EnemyFactory _enemyFactory;
+
+    private bool _isDetectionEnabled = true;
+
     public EnemyManager(
-        IObjectResolver resolver,
-        IEnumerable<Enemy> enemies)
+    IObjectResolver resolver,
+    EnemyFactory enemyFactory,
+    IEnumerable<Enemy> enemies)
     {
         _resolver = resolver;
+        _enemyFactory = enemyFactory;
 
         if (enemies != null)
         {
             foreach (var enemy in enemies)
             {
                 _resolver.Inject(enemy);
-
                 Register(enemy);
             }
         }
 
         _totalEnemyCount = _enemySet.Count;
-
-        //Debug.Log($"Enemy Total : {_totalEnemyCount}");
-
         NotifyEnemyCountChanged();
     }
 
@@ -63,9 +68,35 @@ public class EnemyManager : IDisposable
 
         _defeatedCount++;
 
-        //Debug.Log($"Enemy Defeated! {_defeatedCount} / {_totalEnemyCount}");
+        _onEnemyDefeated.OnNext(Unit.Default);
 
         NotifyEnemyCountChanged();
+    }
+
+    public Enemy SpawnRandomEnemy(Vector3 position)
+    {
+        var enemy = _enemyFactory.CreateRandom(position);
+        if (enemy == null) return null;
+
+        Register(enemy);
+
+        enemy.SetDetectionEnabled(_isDetectionEnabled);
+
+        _totalEnemyCount++;
+        NotifyEnemyCountChanged();
+
+        return enemy;
+    }
+
+    public void SetAllDetectionEnabled(bool enabled)
+    {
+        _isDetectionEnabled = enabled;
+
+        foreach (var enemy in _enemySet)
+        {
+            if (enemy == null) continue;
+            enemy.SetDetectionEnabled(enabled);
+        }
     }
 
     private void NotifyEnemyCountChanged()
@@ -85,9 +116,29 @@ public class EnemyManager : IDisposable
         NotifyEnemyCountChanged();
     }
 
+    public void UpdateEnemySimulationByDistance(
+    Vector3 playerPosition,
+    float activeRadius)
+    {
+        float activeRadiusSqr = activeRadius * activeRadius;
+
+        foreach (var enemy in _enemySet)
+        {
+            if (enemy == null) continue;
+
+            float sqrDistance =
+                (enemy.transform.position - playerPosition).sqrMagnitude;
+
+            bool shouldActive = sqrDistance <= activeRadiusSqr;
+
+            enemy.SetSimulationEnabled(shouldActive);
+        }
+    }
+
     public void Dispose()
     {
         _disposables.Dispose();
         _enemyCount.Dispose();
+        _onEnemyDefeated.Dispose();
     }
 }

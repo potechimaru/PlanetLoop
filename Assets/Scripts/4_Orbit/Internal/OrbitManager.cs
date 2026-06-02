@@ -48,10 +48,10 @@ public class OrbitManager : IDisposable
 
     private void SetupRandomStartSpline()
     {
-        Debug.Log($"[OrbitManager] Created / SetupRandomStartSpline hash={GetHashCode()}");
+        //Debug.Log($"[OrbitManager] Created / SetupRandomStartSpline hash={GetHashCode()}");
         if (_lines == null || _lines.Count == 0)
         {
-            Debug.LogWarning("[OrbitManager] No spline lines found.");
+           // Debug.LogWarning("[OrbitManager] No spline lines found.");
             return;
         }
 
@@ -76,12 +76,12 @@ public class OrbitManager : IDisposable
         //    $"{_startSpline.SplineID}"
         //);
 
-        Debug.Log(
-        $"[OrbitManager] start name={_startSpline.name}, " +
-        $"id={_startSpline.SplineID}, " +
-        $"isStart={_startSpline.IsStartSpline}, " +
-        $"instance={_startSpline.GetInstanceID()}"
-    );
+        //Debug.Log(
+        //$"[OrbitManager] start name={_startSpline.name}, " +
+        //$"id={_startSpline.SplineID}, " +
+        //$"isStart={_startSpline.IsStartSpline}, " +
+        //$"instance={_startSpline.GetInstanceID()}"
+    //);
     }
 
     private void HandlePlayerLanded(ClosedSplineLine line)
@@ -139,6 +139,25 @@ public class OrbitManager : IDisposable
         }
 
         return found;
+    }
+
+    public void UpdatePointRotationByDistance(
+    Vector3 playerPosition,
+    float activeRadius)
+    {
+        float activeRadiusSqr = activeRadius * activeRadius;
+
+        foreach (var line in _lines)
+        {
+            if (line == null) continue;
+
+            float sqrDistance =
+                (line.transform.position - playerPosition).sqrMagnitude;
+
+            bool shouldRotate = sqrDistance <= activeRadiusSqr;
+
+            line.SetPointRotationEnabled(shouldRotate);
+        }
     }
 
     public void Dispose()

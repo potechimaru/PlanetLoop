@@ -1,11 +1,16 @@
 using System;
 using UniRx;
+using UnityEngine;
 
 public interface IEnemyFacade
 {
     IReadOnlyReactiveProperty<(int defeatedCount, int totalEnemyCount)> OnEnemyCountChanged { get; }
 
+    void SetAllDetectionEnabled(bool isEnabled);
+
     IObservable<Unit> OnPlayerHitByEnemyBullet { get; }
+
+    IObservable<Unit> OnEnemyDefeated { get; }
 }
 
 public class EnemyFacade : IEnemyFacade
@@ -24,6 +29,14 @@ public class EnemyFacade : IEnemyFacade
     public IReadOnlyReactiveProperty<(int defeatedCount, int totalEnemyCount)> OnEnemyCountChanged
         => _enemyManager.EnemyCount;
 
+    public void SetAllDetectionEnabled(bool isEnabled)
+    {
+        _enemyManager.SetAllDetectionEnabled(isEnabled);
+    }
+
     public IObservable<Unit> OnPlayerHitByEnemyBullet
         => _enemyBulletManager.OnPlayerHitByEnemyBullet;
+
+    public IObservable<Unit> OnEnemyDefeated
+    => _enemyManager.OnEnemyDefeated;
 }

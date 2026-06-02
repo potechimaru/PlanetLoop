@@ -8,14 +8,14 @@ public class AttachEvent
     private readonly PlayerModel _playerModel;
 
     private readonly Subject<Unit> _onLongJumped;
-    private readonly Subject<Vector3> _onNewOrbitAttached;
+    private readonly Subject<Unit> _onNewOrbitAttached;
 
 
     internal AttachEvent(
         PlayerView playerView,
         PlayerModel playerModel,
         Subject<Unit> onLongJumped,
-        Subject<Vector3> onNewOrbitAttached)
+        Subject<Unit> onNewOrbitAttached)
     {
         _playerModel = playerModel;
         _playerView = playerView;
@@ -29,17 +29,17 @@ public class AttachEvent
         float distance,
         Vector3 playerWorldPos)
     {
-        Debug.Log(
-            $"[AttachEvent] attached name={currentSpline.name}, " +
-            $"id={currentSpline.SplineID}, " +
-            $"isStart={currentSpline.IsStartSpline}, " +
-            $"instance={currentSpline.GetInstanceID()}"
-        );
+        //Debug.Log(
+        //    $"[AttachEvent] attached name={currentSpline.name}, " +
+        //    $"id={currentSpline.SplineID}, " +
+        //    $"isStart={currentSpline.IsStartSpline}, " +
+        //    $"instance={currentSpline.GetInstanceID()}"
+        //);
 
         if (!currentSpline.IsStartSpline)
         {
-            Debug.Log($"IsStartSpline : {currentSpline.IsStartSpline}");
-            CheckNewOrbitAttached(currentSpline, playerWorldPos);
+            //Debug.Log($"IsStartSpline : {currentSpline.IsStartSpline}");
+            CheckNewOrbitAttached(currentSpline);
         }
 
         _playerView.PlaySplineAttachFx(currentSpline, distance, playerWorldPos);
@@ -57,20 +57,19 @@ public class AttachEvent
     }
 
     private void CheckNewOrbitAttached(
-        ClosedSplineLine currentSpline,
-        Vector3 playerWorldPos)
+        ClosedSplineLine currentSpline)
     {
         if (!currentSpline.IsNewOrbit) return;
 
-        Debug.Log(
-            $"[CheckNewOrbitAttached] attached name={currentSpline.name}, " +
-            $"id={currentSpline.SplineID}, " +
-            $"isStart={currentSpline.IsStartSpline}, " +
-            $"instance={currentSpline.GetInstanceID()}"
-        );
+        //Debug.Log(
+        //    $"[CheckNewOrbitAttached] attached name={currentSpline.name}, " +
+        //    $"id={currentSpline.SplineID}, " +
+        //    $"isStart={currentSpline.IsStartSpline}, " +
+        //    $"instance={currentSpline.GetInstanceID()}"
+        //);
 
         currentSpline.FlashLandingMaterial();
-        _onNewOrbitAttached.OnNext(playerWorldPos);
+        _onNewOrbitAttached.OnNext(Unit.Default);
         //Debug.Log("New Orbit Attached!");
     }
 }

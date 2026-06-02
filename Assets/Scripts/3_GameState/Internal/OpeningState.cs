@@ -18,6 +18,7 @@ public class OpeningState : IGameState
     {
         _gameStateExternalFacade.RegisterPlayerSubscriptions();
         _gameStateExternalFacade.SetPlayer();
+        _gameStateExternalFacade.SetAllDetectionEnabled(false);
         Time.timeScale = 0f;
         await _gameUIManager.GameOpening();
         await _gameUIManager.ShowPreGame();
@@ -25,6 +26,7 @@ public class OpeningState : IGameState
     public async UniTask Exit()
     {
         Time.timeScale = 1f;
+        _gameStateExternalFacade.SetAllDetectionEnabled(true);
         //Debug.Log("Exiting Opening State");
         await UniTask.CompletedTask;
     }

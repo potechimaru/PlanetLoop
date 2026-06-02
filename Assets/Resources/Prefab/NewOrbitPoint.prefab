@@ -68,7 +68,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u672A\u5230\u9054\u60D1\u661F\n\u30DC\u30FC\u30CA\u30B9"
+  m_text: "\u65B0\u60D1\u661F\n+50\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c90f2e93ac186c243a49723e1d8c98c2, type: 2}
   m_sharedMaterial: {fileID: -3511686273212334975, guid: c90f2e93ac186c243a49723e1d8c98c2, type: 2}
@@ -151,10 +151,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 729875ad20a02e6439b30cd231b83cd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveDistance: 0.01
+  moveDistance: 0.008
   duration: 0.8
   moveEase: 9
   _fadeDuration: 0.6
+  useRotation: 0
+  rotateAmount: {x: 0, y: 360, z: 0}
+  rotateEase: 6
 --- !u!225 &2871076250666975492
 CanvasGroup:
   m_ObjectHideFlags: 0

@@ -2,6 +2,8 @@ using System;
 using System.Diagnostics;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEditor.PlayerSettings;
 
 public class HUDPresenter : IDisposable
 {
@@ -10,18 +12,25 @@ public class HUDPresenter : IDisposable
     private readonly DefeatEnemyCountView _defeatEnemyCountView;
     private readonly VisitedSplineCountView _visitedSplineCountView;
     private readonly LongJumpedCountView _longJumpedCountView;
+    private readonly PlayUIFactory _playUIFactory;
     private readonly CompositeDisposable _disposables = new CompositeDisposable();
     private readonly IUIExternalFacade _uiExternalFacade;
 
-    public HUDPresenter(ScoreView scoreView, DefeatEnemyCountView defeatEnemyCountView ,VisitedSplineCountView visitedSplineCountView, LongJumpedCountView longJumpedCountView, IUIExternalFacade uiExternalFacade)
+    private readonly Transform _playerTransform;
+
+
+    public HUDPresenter(ScoreView scoreView, DefeatEnemyCountView defeatEnemyCountView ,VisitedSplineCountView visitedSplineCountView, LongJumpedCountView longJumpedCountView, IUIExternalFacade uiExternalFacade, PlayUIFactory playUIFactory, Transform playerTransform)
     {
         _model = new HUDModel();
         _scoreView = scoreView;
         _defeatEnemyCountView = defeatEnemyCountView;
         _visitedSplineCountView = visitedSplineCountView;
         _longJumpedCountView = longJumpedCountView;
+        _playUIFactory = playUIFactory;
 
         _uiExternalFacade = uiExternalFacade;
+
+        _playerTransform = playerTransform;
 
         _model.Score
         .Subscribe(score => _scoreView.SetScore(score))
@@ -47,7 +56,7 @@ public class HUDPresenter : IDisposable
 
         _uiExternalFacade.OnNewOrbitAttached
             .Subscribe(_ => {
-                AddScore(ScoreRuleType.NewOrbit);
+                AddScore(ScoreRuleType.NewOrbit, _playerTransform.position);
                 //UnityEngine.Debug.Log("HUDPresenter: New orbit attached, score updated");
                 }
             )
@@ -56,14 +65,14 @@ public class HUDPresenter : IDisposable
         _uiExternalFacade.OnLongJumped
             .Subscribe(_ =>
             {
-                IncrementLongJumpedCount();
+                IncrementLongJumpedCount(_playerTransform.position);
             })
             .AddTo(_disposables);
 
         _uiExternalFacade.OnPointCollected
             .Subscribe(_ =>
             {
-                AddScore(ScoreRuleType.PointObject, _);
+                AddScore(ConvertToScoreRuleType(_), _playerTransform.position);
             })
             .AddTo(_disposables);
 
@@ -78,7 +87,14 @@ public class HUDPresenter : IDisposable
             .Subscribe(counts =>
             {
                 ReflectEnemyCount(counts.defeatEnemyCount, counts.allEnemyCount);
-                AddScore(ScoreRuleType.DefeatEnemy);
+                //AddScore(ScoreRuleType.DefeatEnemy);
+            })
+            .AddTo(_disposables);
+
+        _uiExternalFacade.OnEnemyDefeated
+            .Subscribe(_ =>
+            {
+                AddScore(ScoreRuleType.DefeatEnemy, _playerTransform.position);
             })
             .AddTo(_disposables);
 
@@ -87,16 +103,31 @@ public class HUDPresenter : IDisposable
 
     }
 
-    public void AddScore(ScoreRuleType type)
+    public void AddScore(ScoreRuleType type, Vector3 position)
     {
+
+        int before = _model.Score.Value;
+
         _model.AddScore(type);
+
+        //UnityEngine.Debug.Log($"HUDPresenter.AddScore called with type: {type}, position: {position}, score before: {before}, score after: {_model.Score.Value}");
+        _playUIFactory.Spawn(ConvertToPlayUIType(type), new Vector2(position.x, position.y + _model.OffsetY));
+
+        int added = _model.Score.Value - before;
     }
 
-    public void AddScore(ScoreRuleType type, PointObjectType pointObjectType)
-    {
-        if (type != ScoreRuleType.PointObject) return;
-        _model.AddScore(type, pointObjectType);
-    }
+    //public void AddScore(ScoreRuleType type, PointObjectType pointObjectType, Vector3 position)
+    //{
+    //    if (!(type == ScoreRuleType.PointMedium || type == ScoreRuleType.PointHigh || type == ScoreRuleType.PointLow)) return;
+
+    //    int before = _model.Score.Value;
+
+    //    _model.AddScore(type, pointObjectType);
+
+    //    _playUIFactory.Spawn(ConvertToPlayUIType(type), new Vector2(position.x, position.y + _model.OffsetY));
+
+    //    int added = _model.Score.Value - before;
+    //}
 
     public void ReflectEnemyCount(int defeatEnemyCount, int allEnemyCount)
     {
@@ -109,17 +140,63 @@ public class HUDPresenter : IDisposable
         _model.ReflectSplineCount(visitedCount, allCount);
     }
 
-    public void IncrementLongJumpedCount()
+    public void IncrementLongJumpedCount(Vector3 position)
     {
         if (_model.IsMaxLongJumpedCount())
             return;
         _model.IncrementLongJumpedCount();
-        AddScore(ScoreRuleType.LongJumped);
+        AddScore(ScoreRuleType.LongJumped, position);
     }
 
     public bool IsMaxLongJumpedCount()
     {
         return _model.IsMaxLongJumpedCount();
+    }
+
+    public int GetScore()
+    {
+        return _model.Score.Value;
+    }
+
+    private PlayUIType ConvertToPlayUIType(ScoreRuleType type)
+    {
+        switch (type)
+        {
+            case ScoreRuleType.NewOrbit:
+                return PlayUIType.NewOrbitPoint;
+            case ScoreRuleType.DefeatEnemy:
+                return PlayUIType.DefeatEnemyPoint;
+            case ScoreRuleType.LongJumped:
+                return PlayUIType.LongJumpPoint;
+            case ScoreRuleType.PointVeryHigh:
+                return PlayUIType.PointVeryHigh;
+            case ScoreRuleType.PointHigh:
+                return PlayUIType.PointHigh;
+            case ScoreRuleType.PointMedium:
+                return PlayUIType.PointMedium;
+            case ScoreRuleType.PointLow:
+                return PlayUIType.PointLow;
+            default:
+                return PlayUIType.NewOrbitPoint; // デフォルト値
+        }
+    }
+
+    private ScoreRuleType ConvertToScoreRuleType (PointObjectType type)
+    {
+        switch (type)
+        {
+            case PointObjectType.VeryHigh:
+                return ScoreRuleType.PointVeryHigh;
+            case PointObjectType.High:
+                return ScoreRuleType.PointHigh;
+            case PointObjectType.Medium:
+                return ScoreRuleType.PointMedium;
+            case PointObjectType.Low:
+                return ScoreRuleType.PointLow;
+            default:
+                return ScoreRuleType.PointMedium; // デフォルト値
+        }
+
     }
 
     public void Dispose()

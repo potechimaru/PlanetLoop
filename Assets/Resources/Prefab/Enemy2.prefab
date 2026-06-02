@@ -5596,11 +5596,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   view: {fileID: 2463977742886767376}
-  player: {fileID: 0}
   config:
-    DetectRadius: 6
-    TelegraphTime: 0.9
-    CooldownTime: 1.2
+    DetectRadius: 5
+    TelegraphTime: 1.5
+    CooldownTime: 3
     MoveSpeed: 1.2
   _enemyType: 1
 --- !u!58 &2887585603905929411

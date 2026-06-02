@@ -12,6 +12,11 @@ public class PopUpAnimation : MonoBehaviour
     [SerializeField] private Ease moveEase = Ease.OutCubic;
     [SerializeField] private float _fadeDuration = 0.6f;
 
+    [Header("Rotation")]
+    [SerializeField] private bool useRotation = true;
+    [SerializeField] private Vector3 rotateAmount = new Vector3(0f, 360f, 0f);
+    [SerializeField] private Ease rotateEase = Ease.OutQuad;
+
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
     private Sequence _sequence;
@@ -34,16 +39,20 @@ public class PopUpAnimation : MonoBehaviour
 
         _canvasGroup.alpha = 1f;
 
-        var startPos = _rectTransform.anchoredPosition;
+        Vector2 startPos = _rectTransform.anchoredPosition;
+        _rectTransform.localRotation = Quaternion.identity;
 
         _sequence = DOTween.Sequence()
             .SetLink(gameObject, LinkBehaviour.KillOnDisable);
 
-        _sequence.Join(
-            _rectTransform
-                .DORotate(new Vector3(0f, 360f, 0f), duration, RotateMode.FastBeyond360)
-                .SetEase(Ease.OutQuad)
-        );
+        if (useRotation)
+        {
+            _sequence.Join(
+                _rectTransform
+                    .DORotate(rotateAmount, duration, RotateMode.FastBeyond360)
+                    .SetEase(rotateEase)
+            );
+        }
 
         _sequence.Join(
             _rectTransform
@@ -61,13 +70,9 @@ public class PopUpAnimation : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            // ƒLƒƒƒ“ƒZƒ‹Žž‚Í–³Ž‹
         }
         catch (Exception ex)
         {
-            if (_sequence == null || !_sequence.IsActive())
-                return;
-
             Debug.LogException(ex);
         }
     }

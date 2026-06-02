@@ -5,7 +5,8 @@ using VContainer.Unity;
 
 public class OrbitInstaller : MonoBehaviour, IInstaller
 {
-    [SerializeField] Transform _linesRoot;
+    [SerializeField] private Transform _linesRoot;
+    [SerializeField] private OrbitPointRotationRangeController _orbitPointRotationRangeController;
     public void Install(IContainerBuilder builder)
     {
         // ヒエラルキー上の ClosedSplineLine を全取得
@@ -19,6 +20,8 @@ public class OrbitInstaller : MonoBehaviour, IInstaller
 
         builder.Register<OrbitFacade>(Lifetime.Singleton).As<IOrbitFacade>();
 
-        
+        builder.RegisterComponent(_orbitPointRotationRangeController);
+
+
     }
 }

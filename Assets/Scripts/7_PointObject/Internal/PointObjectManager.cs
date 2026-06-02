@@ -16,7 +16,7 @@ public class PointObjectManager : IDisposable
     /// </summary>
     public PointObjectManager(IEnumerable<PointObject> pointObjects)
     {
-        Debug.Log($"[PointObjectManager] Registering {pointObjects} point objects");
+        //Debug.Log($"[PointObjectManager] Registering {pointObjects} point objects");
         foreach (var po in pointObjects)
         {
             if (po == null) continue;

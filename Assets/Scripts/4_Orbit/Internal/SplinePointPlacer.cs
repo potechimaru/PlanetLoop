@@ -10,28 +10,23 @@ public class SplinePointPlacer : MonoBehaviour
         FullLoopEven
     }
 
-    [Header("Common")]
-    [SerializeField] private GameObject pointPrefab;
-    [SerializeField] private float normalOffset = 0.1f;
+    [Header("Point Prefabs")]
+    [SerializeField] private GameObject pointLowPrefab;
+    [SerializeField] private GameObject pointMediumPrefab;
+    [SerializeField] private GameObject pointHighPrefab;
+    [SerializeField] private GameObject pointVeryHighPrefab;
 
+    [Header("Common")]
+    [SerializeField] private List<PointPlacementEntry> pointEntries = new();
+    [SerializeField] private float normalOffset = 0.1f;
     [SerializeField] private Transform spawnParent;
 
     [Header("Placement Mode")]
-    [SerializeField] private PlacementMode mode = PlacementMode.ByInterval;
+    [SerializeField] private PlacementMode mode = PlacementMode.FullLoopEven;
 
     [Header("By Interval Settings")]
-    [SerializeField, Min(0f)]
-    private float startDistance = 0f;
-
-    [SerializeField, Min(0.01f)]
-    private float pointInterval = 0.5f;
-
-    [SerializeField, Min(1)]
-    private int intervalPointCount = 12;
-
-    [Header("Full Loop Settings")]
-    [SerializeField, Min(1)]
-    private int loopPointCount = 12;
+    [SerializeField, Min(0f)] private float startDistance = 0f;
+    [SerializeField, Min(0.01f)] private float pointInterval = 0.5f;
 
     private ClosedSplineLine _spline;
     private readonly List<GameObject> _spawned = new();
@@ -50,40 +45,84 @@ public class SplinePointPlacer : MonoBehaviour
         _spline.EditorRebuild();
         BakeInternal(deactivateAfterBake);
     }
-#endif
 
-#if UNITY_EDITOR
     private void BakeInternal(bool deactivateAfterBake)
     {
         ClearImmediate();
 
         float totalLen = _spline.GetTotalLength();
-        if (totalLen <= 0f)
+        if (totalLen <= 0f) return;
+
+        List<GameObject> placementList = BuildPlacementList();
+
+        if (placementList.Count == 0)
+        {
+            Debug.LogWarning("[SplinePointPlacer] 配置するPointPrefabがありません。");
             return;
+        }
 
         if (mode == PlacementMode.ByInterval)
         {
-            for (int i = 0; i < intervalPointCount; i++)
+            for (int i = 0; i < placementList.Count; i++)
             {
                 float d = startDistance + pointInterval * i;
-                CreatePoint(d, deactivateAfterBake);
+                CreatePoint(d, placementList[i], deactivateAfterBake);
             }
         }
-        else // FullLoopEven
+        else
         {
-            float step = totalLen / loopPointCount;
+            float step = totalLen / placementList.Count;
 
-            for (int i = 0; i < loopPointCount; i++)
+            for (int i = 0; i < placementList.Count; i++)
             {
                 float d = step * i;
-                CreatePoint(d, deactivateAfterBake);
+                CreatePoint(d, placementList[i], deactivateAfterBake);
             }
         }
     }
 #endif
 
-    private void CreatePoint(float distance, bool deactivate)
+    private GameObject GetPrefab(PointObjectType type)
     {
+        return type switch
+        {
+            PointObjectType.Low => pointLowPrefab,
+            PointObjectType.Medium => pointMediumPrefab,
+            PointObjectType.High => pointHighPrefab,
+            PointObjectType.VeryHigh => pointVeryHighPrefab,
+            _ => null
+        };
+    }
+
+    private List<GameObject> BuildPlacementList()
+    {
+        var list = new List<GameObject>();
+
+        foreach (var entry in pointEntries)
+        {
+            if (entry == null) continue;
+
+            GameObject prefab = GetPrefab(entry.pointType);
+
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[SplinePointPlacer] Prefab未設定: {entry.pointType}");
+                continue;
+            }
+
+            for (int i = 0; i < entry.count; i++)
+            {
+                list.Add(prefab);
+            }
+        }
+
+        return list;
+    }
+
+    private void CreatePoint(float distance, GameObject prefab, bool deactivate)
+    {
+        if (prefab == null) return;
+
         float totalLen = _spline.GetTotalLength();
         distance = Mathf.Repeat(distance, totalLen);
 
@@ -92,19 +131,19 @@ public class SplinePointPlacer : MonoBehaviour
 
         pos += normal * normalOffset;
 
-        var parent = (spawnParent != null) ? spawnParent : transform;
+        var parent = spawnParent != null ? spawnParent : transform;
 
 #if UNITY_EDITOR
         GameObject go = (GameObject)UnityEditor.PrefabUtility.InstantiatePrefab(
-            pointPrefab,
-            parent);
+            prefab,
+            parent
+        );
 
         UnityEditor.Undo.RegisterCreatedObjectUndo(go, "Bake Spline Point");
 #else
-        GameObject go = Instantiate(pointPrefab, parent);
+        GameObject go = Instantiate(prefab, parent);
 #endif
 
-        // 位置・回転はワールドで合わせる（親がどこでもOK）
         go.transform.position = pos;
         go.transform.rotation = Quaternion.FromToRotation(Vector3.up, normal);
 
@@ -123,7 +162,7 @@ public class SplinePointPlacer : MonoBehaviour
 #if UNITY_EDITOR
     public void ClearImmediate()
     {
-        var parent = (spawnParent != null) ? spawnParent : transform;
+        var parent = spawnParent != null ? spawnParent : transform;
 
         for (int i = parent.childCount - 1; i >= 0; i--)
         {

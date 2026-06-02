@@ -6,12 +6,13 @@ public sealed class EnemyBulletFactory
     [Header("Pools")]
     private SingleBulletPool _singleBulletPool;
     private EnemyBulletManager _enemyBulletManager;
+    private EnemySimulationRangeController _enemySimulationRangeController;
 
-    public EnemyBulletFactory(SingleBulletPool singleBulletPool, EnemyBulletManager enemyBulletManager)
+    public EnemyBulletFactory(SingleBulletPool singleBulletPool, EnemyBulletManager enemyBulletManager, EnemySimulationRangeController enemySimulationRangeController)
     {
         _singleBulletPool = singleBulletPool;
         _enemyBulletManager = enemyBulletManager;
-
+        _enemySimulationRangeController = enemySimulationRangeController;
 
     }
 
@@ -25,12 +26,12 @@ public sealed class EnemyBulletFactory
         {
             case EnemyAttackType.Single:
                 if (_singleBulletPool == null) return;
-                _singleBulletPool.Rent(anchoredPos, dirNormalized).Forget();
+                _singleBulletPool.Rent(anchoredPos, dirNormalized, _enemySimulationRangeController.GetActiveRadius()).Forget();
                 break;
 
             case EnemyAttackType.Spread:
                 if (_enemyBulletManager == null) return;
-                _singleBulletPool.Rent(anchoredPos, dirNormalized).Forget();
+                _singleBulletPool.Rent(anchoredPos, dirNormalized, _enemySimulationRangeController.GetActiveRadius()).Forget();
                 break;
 
             default:

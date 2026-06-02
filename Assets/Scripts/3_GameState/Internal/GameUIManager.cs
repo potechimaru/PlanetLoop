@@ -26,12 +26,16 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private CanvasGroupFader _resultCanvasGroupFader;
     [SerializeField] private List<UnderLineAnimation> _resultUnderLineAnimations;
     [SerializeField] private CanvasGroupFader _HUDCanvasGroupFader;
+    [SerializeField] private CanvasGroupFader _helperUICanvasGroupFader;
+    [SerializeField] private ScoreCountUpAnimation _scoreCountUpAnimation;
+
 
     [Header("ButtonSubscription")]
     [SerializeField] private ClickInputPublisher _clickInputPublisher;
     [SerializeField] private ToTitleButton _toTitleButton;
     [SerializeField] private RetryButton _retryButton;
 
+    [Inject] private IGameStateExternalFacade _gameStateExternalFacade;
     [Inject] private IGameStateChangeRequester _gameStateChangeRequester;
     [Inject] private SceneLoader sceneLoader;
     [Inject] private IAppStateChangeRequester appStateChangeRequester;
@@ -117,7 +121,7 @@ public class GameUIManager : MonoBehaviour
         {
             _gameOpeningCanvasGroupFade.gameObject.SetActive(true);
 
-            await _gameOpeningCanvasGroupFade.FadeToAsync(0.3f, 0.3f, ct);
+            _gameOpeningCanvasGroupFade.FadeToAsync(0.3f, 0.3f, ct).Forget();
 
             _HUDCanvasGroup.alpha = 0f;
             _HUDCanvasGroup.interactable = false;
@@ -132,8 +136,6 @@ public class GameUIManager : MonoBehaviour
                 anim.SetCurrentPositionAsInitial();
             }
 
-            // レイアウトが絡む場合は1フレーム待つ
-            await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, ct);
 
             // もう一度、確定後の位置を初期位置として記録
             for (int i = 0; i < _preGameHUDAnimation.Count; i++)
@@ -144,7 +146,10 @@ public class GameUIManager : MonoBehaviour
             }
 
             // 画面外に置き終わってから見せる
-            _HUDCanvasGroup.alpha = 1f;
+            _HUDCanvasGroupFader.gameObject.SetActive(true);
+            _HUDCanvasGroupFader.FadeInAsync(0.5f, ct).Forget();
+            //Debug.Log("HUD appear");
+
 
             for (int i = 0; i < _preGameHUDAnimation.Count; i++)
             {
@@ -182,32 +187,76 @@ public class GameUIManager : MonoBehaviour
     public async UniTask ShowGameOver()
     {
         var ct = _destroyCancellationToken;
+
         try
         {
-            _gameOpeningCanvasGroupFade.gameObject.SetActive(true);
-            await _gameOpeningCanvasGroupFade.FadeToAsync(0.9f, 0.3f, ct);
+            if (this == null) return;
 
-            if (_gameOverTextAnimation != null)
+            if (_gameOpeningCanvasGroupFade != null)
+            {
+                _gameOpeningCanvasGroupFade.gameObject.SetActive(true);
+                await _gameOpeningCanvasGroupFade.FadeToAsync(0.9f, 0.3f, ct);
+            }
+
+            ct.ThrowIfCancellationRequested();
+            if (this == null) return;
+
+            if (_gameOverTextAnimation == null) return;
+
+            if (_HUDCanvasGroupFader != null)
             {
                 _HUDCanvasGroupFader.gameObject.SetActive(true);
                 _HUDCanvasGroupFader.FadeOutAsync(0.8f, ct).Forget();
-                _gameOverTextAnimation.gameObject.SetActive(true);
-                _gameOverTextAnimation.ChangeActiveLetters();
-                await _gameOverTextAnimation.PlayAsync(ct);
-                _scoreFadeMoveAnimation.gameObject.SetActive(true);
-                await _scoreFadeMoveAnimation.PlayAsync(ct);
-                _titleButtonFadeMoveAnimation.gameObject.SetActive(true);
-                _restartButtonFadeMoveAnimation.gameObject.SetActive(true);
-                _titleButtonFadeMoveAnimation.PlayAsync(ct).Forget();
-                _restartButtonFadeMoveAnimation.PlayAsync(ct).Forget();
-                for (int i = 0; i < _resultUnderLineAnimations.Count; i++)
-                {
-                    var anim = _resultUnderLineAnimations[i];
-                    anim.gameObject.SetActive(true);
-                    anim.Play();
-                }
-                ResultClickSubscription();
             }
+
+            if (_helperUICanvasGroupFader != null)
+            {
+                _helperUICanvasGroupFader.gameObject.SetActive(true);
+                _helperUICanvasGroupFader.FadeOutAsync(0.8f, ct).Forget();
+            }
+
+            _gameOverTextAnimation.gameObject.SetActive(true);
+            _gameOverTextAnimation.ChangeActiveLetters();
+
+            await _gameOverTextAnimation.PlayAsync(ct);
+
+            ct.ThrowIfCancellationRequested();
+            if (this == null) return;
+
+            if (_scoreFadeMoveAnimation != null)
+            {
+                _scoreFadeMoveAnimation.gameObject.SetActive(true);
+
+                if (_scoreCountUpAnimation != null)
+                    _scoreCountUpAnimation.PlayAsync(_gameStateExternalFacade.GetScore()).Forget();
+
+                await _scoreFadeMoveAnimation.PlayAsync(ct);
+            }
+
+            ct.ThrowIfCancellationRequested();
+            if (this == null) return;
+
+            if (_titleButtonFadeMoveAnimation != null)
+            {
+                _titleButtonFadeMoveAnimation.gameObject.SetActive(true);
+                _titleButtonFadeMoveAnimation.PlayAsync(ct).Forget();
+            }
+
+            if (_restartButtonFadeMoveAnimation != null)
+            {
+                _restartButtonFadeMoveAnimation.gameObject.SetActive(true);
+                _restartButtonFadeMoveAnimation.PlayAsync(ct).Forget();
+            }
+
+            foreach (var anim in _resultUnderLineAnimations)
+            {
+                if (anim == null) continue;
+
+                anim.gameObject.SetActive(true);
+                anim.Play();
+            }
+
+            ResultClickSubscription();
         }
         catch (OperationCanceledException)
         {
@@ -225,7 +274,7 @@ public class GameUIManager : MonoBehaviour
         try
         {
             _resultCanvasGroupFader.gameObject.SetActive(true);
-            await _resultCanvasGroupFader.FadeOutAsync();
+            await _resultCanvasGroupFader.FadeInAsync();
             await sceneLoader.LoadTitleSceneAsync();
             await UniTask.Yield();
 
@@ -248,7 +297,7 @@ public class GameUIManager : MonoBehaviour
         try
         {
             _resultCanvasGroupFader.gameObject.SetActive(true);
-            await _resultCanvasGroupFader.FadeOutAsync();
+            await _resultCanvasGroupFader.FadeInAsync();
             await sceneLoader.RetryGameAsync();
         }
         catch (OperationCanceledException)

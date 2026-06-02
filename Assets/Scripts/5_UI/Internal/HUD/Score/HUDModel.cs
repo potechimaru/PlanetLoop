@@ -23,13 +23,17 @@ public class HUDModel
     public  int MaxLongJumpedCount { get; private set; } = 3;
 
 
-    private readonly int _NEW_ORBIT_SCORE = 100;
+    private readonly int _NEW_ORBIT_SCORE = 50;
     private readonly int _DEFEAT_ENEMY_SCORE = 50;
 
-    private readonly int _NORMAL_POINT_OBJECT_SCORE = 100;
-    private readonly int _HIGH_POINT_OBJECT_SCORE = 200;
+    private readonly int _LOW_POINT_OBJECT_SCORE = 5;
+    private readonly int _NORMAL_POINT_OBJECT_SCORE = 20;
+    private readonly int _HIGH_POINT_OBJECT_SCORE = 100;
+    private readonly int _VERY_HIGH_POINT_OBJECT_SCORE = 500;
 
-    private readonly int _LONG_JUMP_SCORE = 150;
+    private readonly int _LONG_JUMP_SCORE = 1500;
+
+    public float OffsetY { get; } = 1.5f;
 
     public void SetScore(int value)
     {
@@ -50,21 +54,41 @@ public class HUDModel
         {
             _score.Value += _LONG_JUMP_SCORE;
         }
-    }
-
-    public void AddScore(ScoreRuleType type, PointObjectType pointObjectType)
-    {
-        if (type != ScoreRuleType.PointObject) return;
-
-        if (pointObjectType == PointObjectType.High)
+        else if (type == ScoreRuleType.PointVeryHigh)
+        {
+            _score.Value += _VERY_HIGH_POINT_OBJECT_SCORE;
+        }
+        else if (type == ScoreRuleType.PointHigh)
         {
             _score.Value += _HIGH_POINT_OBJECT_SCORE;
         }
-        else if (pointObjectType == PointObjectType.Normal)
+        else if (type == ScoreRuleType.PointMedium)
         {
             _score.Value += _NORMAL_POINT_OBJECT_SCORE;
         }
+        else if (type == ScoreRuleType.PointLow)
+        {
+            _score.Value += _LOW_POINT_OBJECT_SCORE;
+        }
     }
+
+    //public void AddScore(ScoreRuleType type, PointObjectType pointObjectType)
+    //{
+    //    if (!(type == ScoreRuleType.PointMedium || type == ScoreRuleType.PointHigh || type == ScoreRuleType.PointLow)) return;
+
+    //    if (pointObjectType == PointObjectType.High)
+    //    {
+    //        _score.Value += _HIGH_POINT_OBJECT_SCORE;
+    //    }
+    //    else if (pointObjectType == PointObjectType.Medium)
+    //    {
+    //        _score.Value += _NORMAL_POINT_OBJECT_SCORE;
+    //    }
+    //    else if (pointObjectType == PointObjectType.Low)
+    //    {
+    //        _score.Value += _LOW_POINT_OBJECT_SCORE;
+    //    }
+    //}
 
     public void IncrementLongJumpedCount()
     {

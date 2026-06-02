@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PointObject : MonoBehaviour
 {
-    [SerializeField] private PointObjectType _type = PointObjectType.Normal;
+    [SerializeField] private PointObjectType _type = PointObjectType.Medium;
 
     private readonly Subject<PointObjectType> _onTriggered = new();
     public IObservable<PointObjectType> OnTriggered => _onTriggered;

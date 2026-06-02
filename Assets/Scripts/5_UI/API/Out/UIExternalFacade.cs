@@ -5,8 +5,9 @@ using UniRx;
 public interface IUIExternalFacade
 {
 
+
     //Player
-    IObservable<Vector3> OnNewOrbitAttached { get; }
+    IObservable<Unit> OnNewOrbitAttached { get; }
     IObservable<Unit> OnLongJumped { get; }
 
     // PointObject
@@ -18,6 +19,8 @@ public interface IUIExternalFacade
     // Enemy
     IReadOnlyReactiveProperty<(int defeatEnemyCount, int allEnemyCount)> OnEnemyCountChanged { get; }
 
+    IObservable<Unit> OnEnemyDefeated { get; }
+
 }
 public class UIExternalFacade : IUIExternalFacade
 {
@@ -25,19 +28,20 @@ public class UIExternalFacade : IUIExternalFacade
     private readonly IOrbitFacade _orbitFacade;
     private readonly IEnemyFacade _enemyFacade;
     private readonly IPlayerFacade _playerFacade;
-    private readonly IGameStateFacade _gameStateFacade;
 
-    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade, IGameStateFacade gameStateFacade)
+    private readonly GameSessionService _gameSessionService;
+
+    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade, GameSessionService gameSessionService)
     {
         _pointObjectFacade = pointObjectFacade;
         _orbitFacade = orbitFacade;
         _enemyFacade = enemyFacade;
         _playerFacade = playerFacade;
-        _gameStateFacade = gameStateFacade;
+        _gameSessionService = gameSessionService;
     }
 
     // Player
-    public IObservable<Vector3> OnNewOrbitAttached => _playerFacade.OnNewOrbitAttached;
+    public IObservable<Unit> OnNewOrbitAttached => _playerFacade.OnNewOrbitAttached;
     public IObservable<Unit> OnLongJumped => _playerFacade.OnLongJumped;
 
     // PointObject
@@ -48,6 +52,10 @@ public class UIExternalFacade : IUIExternalFacade
 
     // Orbit
     public IReadOnlyReactiveProperty<(int visitedCount, int allCount)> OnSplineCountChanged => _orbitFacade.OnSplineCountChanged;
+
+    public IObservable<Unit> OnEnemyDefeated
+    => _enemyFacade.OnEnemyDefeated;
+
 
 
 

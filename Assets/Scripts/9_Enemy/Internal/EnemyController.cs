@@ -19,6 +19,8 @@ public sealed class EnemyController
     public readonly Vector3 Origin;
     public Vector3 WanderTarget;
 
+    public bool IsDetectionEnabled { get; private set; } = true;
+
     public EnemyController(
         Transform self,
         Transform player,
@@ -80,6 +82,11 @@ public sealed class EnemyController
     {
         if (_view == null) return;
         _view.HideTelegraphs();
+    }
+
+    public void SetDetectionEnabled(bool enabled)
+    {
+        IsDetectionEnabled = enabled;
     }
 
     public void FireBullet(Vector3 dirNormalized)

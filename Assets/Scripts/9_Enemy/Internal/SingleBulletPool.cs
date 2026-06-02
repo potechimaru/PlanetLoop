@@ -14,6 +14,8 @@ public class SingleBulletPool : MonoBehaviour, IBulletReturner
 
     [Inject] private EnemyBulletManager _enemyBulletManager;
 
+    [Inject] private Transform _playerTransform; 
+
     private readonly Stack<PooledBulletObject> _pool = new();
     private readonly HashSet<PooledBulletObject> _rented = new();
 
@@ -48,7 +50,7 @@ public class SingleBulletPool : MonoBehaviour, IBulletReturner
         return bullet;
     }
 
-    public async UniTask Rent(Vector2 anchoredPos, Vector3 dirNormalized)
+    public async UniTask Rent(Vector2 anchoredPos, Vector3 dirNormalized, float activeRadius)
     {
         PooledBulletObject item = _pool.Count > 0 ? _pool.Pop() : CreateNew(defaultParent);
         if (item == null) return;
@@ -63,7 +65,7 @@ public class SingleBulletPool : MonoBehaviour, IBulletReturner
 
         rt.anchoredPosition = anchoredPos;
         item.gameObject.SetActive(true);
-        await item.GetComponent<EnemyBullet>().Launch(dirNormalized);
+        item.GetComponent<EnemyBullet>().Launch(dirNormalized, _playerTransform, activeRadius);
 
         await UniTask.CompletedTask;
 

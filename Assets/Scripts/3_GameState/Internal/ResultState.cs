@@ -6,15 +6,18 @@ public class ResultState : IGameState
 {
     public ReactiveCommand<GameStateKey> NextState { get; } = new();
     private readonly GameUIManager _gameUIManager;
+    private readonly IGameStateExternalFacade _gameStateExternalFacade;
 
-    public ResultState(GameUIManager gameUIManager)
+    public ResultState(GameUIManager gameUIManager, IGameStateExternalFacade gameStateExternalFacade)
     {
         _gameUIManager = gameUIManager;
+        _gameStateExternalFacade = gameStateExternalFacade;
 
     }
 
     public async UniTask Enter()
     {
+        _gameStateExternalFacade.EndGame();
         await _gameUIManager.ShowGameOver();
         await UniTask.CompletedTask;
     }
