@@ -6,18 +6,19 @@ public interface IUIFacade
     bool IsMaxLongJumpedCount();
     int GetScore();
 
+    float GetElapsedTime();
+
+    void StartTimer();
+    void StopTimer();
 }
 
 public class UIFacade : IUIFacade
 {
     private readonly HUDPresenter _hudPresenter;
-    private readonly PlayUIFactory _playUIFactory;
 
     public UIFacade(HUDPresenter hudPresenter, PlayUIFactory playUIFactory)
     {
         _hudPresenter = hudPresenter;
-        _playUIFactory = playUIFactory;
-
     }
 
     public bool IsMaxLongJumpedCount()
@@ -30,4 +31,18 @@ public class UIFacade : IUIFacade
         return _hudPresenter.GetScore();
     }
 
+    public float GetElapsedTime()
+    {
+        return _hudPresenter.GetElapsedTime();
+    }
+
+    public void StartTimer()
+    {
+        _hudPresenter.StartTimer();
+    }
+
+    public void StopTimer()
+    {
+        _hudPresenter.StopTimer();
+    }
 }

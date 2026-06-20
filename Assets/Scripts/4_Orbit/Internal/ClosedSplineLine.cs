@@ -15,12 +15,16 @@ public class ClosedSplineLine : MonoBehaviour
     [SerializeField, Min(1)]
     private int splineID = 1;
 
-    [SerializeField] private bool _isStartSpline;
+    private bool _isStartSpline;
     public bool IsStartSpline
     {
         get => _isStartSpline;
         set => _isStartSpline = value;
     }
+
+    [SerializeField] private bool _canBeStartSpline = true;
+
+    public bool CanBeStartSpline => _canBeStartSpline;
 
     [Header("Spline Control Points (Local Space)")]
     [SerializeField]
@@ -160,6 +164,20 @@ public class ClosedSplineLine : MonoBehaviour
             return;
 
         _lineRenderer.material = startSplineMaterial;
+    }
+
+    public void ResetOrbitState()
+    {
+        IsStartSpline = false;
+        IsNewOrbit = true;
+        SetPointRotationEnabled(false);
+
+        EnsureRenderer();
+
+        if (normalMaterial != null)
+        {
+            _lineRenderer.material = normalMaterial;
+        }
     }
 
     /* =====================================
@@ -484,7 +502,7 @@ public class ClosedSplineLine : MonoBehaviour
 
     public void FlashLandingMaterial()
     {
-        if (splineID == 1) return; // スタート地点はフラッシュさせない
+        if (IsStartSpline) return; // スタート地点はフラッシュさせない
         if (!Application.isPlaying) return;
         EnsureRenderer();
 

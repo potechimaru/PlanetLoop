@@ -1,65 +1,94 @@
 using System;
-using System.Diagnostics;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
 
 public class HUDPresenter : IDisposable
 {
     private readonly HUDModel _model;
     private readonly ScoreView _scoreView;
-    private readonly DefeatEnemyCountView _defeatEnemyCountView;
-    private readonly VisitedSplineCountView _visitedSplineCountView;
-    private readonly LongJumpedCountView _longJumpedCountView;
+    private readonly IDefeatEnemyCountView _defeatEnemyCountView;
+    private readonly IVisitedSplineCountView _visitedSplineCountView;
+    private readonly ILongJumpedCountView _longJumpedCountView;
+    private readonly IResetConditionView _resetConditionView;
+    private readonly TimerView _timerView;
+
     private readonly PlayUIFactory _playUIFactory;
     private readonly CompositeDisposable _disposables = new CompositeDisposable();
     private readonly IUIExternalFacade _uiExternalFacade;
-
     private readonly Transform _playerTransform;
 
+    private IDisposable _timerDisposable;
+    private float _elapsedTime;
 
-    public HUDPresenter(ScoreView scoreView, DefeatEnemyCountView defeatEnemyCountView ,VisitedSplineCountView visitedSplineCountView, LongJumpedCountView longJumpedCountView, IUIExternalFacade uiExternalFacade, PlayUIFactory playUIFactory, Transform playerTransform)
+    public HUDPresenter(
+        ScoreView scoreView,
+        IDefeatEnemyCountView defeatEnemyCountView,
+        IVisitedSplineCountView visitedSplineCountView,
+        ILongJumpedCountView longJumpedCountView,
+        IResetConditionView resetConditionView,
+        TimerView timerView,
+        IUIExternalFacade uiExternalFacade,
+        PlayUIFactory playUIFactory,
+        Transform playerTransform)
     {
         _model = new HUDModel();
+
         _scoreView = scoreView;
         _defeatEnemyCountView = defeatEnemyCountView;
         _visitedSplineCountView = visitedSplineCountView;
         _longJumpedCountView = longJumpedCountView;
-        _playUIFactory = playUIFactory;
+        _resetConditionView = resetConditionView;
+        _timerView = timerView;
 
         _uiExternalFacade = uiExternalFacade;
-
+        _playUIFactory = playUIFactory;
         _playerTransform = playerTransform;
 
         _model.Score
-        .Subscribe(score => _scoreView.SetScore(score))
-        .AddTo(_disposables);
+            .Subscribe(score => _scoreView.SetScore(score))
+            .AddTo(_disposables);
 
         _model.DefeatEnemyCount
             .CombineLatest(
                 _model.AllEnemyCount,
                 (defeat, all) => (defeat, all))
-            .Subscribe(x => _defeatEnemyCountView.SetEnemyCount(x.defeat, x.all))
+            .Subscribe(x =>
+            {
+                _defeatEnemyCountView.SetCount(x.defeat, x.all);
+                _resetConditionView.SetCount(x.defeat, _model.EnemyCountToReset);
+            })
             .AddTo(_disposables);
 
         _model.VisitedSplineCount
             .CombineLatest(
                 _model.AllSplineCount,
                 (visited, all) => (visited, all))
-            .Subscribe(x => _visitedSplineCountView.SetSplineCount(x.visited, x.all))
+            .Subscribe(x =>
+            {
+                _visitedSplineCountView.SetCount(x.visited, x.all);
+            })
             .AddTo(_disposables);
 
         _model.LongJumpedCount
-            .Subscribe(count => _longJumpedCountView.SetLongJumpedCount(count, _model.MaxLongJumpedCount))
+            .Subscribe(count =>
+            {
+                _longJumpedCountView.SetCount(count, _model.MaxLongJumpedCount);
+            })
+            .AddTo(_disposables);
+
+        _model.OnEnemyResetThresholdReached
+            .Subscribe(_ =>
+            {
+                _uiExternalFacade.ResetAllOrbits();
+                _uiExternalFacade.ResetAllPoints();
+            })
             .AddTo(_disposables);
 
         _uiExternalFacade.OnNewOrbitAttached
-            .Subscribe(_ => {
+            .Subscribe(_ =>
+            {
                 AddScore(ScoreRuleType.NewOrbit, _playerTransform.position);
-                //UnityEngine.Debug.Log("HUDPresenter: New orbit attached, score updated");
-                }
-            )
+            })
             .AddTo(_disposables);
 
         _uiExternalFacade.OnLongJumped
@@ -70,9 +99,9 @@ public class HUDPresenter : IDisposable
             .AddTo(_disposables);
 
         _uiExternalFacade.OnPointCollected
-            .Subscribe(_ =>
+            .Subscribe(type =>
             {
-                AddScore(ConvertToScoreRuleType(_), _playerTransform.position);
+                AddScore(ConvertToScoreRuleType(type), _playerTransform.position);
             })
             .AddTo(_disposables);
 
@@ -87,7 +116,6 @@ public class HUDPresenter : IDisposable
             .Subscribe(counts =>
             {
                 ReflectEnemyCount(counts.defeatEnemyCount, counts.allEnemyCount);
-                //AddScore(ScoreRuleType.DefeatEnemy);
             })
             .AddTo(_disposables);
 
@@ -99,39 +127,42 @@ public class HUDPresenter : IDisposable
             .AddTo(_disposables);
 
         _scoreView.SetScore(_model.Score.Value);
-        
+        _timerView.ResetTime();
+    }
 
+    public void StartTimer()
+    {
+        StopTimer();
+
+        _elapsedTime = 0f;
+        _timerView.ResetTime();
+
+        _timerDisposable = Observable.EveryUpdate()
+            .Subscribe(_ =>
+            {
+                _elapsedTime += Time.deltaTime;
+                _timerView.SetTime(_elapsedTime);
+            });
+    }
+
+    public void StopTimer()
+    {
+        _timerDisposable?.Dispose();
+        _timerDisposable = null;
     }
 
     public void AddScore(ScoreRuleType type, Vector3 position)
     {
-
-        int before = _model.Score.Value;
-
         _model.AddScore(type);
 
-        //UnityEngine.Debug.Log($"HUDPresenter.AddScore called with type: {type}, position: {position}, score before: {before}, score after: {_model.Score.Value}");
-        _playUIFactory.Spawn(ConvertToPlayUIType(type), new Vector2(position.x, position.y + _model.OffsetY));
-
-        int added = _model.Score.Value - before;
+        _playUIFactory.Spawn(
+            ConvertToPlayUIType(type),
+            new Vector2(position.x, position.y + _model.OffsetY)
+        );
     }
-
-    //public void AddScore(ScoreRuleType type, PointObjectType pointObjectType, Vector3 position)
-    //{
-    //    if (!(type == ScoreRuleType.PointMedium || type == ScoreRuleType.PointHigh || type == ScoreRuleType.PointLow)) return;
-
-    //    int before = _model.Score.Value;
-
-    //    _model.AddScore(type, pointObjectType);
-
-    //    _playUIFactory.Spawn(ConvertToPlayUIType(type), new Vector2(position.x, position.y + _model.OffsetY));
-
-    //    int added = _model.Score.Value - before;
-    //}
 
     public void ReflectEnemyCount(int defeatEnemyCount, int allEnemyCount)
     {
-        //UnityEngine.Debug.Log($"HUDPresenter.ReflectEnemyCount called with defeatEnemyCount: {defeatEnemyCount}, allEnemyCount: {allEnemyCount}");
         _model.ReflectEnemyCount(defeatEnemyCount, allEnemyCount);
     }
 
@@ -144,6 +175,7 @@ public class HUDPresenter : IDisposable
     {
         if (_model.IsMaxLongJumpedCount())
             return;
+
         _model.IncrementLongJumpedCount();
         AddScore(ScoreRuleType.LongJumped, position);
     }
@@ -156,6 +188,11 @@ public class HUDPresenter : IDisposable
     public int GetScore()
     {
         return _model.Score.Value;
+    }
+
+    public float GetElapsedTime()
+    {
+        return _elapsedTime;
     }
 
     private PlayUIType ConvertToPlayUIType(ScoreRuleType type)
@@ -177,11 +214,11 @@ public class HUDPresenter : IDisposable
             case ScoreRuleType.PointLow:
                 return PlayUIType.PointLow;
             default:
-                return PlayUIType.NewOrbitPoint; // デフォルト値
+                return PlayUIType.NewOrbitPoint;
         }
     }
 
-    private ScoreRuleType ConvertToScoreRuleType (PointObjectType type)
+    private ScoreRuleType ConvertToScoreRuleType(PointObjectType type)
     {
         switch (type)
         {
@@ -194,13 +231,13 @@ public class HUDPresenter : IDisposable
             case PointObjectType.Low:
                 return ScoreRuleType.PointLow;
             default:
-                return ScoreRuleType.PointMedium; // デフォルト値
+                return ScoreRuleType.PointMedium;
         }
-
     }
 
     public void Dispose()
     {
+        StopTimer();
         _disposables.Dispose();
     }
 }

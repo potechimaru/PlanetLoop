@@ -6,6 +6,7 @@ using VContainer.Unity;
 public class PlayerInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private PlayerView _playerView;
+    [SerializeField] private LayerMask playerSpawnBlockingLayerMask;
     public void Install(IContainerBuilder builder)
     {
         builder.Register<PlayerStateMachine>(Lifetime.Singleton).As<IDisposable>().AsSelf();
@@ -17,6 +18,9 @@ public class PlayerInstaller : MonoBehaviour, IInstaller
 
         builder.Register<PlayerFacade>(Lifetime.Singleton).As<IPlayerFacade>();
         builder.Register<PlayerExternalFacade>(Lifetime.Singleton).As<IPlayerExternalFacade>();
+
+        builder.Register<PlayerSpawnOverlapResolver>(Lifetime.Singleton)
+        .WithParameter(playerSpawnBlockingLayerMask);
 
     }
 }

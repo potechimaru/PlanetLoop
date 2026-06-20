@@ -16,7 +16,7 @@ public class PlayerView : MonoBehaviour
     [SerializeField] private ParticleSystem _deadEffect;
     [SerializeField] private PlayerDisappearAnimation _playerDisappearAnimation;
 
-    [SerializeField] private ContinuousRotateAnimation _continuousRotateAnimation;
+    //[SerializeField] private ContinuousRotateAnimation _continuousRotateAnimation;
 
     public ClosedSplineLine Spline => _spline;
     public bool UseLocalPlaneXY => _useLocalPlaneXY;
@@ -111,9 +111,9 @@ public class PlayerView : MonoBehaviour
         }
     }
 
-    public void FlipRotateUI()
-    {
-        _continuousRotateAnimation.FlipY();
+    //public void FlipRotateUI()
+    //{
+    //    _continuousRotateAnimation.FlipY();
 
-    }
+    //}
 }

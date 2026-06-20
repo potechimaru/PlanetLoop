@@ -21,6 +21,7 @@ public class GameUIManager : MonoBehaviour
     [Header("Result")]
     [SerializeField] private GameOverTextAnimation _gameOverTextAnimation;
     [SerializeField] private UIFadeMoveAnimation _scoreFadeMoveAnimation;
+    [SerializeField] private UIFadeMoveAnimation _timeFadeMoveAnimation;
     [SerializeField] private UIFadeMoveAnimation _titleButtonFadeMoveAnimation;
     [SerializeField] private UIFadeMoveAnimation _restartButtonFadeMoveAnimation;
     [SerializeField] private CanvasGroupFader _resultCanvasGroupFader;
@@ -28,6 +29,7 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private CanvasGroupFader _HUDCanvasGroupFader;
     [SerializeField] private CanvasGroupFader _helperUICanvasGroupFader;
     [SerializeField] private ScoreCountUpAnimation _scoreCountUpAnimation;
+    [SerializeField] private TimeCountUpAnimation _timeCountUpAnimation;
 
 
     [Header("ButtonSubscription")]
@@ -226,11 +228,18 @@ public class GameUIManager : MonoBehaviour
             if (_scoreFadeMoveAnimation != null)
             {
                 _scoreFadeMoveAnimation.gameObject.SetActive(true);
+                _timeFadeMoveAnimation.gameObject.SetActive(true);
 
                 if (_scoreCountUpAnimation != null)
                     _scoreCountUpAnimation.PlayAsync(_gameStateExternalFacade.GetScore()).Forget();
 
-                await _scoreFadeMoveAnimation.PlayAsync(ct);
+                if (_timeCountUpAnimation != null)
+                    _timeCountUpAnimation.PlayAsync(_gameStateExternalFacade.GetElapsedTime()).Forget();
+
+                await UniTask.WhenAll(
+                    _scoreFadeMoveAnimation.PlayAsync(ct),
+                    _timeFadeMoveAnimation.PlayAsync(ct)
+                );
             }
 
             ct.ThrowIfCancellationRequested();

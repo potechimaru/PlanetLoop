@@ -11,6 +11,28 @@ public class EnemyFactory
         _enemyPool = enemyPool;
     }
 
+    public Enemy CreateRandomFromTypes(
+    IReadOnlyList<EnemyType> enemyTypes,
+    Vector3 position)
+    {
+        if (_enemyPool == null)
+        {
+            Debug.LogError("[EnemyFactory] EnemyPool Ç™ null Ç≈Ç∑ÅB");
+            return null;
+        }
+
+        if (enemyTypes == null || enemyTypes.Count == 0)
+        {
+            Debug.LogError("[EnemyFactory] enemyTypes Ç™ãÛÇ≈Ç∑ÅB");
+            return null;
+        }
+
+        int index = Random.Range(0, enemyTypes.Count);
+        EnemyType enemyType = enemyTypes[index];
+
+        return Create(enemyType, position);
+    }
+
     public Enemy CreateRandom(Vector3 position)
     {
         if (_enemyPool == null)

@@ -5,7 +5,7 @@ public class ScoreView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _scoreText;
 
-    private const string Prefix = "Score : ";
+    private const string Prefix = "ÉXÉRÉA : ";
 
 
     public void SetScore(int score)

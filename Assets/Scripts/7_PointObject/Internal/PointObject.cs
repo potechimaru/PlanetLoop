@@ -10,6 +10,8 @@ public class PointObject : MonoBehaviour
     public IObservable<PointObjectType> OnTriggered => _onTriggered;
 
     private bool _collected;
+    private bool _canCollect;
+
     private Collider2D _collider;
 
     private void Awake()
@@ -17,21 +19,36 @@ public class PointObject : MonoBehaviour
         _collider = GetComponent<Collider2D>();
     }
 
+    public void SetCollectEnabled(bool enabled)
+    {
+        _canCollect = enabled;
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (!_canCollect) return;
+
         if (_collected) return;
         if (!other.CompareTag("Player")) return;
 
         _collected = true;
 
-        // スコア通知は即時
         _onTriggered.OnNext(_type);
 
-        // 再衝突防止
         if (_collider != null)
             _collider.enabled = false;
 
         gameObject.SetActive(false);
+    }
+
+    public void ResetPoint()
+    {
+        _collected = false;
+
+        if (_collider != null)
+            _collider.enabled = true;
+
+        gameObject.SetActive(true);
     }
 
     private void OnDestroy()

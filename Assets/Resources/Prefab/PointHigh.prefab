@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4036049380575378541}
   - component: {fileID: 7188431650981603690}
   - component: {fileID: 517728301112857017}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: -3545544321098443338}
   - component: {fileID: -7124855485098349198}
   - component: {fileID: 5027413431756172955}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PointHigh
   m_TagString: Untagged
   m_Icon: {fileID: 0}

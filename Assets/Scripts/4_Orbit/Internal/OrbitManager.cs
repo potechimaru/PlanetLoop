@@ -48,40 +48,34 @@ public class OrbitManager : IDisposable
 
     private void SetupRandomStartSpline()
     {
-        //Debug.Log($"[OrbitManager] Created / SetupRandomStartSpline hash={GetHashCode()}");
         if (_lines == null || _lines.Count == 0)
         {
-           // Debug.LogWarning("[OrbitManager] No spline lines found.");
             return;
         }
 
         foreach (var line in _lines)
         {
+            if (line == null) continue;
             line.IsStartSpline = false;
         }
 
-        int randomIndex =
-            UnityEngine.Random.Range(0, _lines.Count);
+        var startCandidates = _lines
+            .Where(line => line != null && line.CanBeStartSpline)
+            .ToList();
 
-        _startSpline = _lines[randomIndex];
+        if (startCandidates.Count == 0)
+        {
+            Debug.LogWarning("[OrbitManager] StartSplineŒó•â‚ª‚ ‚è‚Ü‚¹‚ñBCanBeStartSpline‚ªtrue‚ÌSpline‚ğİ’è‚µ‚Ä‚­‚¾‚³‚¢B");
+            return;
+        }
+
+        int randomIndex = UnityEngine.Random.Range(0, startCandidates.Count);
+
+        _startSpline = startCandidates[randomIndex];
 
         _startSpline.IsStartSpline = true;
-
         _startSpline.IsNewOrbit = false;
-
         _startSpline.ApplyStartSplineMaterial();
-
-        //Debug.Log(
-        //    $"[OrbitManager] Start spline selected : " +
-        //    $"{_startSpline.SplineID}"
-        //);
-
-        //Debug.Log(
-        //$"[OrbitManager] start name={_startSpline.name}, " +
-        //$"id={_startSpline.SplineID}, " +
-        //$"isStart={_startSpline.IsStartSpline}, " +
-        //$"instance={_startSpline.GetInstanceID()}"
-    //);
     }
 
     private void HandlePlayerLanded(ClosedSplineLine line)
@@ -158,6 +152,28 @@ public class OrbitManager : IDisposable
 
             line.SetPointRotationEnabled(shouldRotate);
         }
+    }
+
+    public void ResetAllOrbits()
+    {
+        foreach (var line in _lines)
+        {
+            if (line == null) continue;
+
+            line.ResetOrbitState();
+        }
+
+        RestoreCurrentStartSpline();
+        NotifySplineCount();
+    }
+
+    private void RestoreCurrentStartSpline()
+    {
+        if (_startSpline == null) return;
+
+        _startSpline.IsStartSpline = true;
+        _startSpline.IsNewOrbit = false;
+        _startSpline.ApplyStartSplineMaterial();
     }
 
     public void Dispose()

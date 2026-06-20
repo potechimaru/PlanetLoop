@@ -4,7 +4,7 @@ using UniRx;
 using UnityEngine;
 using VContainer;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IEnemyContactHandle
 {
     [Header("Refs")]
     [SerializeField] private EnemyView view;
@@ -16,6 +16,7 @@ public class Enemy : MonoBehaviour
     public EnemyType EnemyType => _enemyType;
 
     [Inject] private EnemyBulletFactory _bulletFactory;
+    [Inject] private EnemyLaserFactory _laserFactory;
 
     private Transform _playerTransform;
 
@@ -29,8 +30,8 @@ public class Enemy : MonoBehaviour
     private readonly CompositeDisposable _disposables = new();
     private bool _isDead;
 
-    private Subject<Unit> _onDead = new();
-    public IObservable<Unit> OnPlayerHit => _onDead;
+    private readonly Subject<Unit> _onPlayerTouched = new();
+    public IObservable<Unit> OnPlayerTouched => _onPlayerTouched;
 
     private EnemySpawnPoint _spawnPoint;
 
@@ -53,6 +54,7 @@ public class Enemy : MonoBehaviour
             view,
             config,
             _bulletFactory,
+            _laserFactory,
             attackType);
 
         var strategies = EnemyStrategyFactory.Create(_enemyType, _enemyController);
@@ -68,6 +70,7 @@ public class Enemy : MonoBehaviour
 
         _enemyController?.HideTelegraph();
     }
+
     protected virtual void RegisterState()
     {
         _sm.RegisterState(
@@ -101,7 +104,6 @@ public class Enemy : MonoBehaviour
         _sm?.Tick();
     }
 
-
     public async UniTask DisableEnemy()
     {
         if (_isDead) return;
@@ -112,7 +114,6 @@ public class Enemy : MonoBehaviour
 
         _enemyController?.StopRotateDecoration();
         _enemyController?.HideTelegraph();
-
 
         var controller = _enemyController;
         if (controller == null) return;
@@ -130,12 +131,12 @@ public class Enemy : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Player"))
-        {
-            _onDead.OnNext(Unit.Default);
-        }
+        if (_isDead) return;
+        if (!collision.CompareTag("Player")) return;
+
+        _onPlayerTouched.OnNext(Unit.Default);
     }
 
     public void SetSpawnPoint(EnemySpawnPoint spawnPoint)
@@ -148,11 +149,16 @@ public class Enemy : MonoBehaviour
         _enemyController?.SetDetectionEnabled(enabled);
     }
 
+    public void Defeat()
+    {
+        DisableEnemy().Forget();
+    }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         _sm?.Dispose();
         _disposables.Dispose();
+        _onPlayerTouched.Dispose();
     }
 
     private static EnemyAttackType GetAttackType(EnemyType enemyType)
@@ -161,6 +167,9 @@ public class Enemy : MonoBehaviour
         {
             EnemyType.Enemy1 => EnemyAttackType.Single,
             EnemyType.Enemy2 => EnemyAttackType.Spread,
+            EnemyType.Enemy3 => EnemyAttackType.LargeSingle,
+            EnemyType.Enemy4 => EnemyAttackType.LargeSpread,
+            EnemyType.Enemy5 => EnemyAttackType.Laser,
             _ => EnemyAttackType.Single
         };
     }

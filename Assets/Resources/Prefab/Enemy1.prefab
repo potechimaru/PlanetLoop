@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2189525246401723399}
   - component: {fileID: 5997943609996826924}
   - component: {fileID: 6397676098984113566}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Enemy1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -175,7 +175,7 @@ GameObject:
   - component: {fileID: 2151737374180166657}
   - component: {fileID: 7648187116635880538}
   - component: {fileID: 6873689674028621694}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Telegraph
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -333,7 +333,7 @@ GameObject:
   m_Component:
   - component: {fileID: 991438886883983561}
   - component: {fileID: 187600423684790159}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: AroundEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -419,7 +419,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5519618642337925669}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Telegraphs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -455,7 +455,7 @@ GameObject:
   - component: {fileID: 2244618578262003831}
   - component: {fileID: 1908890379762926283}
   - component: {fileID: 7242074891317358449}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Telegraph (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -614,7 +614,7 @@ GameObject:
   - component: {fileID: 3501632998144628340}
   - component: {fileID: 3712236546329726196}
   - component: {fileID: 593122849605309587}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: EnemyDefeatedEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5505,7 +5505,7 @@ GameObject:
   - component: {fileID: 6634292829541178942}
   - component: {fileID: 8774095172689253813}
   - component: {fileID: 6390030065540620216}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Telegraph (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5663,7 +5663,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5921457513438070361}
   - component: {fileID: 4104999114100597381}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: View
   m_TagString: Untagged
   m_Icon: {fileID: 0}

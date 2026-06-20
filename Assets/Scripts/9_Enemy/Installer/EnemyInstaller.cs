@@ -6,6 +6,8 @@ using VContainer.Unity;
 public class EnemyInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private SingleBulletPool _singleBulletPool;
+    [SerializeField] private LargeSingleBulletPool _largeSingleBulletPool;
+    [SerializeField] private LaserBeamPool _laserBeamPool;
     [SerializeField] private Transform _enemyRoot;
     [SerializeField] private EnemyPool _enemyPool;
     [SerializeField] private EnemySpawnDirector _enemySpawnDirector;
@@ -17,11 +19,15 @@ public class EnemyInstaller : MonoBehaviour, IInstaller
     public void Install(IContainerBuilder builder)
     {
         builder.Register<EnemyBulletFactory>(Lifetime.Singleton);
+        builder.Register<EnemyLaserFactory>(Lifetime.Singleton);
 
         if (_singleBulletPool != null)
         {
             builder.RegisterComponent(_singleBulletPool).WithParameter(_playerTransform);
+            builder.RegisterComponent(_largeSingleBulletPool).WithParameter(_playerTransform);
         }
+
+        builder.RegisterComponent(_laserBeamPool).WithParameter(_playerTransform);
 
         var enemies = _enemyRoot.GetComponentsInChildren<Enemy>();
 
@@ -30,11 +36,14 @@ public class EnemyInstaller : MonoBehaviour, IInstaller
                .WithParameter<IEnumerable<Enemy>>(enemies);
 
         builder.Register<EnemyBulletManager>(Lifetime.Singleton);
+        builder.Register<LaserBeamManager>(Lifetime.Singleton);
 
         builder.Register<EnemyFacade>(Lifetime.Singleton).As<IEnemyFacade>();
         builder.Register<EnemyExternalFacade>(Lifetime.Singleton).As<IEnemyExternalFacade>();
 
         builder.Register<EnemyFactory>(Lifetime.Singleton);
+
+
         builder.RegisterComponent(_enemyPool).WithParameter(_playerTransform);
 
         builder.RegisterComponent(_enemySpawnDirector);

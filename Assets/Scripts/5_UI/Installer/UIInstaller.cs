@@ -7,6 +7,9 @@ public class UIInstaller : MonoBehaviour, IInstaller
     [SerializeField] private ScoreView _scoreView;
     [SerializeField] private DefeatEnemyCountView _defeatEnemyCountView;
     [SerializeField] private LongJumpedCountView _longJumpedCountView;
+    [SerializeField] private ResetConditionView _resetConditionView;
+
+    [SerializeField] private TimerView _timerView;
 
     [SerializeField] private NewOrbitPointPool _newOrbitPointPool;
     [SerializeField] private DefeatEnemyPointPool _enemyDefeatedPointPool;
@@ -25,9 +28,19 @@ public class UIInstaller : MonoBehaviour, IInstaller
     {
         builder.Register<HUDPresenter>(Lifetime.Singleton).WithParameter(_playerTransform);
         builder.RegisterComponent(_scoreView);
-        builder.RegisterComponent(_defeatEnemyCountView);
-        builder.RegisterComponent(_longJumpedCountView);
-        builder.RegisterComponent(_visitedSplineCountView);
+        builder.RegisterComponent(_defeatEnemyCountView)
+            .As<IDefeatEnemyCountView>();
+
+        builder.RegisterComponent(_visitedSplineCountView)
+            .As<IVisitedSplineCountView>();
+
+        builder.RegisterComponent(_longJumpedCountView)
+            .As<ILongJumpedCountView>();
+
+        builder.RegisterComponent(_resetConditionView)
+            .As<IResetConditionView>();
+
+        builder.RegisterComponent(_timerView);
 
         builder.Register<PlayUIFactory>(Lifetime.Singleton);
 

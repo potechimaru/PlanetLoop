@@ -17,6 +17,8 @@ public class PlayState : IGameState
     {
         _gameStateExternalFacade.RegisterInputSubscriptions();
         _gameStateExternalFacade.StartMove();
+        _gameStateExternalFacade.StartPointObjectListening();
+        _gameStateExternalFacade.StartTimer();
         await UniTask.CompletedTask;
     }
     public async UniTask Exit()

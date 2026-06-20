@@ -39,6 +39,8 @@ internal class PlayerModel
 
     private readonly float _LONG_JUMP_DISTANCE = 40f;
 
+    public int GuardCount { get; set; } = 0;
+
     private float GetChargeJumpSpeed()
     {
         if (CurrentChargeDuaration <= _CHARGE_DUARATION_1) return _NORMAL_JUMP_SPEED;
@@ -71,5 +73,15 @@ internal class PlayerModel
     public void InitializeJumpSpeed()
     {
         CurrentJumpspeed = _NORMAL_JUMP_SPEED;
+    }
+
+    public void SetCharge1MoveSpeed()
+    {
+        CurrentJumpspeed = _CHARGE_JUMP_SPEED_1;
+    }
+
+    public void SetCharge1JumpSpeed()
+    {
+        CurrentMoveSpeed = _CHARGE_MOVE_SPEED_1;
     }
 }

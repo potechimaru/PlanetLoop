@@ -12,9 +12,11 @@ public interface IUIExternalFacade
 
     // PointObject
     IObservable<PointObjectType> OnPointCollected { get; }
+    void ResetAllPoints();
 
     // Orbit
     IReadOnlyReactiveProperty<(int visitedCount, int allCount)> OnSplineCountChanged { get; }
+    void ResetAllOrbits();
 
     // Enemy
     IReadOnlyReactiveProperty<(int defeatEnemyCount, int allEnemyCount)> OnEnemyCountChanged { get; }
@@ -31,7 +33,7 @@ public class UIExternalFacade : IUIExternalFacade
 
     private readonly GameSessionService _gameSessionService;
 
-    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade, GameSessionService gameSessionService)
+    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade ,GameSessionService gameSessionService)
     {
         _pointObjectFacade = pointObjectFacade;
         _orbitFacade = orbitFacade;
@@ -47,6 +49,11 @@ public class UIExternalFacade : IUIExternalFacade
     // PointObject
     public IObservable<PointObjectType> OnPointCollected => _pointObjectFacade.OnPointCollected;
 
+    public void ResetAllPoints()
+    {
+        _pointObjectFacade.ResetAllPoints();
+    }
+
     // Enemy
     public IReadOnlyReactiveProperty<(int defeatEnemyCount, int allEnemyCount)> OnEnemyCountChanged => _enemyFacade.OnEnemyCountChanged;
 
@@ -55,6 +62,11 @@ public class UIExternalFacade : IUIExternalFacade
 
     public IObservable<Unit> OnEnemyDefeated
     => _enemyFacade.OnEnemyDefeated;
+
+    public void ResetAllOrbits()
+    {
+        _orbitFacade.ResetAllOrbits();
+    }
 
 
 

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4036049380575378541}
   - component: {fileID: 7188431650981603690}
   - component: {fileID: 517728301112857017}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -64,7 +64,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -876546973899608171, guid: 26afa0bfac206a347b7011bfa3c3c10d, type: 3}
+  - {fileID: 2100000, guid: f40ad50e0aeab7e48be3b89b38c0860d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: -3545544321098443338}
   - component: {fileID: -7124855485098349198}
   - component: {fileID: 5027413431756172955}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PointMedium
   m_TagString: Untagged
   m_Icon: {fileID: 0}

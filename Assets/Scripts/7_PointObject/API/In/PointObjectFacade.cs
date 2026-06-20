@@ -3,7 +3,10 @@ using UnityEngine;
 
 public interface IPointObjectFacade
 {
+    void StartPointObjectListening();
     IObservable<PointObjectType> OnPointCollected { get; }
+
+    void ResetAllPoints();
 
 }
 
@@ -16,6 +19,16 @@ public class PointObjectFacade : IPointObjectFacade
     }
 
     public IObservable<PointObjectType> OnPointCollected => _manager.OnPointCollected;
+
+    public void StartPointObjectListening()
+    {
+        _manager.StartListening();
+    }
+
+    public void ResetAllPoints()
+    {
+        _manager.ResetAllPoints();
+    }
 
 
 }

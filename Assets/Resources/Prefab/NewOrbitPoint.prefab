@@ -68,7 +68,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u65B0\u60D1\u661F\n+50\n"
+  m_text: "\u65B0\u60D1\u661F\n+30\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c90f2e93ac186c243a49723e1d8c98c2, type: 2}
   m_sharedMaterial: {fileID: -3511686273212334975, guid: c90f2e93ac186c243a49723e1d8c98c2, type: 2}

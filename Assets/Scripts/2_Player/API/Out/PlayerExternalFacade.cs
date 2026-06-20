@@ -30,8 +30,19 @@ public interface IPlayerExternalFacade
     // Enemy
     public IObservable<Unit> OnPlayerHitByEnemyBullet { get; }
 
+    public IObservable<Unit> OnPlayerHitByLaserBeam { get; }
+
+    IObservable<IEnemyContactHandle> OnPlayerTouchedEnemy { get; }
+
+    void DefeatEnemy(IEnemyContactHandle enemyHandle);
+
+    // Obstacle
+    IObservable<Unit> OnPlayerHitObstacle { get; }
+
+
 
 }
+
 
 public class PlayerExternalFacade : IPlayerExternalFacade
 {
@@ -40,6 +51,7 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     private readonly IBlackHoleFacade _blackHoleFacade;
     private readonly IPointObjectFacade _pointObjectFacade;
     private readonly IEnemyFacade _enemyFacade;
+    private readonly IObstacleFacade _obstacleFacade;
 
 
     public PlayerExternalFacade(
@@ -47,7 +59,8 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         IOrbitFacade orbitFacade,
         IBlackHoleFacade blackHoleFacade,
         IPointObjectFacade pointObjectFacade,
-        IEnemyFacade enemyFacade
+        IEnemyFacade enemyFacade,
+        IObstacleFacade obstacleFacade
         )
     {
         _inputFacade = inputFacade;
@@ -55,6 +68,7 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         _blackHoleFacade = blackHoleFacade;
         _pointObjectFacade = pointObjectFacade;
         _enemyFacade = enemyFacade;
+        _obstacleFacade = obstacleFacade;
 
 
     }
@@ -112,5 +126,20 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     // Enemy
     public IObservable<Unit> OnPlayerHitByEnemyBullet
         => _enemyFacade.OnPlayerHitByEnemyBullet;
+
+    public IObservable<Unit> OnPlayerHitByLaserBeam
+        => _enemyFacade.OnPlayerHitByLaserBeam;
+
+    public IObservable<IEnemyContactHandle> OnPlayerTouchedEnemy
+    => _enemyFacade.OnPlayerTouchedEnemy;
+
+    public void DefeatEnemy(IEnemyContactHandle enemyHandle)
+    {
+        _enemyFacade.DefeatEnemy(enemyHandle);
+    }
+
+    // Obstacle
+    public IObservable<Unit> OnPlayerHitObstacle
+        => _obstacleFacade.OnPlayerHitObstacle;
 
 }

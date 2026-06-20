@@ -11,6 +11,7 @@ public class PlayerController : ITickable
     private readonly PlayerSplineMover _mover;
     private readonly AttachEvent _attachEvent;
     private readonly IPlayerExternalFacade _playerExternalFacade;
+    private readonly PlayerSpawnOverlapResolver _spawnOverlapResolver;
 
     private PlayerStateMachine _playerStateMachine;
 
@@ -24,20 +25,23 @@ public class PlayerController : ITickable
     public IObservable<Unit> OnPlayerDead => _onPlayerDead;
 
     public PlayerController(
-        PlayerView view,
-        IPlayerExternalFacade playerExternalFacade)
+    PlayerView view,
+    IPlayerExternalFacade playerExternalFacade,
+    PlayerSpawnOverlapResolver spawnOverlapResolver)
     {
         _model = new PlayerModel();
         _view = view;
         _playerExternalFacade = playerExternalFacade;
-        _attachEvent = new AttachEvent(_view, _model,_onLongJumped, _onNewOrbitAttached);
+        _spawnOverlapResolver = spawnOverlapResolver;
+
+        _attachEvent = new AttachEvent(_view, _model, _onLongJumped, _onNewOrbitAttached);
 
         _mover = new PlayerSplineMover(
             _view,
             _model,
             _attachEvent,
-            _playerExternalFacade);
-
+            _playerExternalFacade,
+            _spawnOverlapResolver);
     }
 
     public void RegisterInputSubscriptions()
@@ -45,6 +49,7 @@ public class PlayerController : ITickable
         _playerExternalFacade.MoveSubscribe(() =>
         {
             if (_playerStateMachine.CurrentState is GameOverState) return;
+
             if (_playerStateMachine.CurrentState is ChargeState)
             {
                 CancelChargeAndReturnMove();
@@ -52,8 +57,7 @@ public class PlayerController : ITickable
             }
 
             _model.Clockwise = !_model.Clockwise;
-            _view.FlipRotateUI();
-
+            //_view.FlipRotateUI();
         });
 
         _playerExternalFacade.JumpReleasedSubscribe(() =>
@@ -72,13 +76,24 @@ public class PlayerController : ITickable
 
             _playerStateMachine.ChangeState(PlayerStateKey.Charge);
         });
-
-        
     }
 
     public void RegisterPlayerSubscriptions()
     {
         _playerExternalFacade.OnPlayerHitByEnemyBullet.Subscribe(_ =>
+        {
+            if (TryGuardEnemyBullet())
+                return;
+
+            _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
+        });
+
+        _playerExternalFacade.OnPlayerHitByLaserBeam.Subscribe(_ =>
+        {
+            _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
+        });
+
+        _playerExternalFacade.OnPlayerHitObstacle.Subscribe(_ =>
         {
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
         });
@@ -93,12 +108,27 @@ public class PlayerController : ITickable
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
         });
 
+        _playerExternalFacade.OnPlayerTouchedEnemy.Subscribe(enemyHandle =>
+        {
+            if (TryGuardEnemyContact())
+            {
+                _playerExternalFacade.DefeatEnemy(enemyHandle);
+                return;
+            }
+
+            _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
+        });
     }
 
     private void CancelChargeAndReturnMove()
     {
+        _model.GuardCount = 0;
+
         _model.InitializeMoveSpeed();
         _model.InitializeJumpSpeed();
+
+        _view.SetAuraColor(ChargeLevel.Normal);
+
         _playerStateMachine.ChangeState(PlayerStateKey.Move);
     }
 
@@ -121,8 +151,11 @@ public class PlayerController : ITickable
     {
         _view.HideJumpNormalGuide();
         _view.SetAuraColor(ChargeLevel.Normal);
+
         _mover.InitializeMove();
         _model.InitializeMoveSpeed();
+
+        _model.GuardCount = 0;
     }
 
     public void TickMove()
@@ -132,6 +165,8 @@ public class PlayerController : ITickable
 
     public void StartJump()
     {
+        RefreshGuardCount();
+
         _view.HideJumpNormalGuide();
         _mover.StartJump();
     }
@@ -144,6 +179,7 @@ public class PlayerController : ITickable
     public void StartCharge()
     {
         _model.CurrentChargeDuaration = 0f;
+        _model.GuardCount = 0;
     }
 
     public void TickCharge()
@@ -154,6 +190,74 @@ public class PlayerController : ITickable
 
         _view.SetAuraColor(_model.CurrentChargeLevel);
         _view.ShowJumpNormalGuide(_mover.GetOuterNormal());
+    }
+
+    private void RefreshGuardCount()
+    {
+        switch (_model.CurrentChargeLevel)
+        {
+            case ChargeLevel.Charge1:
+                _model.GuardCount = 1;
+                break;
+
+            case ChargeLevel.Charge2:
+                _model.GuardCount = 2;
+                break;
+
+            case ChargeLevel.Normal:
+            default:
+                _model.GuardCount = 0;
+                break;
+        }
+    }
+
+    private bool TryGuardEnemyBullet()
+    {
+        if (_model.GuardCount <= 0)
+            return false;
+
+        _model.GuardCount--;
+
+        switch (_model.GuardCount)
+        {
+            case 1:
+                _view.SetAuraColor(ChargeLevel.Charge1);
+                break;
+
+            case 0:
+                _view.SetAuraColor(ChargeLevel.Normal);
+
+                _model.InitializeMoveSpeed();
+                _model.InitializeJumpSpeed();
+                break;
+        }
+
+        return true;
+    }
+
+    private bool TryGuardEnemyContact()
+    {
+        if (_model.GuardCount <= 0)
+            return false;
+
+        _model.GuardCount--;
+
+        switch (_model.GuardCount)
+        {
+            case 1:
+                _view.SetAuraColor(ChargeLevel.Charge1);
+                _model.SetCharge1JumpSpeed();
+                _model.SetCharge1MoveSpeed();
+                break;
+
+            case 0:
+                _view.SetAuraColor(ChargeLevel.Normal);
+                _model.InitializeMoveSpeed();
+                _model.InitializeJumpSpeed();
+                break;
+        }
+
+        return true;
     }
 
     public void Dead()

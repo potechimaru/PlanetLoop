@@ -1,17 +1,15 @@
 using UnityEngine;
 using TMPro;
 
-public class DefeatEnemyCountView : MonoBehaviour
+public interface IDefeatEnemyCountView : IHUDCountView { }
+
+public class DefeatEnemyCountView : MonoBehaviour, IDefeatEnemyCountView
 {
-    [SerializeField] private TextMeshProUGUI _defeatEnemyCountText;
+    [SerializeField] private TextMeshProUGUI _text;
 
-    //private const string Prefix = "Enemy : ";
-
-    public void SetEnemyCount(int defeatEnemyCount, int allEnemyCount)
+    public void SetCount(int current, int max)
     {
-        if (_defeatEnemyCountText == null) return;
-        //Debug.Log($"DefeatEnemyCountView.SetEnemyCount called with defeatEnemyCount: {defeatEnemyCount}, allEnemyCount: {allEnemyCount}");
-        _defeatEnemyCountText.text = $"{defeatEnemyCount}/{allEnemyCount}";
+        if (_text == null) return;
+        _text.text = $"{current}";
     }
-
 }

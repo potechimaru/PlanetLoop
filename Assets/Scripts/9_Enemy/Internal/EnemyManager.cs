@@ -19,6 +19,9 @@ public class EnemyManager : IDisposable
     private readonly Subject<Unit> _onEnemyDefeated = new();
     public IObservable<Unit> OnEnemyDefeated => _onEnemyDefeated;
 
+    private readonly Subject<IEnemyContactHandle> _onPlayerTouchedEnemy = new();
+    public IObservable<IEnemyContactHandle> OnPlayerTouchedEnemy => _onPlayerTouchedEnemy;
+
     private int _defeatedCount = 0;
     private int _totalEnemyCount = 0;
 
@@ -52,11 +55,10 @@ public class EnemyManager : IDisposable
         if (enemy == null) return;
         if (!_enemySet.Add(enemy)) return;
 
-        enemy.OnPlayerHit
+        enemy.OnPlayerTouched
             .Subscribe(_ =>
             {
-                Unregister(enemy);
-                enemy.DisableEnemy().Forget();
+                _onPlayerTouchedEnemy.OnNext(enemy);
             })
             .AddTo(_disposables);
     }
@@ -71,6 +73,23 @@ public class EnemyManager : IDisposable
         _onEnemyDefeated.OnNext(Unit.Default);
 
         NotifyEnemyCountChanged();
+    }
+
+    public Enemy SpawnRandomEnemyFromTypes(
+    Vector3 position,
+    IReadOnlyList<EnemyType> enemyTypes)
+    {
+        var enemy = _enemyFactory.CreateRandomFromTypes(enemyTypes, position);
+        if (enemy == null) return null;
+
+        Register(enemy);
+
+        enemy.SetDetectionEnabled(_isDetectionEnabled);
+
+        _totalEnemyCount++;
+        NotifyEnemyCountChanged();
+
+        return enemy;
     }
 
     public Enemy SpawnRandomEnemy(Vector3 position)
@@ -110,6 +129,16 @@ public class EnemyManager : IDisposable
         return _enemySet.ToList();
     }
 
+    public void DefeatEnemy(IEnemyContactHandle handle)
+    {
+        if (handle is not Enemy enemy) return;
+        if (enemy == null) return;
+        if (!_enemySet.Contains(enemy)) return;
+
+        Unregister(enemy);
+        handle.Defeat();
+    }
+
     public void ResetDefeatedCount()
     {
         _defeatedCount = 0;
@@ -140,5 +169,6 @@ public class EnemyManager : IDisposable
         _disposables.Dispose();
         _enemyCount.Dispose();
         _onEnemyDefeated.Dispose();
+        _onPlayerTouchedEnemy.Dispose();
     }
 }

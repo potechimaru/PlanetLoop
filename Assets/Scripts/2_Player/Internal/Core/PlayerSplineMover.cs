@@ -10,6 +10,12 @@ internal class PlayerSplineMover
     private readonly IPlayerExternalFacade _playerExternalFacade;
     private readonly AttachEvent _attachEvent;
 
+    private readonly PlayerSpawnOverlapResolver _spawnOverlapResolver;
+
+    private const float SpawnCheckRadius = 1.5f;
+    private const float SpawnSearchStep = 0.2f;
+    private const int SpawnSearchMaxStep = 50;
+
     private ClosedSplineLine _currentSpline;
 
     private float _totalLen;
@@ -30,15 +36,17 @@ internal class PlayerSplineMover
 
 
     internal PlayerSplineMover(
-        PlayerView view,
-        PlayerModel model,
-        AttachEvent attachEvent,
-        IPlayerExternalFacade playerExternalFacade)
+    PlayerView view,
+    PlayerModel model,
+    AttachEvent attachEvent,
+    IPlayerExternalFacade playerExternalFacade,
+    PlayerSpawnOverlapResolver spawnOverlapResolver)
     {
         _view = view;
         _model = model;
         _attachEvent = attachEvent;
         _playerExternalFacade = playerExternalFacade;
+        _spawnOverlapResolver = spawnOverlapResolver;
 
         _currentSpline = _view.Spline;
     }
@@ -83,10 +91,53 @@ internal class PlayerSplineMover
 
         _distance = Mathf.Repeat(distance, _totalLen);
 
+        _distance = FindSafeSpawnDistance(_distance);
+
         _isJumping = false;
         _isAttaching = false;
 
         ApplyPosition();
+    }
+
+    private float FindSafeSpawnDistance(float startDistance)
+    {
+        if (_spawnOverlapResolver == null)
+            return startDistance;
+
+        if (!IsDistanceBlocked(startDistance))
+            return startDistance;
+
+        for (int i = 1; i <= SpawnSearchMaxStep; i++)
+        {
+            float forwardDistance = Mathf.Repeat(
+                startDistance + SpawnSearchStep * i,
+                _totalLen
+            );
+
+            if (!IsDistanceBlocked(forwardDistance))
+                return forwardDistance;
+
+            float backwardDistance = Mathf.Repeat(
+                startDistance - SpawnSearchStep * i,
+                _totalLen
+            );
+
+            if (!IsDistanceBlocked(backwardDistance))
+                return backwardDistance;
+        }
+
+        Debug.LogWarning("[PlayerSplineMover] ˆÀ‘S‚È‰ŠúˆÊ’u‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B");
+        return startDistance;
+    }
+
+    private bool IsDistanceBlocked(float distance)
+    {
+        Vector3 pos = _currentSpline.EvaluateByDistance(distance);
+
+        return _spawnOverlapResolver.IsBlocked(
+            pos,
+            SpawnCheckRadius
+        );
     }
 
     public void InitializeMove()

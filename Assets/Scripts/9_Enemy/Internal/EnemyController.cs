@@ -11,6 +11,7 @@ public sealed class EnemyController
     private readonly EnemyView _view;
     private readonly EnemyConfig _config;
     private readonly EnemyBulletFactory _bulletFactory;
+    private readonly EnemyLaserFactory _laserFactory;
     private readonly EnemyAttackType _enemyAttackType;
 
     public float TelegraphElapsed;
@@ -27,6 +28,7 @@ public sealed class EnemyController
         EnemyView view,
         EnemyConfig config,
         EnemyBulletFactory bulletFactory,
+        EnemyLaserFactory laserFactory,
         EnemyAttackType enemyAttackType)
     {
         _self = self;
@@ -34,6 +36,7 @@ public sealed class EnemyController
         _view = view;
         _config = config;
         _bulletFactory = bulletFactory;
+        _laserFactory = laserFactory;
         _enemyAttackType = enemyAttackType;
 
         Origin = self.position;
@@ -93,6 +96,12 @@ public sealed class EnemyController
     {
         if (_view == null) return;
         _bulletFactory.Spawn(_enemyAttackType, _self.position, dirNormalized);
+    }
+
+    public void FireLaser(Vector3 dirNormalized)
+    {
+        if (_view == null) return;
+        _laserFactory.SpawnAsync(_self.position, dirNormalized).Forget();
     }
 
     public async UniTask PlayDisappearAnimationAsync()

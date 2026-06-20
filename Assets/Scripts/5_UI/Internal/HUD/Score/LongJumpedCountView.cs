@@ -1,17 +1,15 @@
 using UnityEngine;
 using TMPro;
 
-public class LongJumpedCountView : MonoBehaviour
+public interface ILongJumpedCountView : IHUDCountView { }
+
+public class LongJumpedCountView : MonoBehaviour, ILongJumpedCountView
 {
-    [SerializeField] private TextMeshProUGUI _longJumpedCountText;
+    [SerializeField] private TextMeshProUGUI _text;
 
-    //private const string Prefix = "LongJump : ";
-
-    public void SetLongJumpedCount(int longJumpedCount, int maxJumpedCount)
+    public void SetCount(int current, int max)
     {
-        if (_longJumpedCountText == null) return;
-        //Debug.Log($"LongJumpedCountView.SetLongJumpedCount called with longJumpedCount: {longJumpedCount}, maxJumpedCount: {maxJumpedCount}");
-        _longJumpedCountText.text = $"{longJumpedCount}/{maxJumpedCount}";
+        if (_text == null) return;
+        _text.text = $"{current}/{max}";
     }
-
 }

@@ -29,16 +29,9 @@ public class AttachEvent
         float distance,
         Vector3 playerWorldPos)
     {
-        //Debug.Log(
-        //    $"[AttachEvent] attached name={currentSpline.name}, " +
-        //    $"id={currentSpline.SplineID}, " +
-        //    $"isStart={currentSpline.IsStartSpline}, " +
-        //    $"instance={currentSpline.GetInstanceID()}"
-        //);
 
         if (!currentSpline.IsStartSpline)
         {
-            //Debug.Log($"IsStartSpline : {currentSpline.IsStartSpline}");
             CheckNewOrbitAttached(currentSpline);
         }
 
@@ -51,7 +44,6 @@ public class AttachEvent
     {
         if (jumpDistance >= _playerModel.LongJumpDistanceThreshold)
         {
-            //Debug.Log($"Long Jumped! Distance: {jumpDistance}");
             _onLongJumped.OnNext(Unit.Default);
         }
     }
@@ -61,15 +53,14 @@ public class AttachEvent
     {
         if (!currentSpline.IsNewOrbit) return;
 
-        //Debug.Log(
-        //    $"[CheckNewOrbitAttached] attached name={currentSpline.name}, " +
-        //    $"id={currentSpline.SplineID}, " +
-        //    $"isStart={currentSpline.IsStartSpline}, " +
-        //    $"instance={currentSpline.GetInstanceID()}"
-        //);
+        Debug.Log(
+            $"[CheckNewOrbitAttached] attached name={currentSpline.name}, " +
+            $"id={currentSpline.SplineID}, " +
+            $"isStart={currentSpline.IsStartSpline}, " +
+            $"instance={currentSpline.GetInstanceID()}"
+        );
 
         currentSpline.FlashLandingMaterial();
         _onNewOrbitAttached.OnNext(Unit.Default);
-        //Debug.Log("New Orbit Attached!");
     }
 }

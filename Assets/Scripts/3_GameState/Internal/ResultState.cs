@@ -18,6 +18,7 @@ public class ResultState : IGameState
     public async UniTask Enter()
     {
         _gameStateExternalFacade.EndGame();
+        _gameStateExternalFacade.StopTimer();
         await _gameUIManager.ShowGameOver();
         await UniTask.CompletedTask;
     }

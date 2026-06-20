@@ -1,3 +1,4 @@
+using System;
 using UniRx;
 
 public class HUDModel
@@ -20,11 +21,15 @@ public class HUDModel
     private readonly ReactiveProperty<int> _longJumpedCount = new ReactiveProperty<int>(0);
     public IReadOnlyReactiveProperty<int> LongJumpedCount => _longJumpedCount;
 
+    private readonly Subject<Unit> _onEnemyResetThresholdReached = new();
+    public IObservable<Unit> OnEnemyResetThresholdReached
+        => _onEnemyResetThresholdReached;
+
     public  int MaxLongJumpedCount { get; private set; } = 3;
 
 
-    private readonly int _NEW_ORBIT_SCORE = 50;
-    private readonly int _DEFEAT_ENEMY_SCORE = 50;
+    private readonly int _NEW_ORBIT_SCORE = 30;
+    private readonly int _DEFEAT_ENEMY_SCORE = 100;
 
     private readonly int _LOW_POINT_OBJECT_SCORE = 5;
     private readonly int _NORMAL_POINT_OBJECT_SCORE = 20;
@@ -34,6 +39,8 @@ public class HUDModel
     private readonly int _LONG_JUMP_SCORE = 1500;
 
     public float OffsetY { get; } = 1.5f;
+
+    public int EnemyCountToReset { get; } = 2;
 
     public void SetScore(int value)
     {
@@ -95,10 +102,26 @@ public class HUDModel
         _longJumpedCount.Value += 1;
     }
 
-    public void ReflectEnemyCount(int defeatEnemyCount, int allEnemyCount)
+    public void ReflectEnemyCount(
+    int defeatEnemyCount,
+    int allEnemyCount)
     {
+        int previousCount = _defeatEnemyCount.Value;
+
         _defeatEnemyCount.Value = defeatEnemyCount;
         _allEnemyCount.Value = allEnemyCount;
+
+        if (defeatEnemyCount <= 0)
+            return;
+
+        if (defeatEnemyCount % EnemyCountToReset != 0)
+            return;
+
+        // “¯‚¶’l‚Å•¡”‰ñ’Ê’m‚³‚ê‚é‚Ì‚ð–h‚®
+        if (previousCount == defeatEnemyCount)
+            return;
+
+        _onEnemyResetThresholdReached.OnNext(Unit.Default);
     }
 
     public void ReflectSplineCount(int visitedSplineCount, int allSplineCount)

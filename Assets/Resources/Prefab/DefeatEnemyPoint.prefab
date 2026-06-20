@@ -68,7 +68,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\u6483\u7834+50"
+  m_text: "\u6483\u7834+100"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 5b256dec708d5854c90481b70f72a165, type: 2}
   m_sharedMaterial: {fileID: -3511686273212334975, guid: df4047fe0caad514aa1698373e2ac978, type: 2}
@@ -155,6 +155,9 @@ MonoBehaviour:
   duration: 0.8
   moveEase: 9
   _fadeDuration: 0.6
+  useRotation: 1
+  rotateAmount: {x: 0, y: 360, z: 0}
+  rotateEase: 6
 --- !u!225 &2871076250666975492
 CanvasGroup:
   m_ObjectHideFlags: 0

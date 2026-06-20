@@ -63,12 +63,19 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _DistortionBrightness: 0.2
+    - _DistortionDarkness: 20
+    - _DistortionPower: 0.4
+    - _DistortionWhiteness: 0.1
     - _Emission: 4
     - _MainTex: 0
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _Radius: 0.92813134
     - _Randomness: 50
     - _Speed: 3
-    m_Colors: []
+    m_Colors:
+    - _BlackHoleBrightnessColor: {r: 0.23642755, g: 0.4869944, b: 0.7264151, a: 1}
+    - _Center: {r: -1.5493374, g: -0.8071556, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
