@@ -15,8 +15,10 @@ public class Enemy : MonoBehaviour, IEnemyContactHandle
     [SerializeField] private EnemyType _enemyType = EnemyType.Enemy1;
     public EnemyType EnemyType => _enemyType;
 
+    [Inject] private IEnemyExternalFacade _enemyExternalFacade;
     [Inject] private EnemyBulletFactory _bulletFactory;
     [Inject] private EnemyLaserFactory _laserFactory;
+    
 
     private Transform _playerTransform;
 
@@ -79,7 +81,7 @@ public class Enemy : MonoBehaviour, IEnemyContactHandle
 
         _sm.RegisterState(
             EnemyStateKey.Telegraph,
-            new EnemyTelegraphState(_enemyController, _move, _attack));
+            new EnemyTelegraphState(_enemyController, _move, _attack, _enemyExternalFacade));
 
         _sm.RegisterState(
             EnemyStateKey.Cooldown,

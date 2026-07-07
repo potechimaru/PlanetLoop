@@ -16,6 +16,10 @@ public interface IInputFacade
 
 }
 
+/// <summary>
+/// Inputコンポーネント群の内部メソッドを外部に公開するFacade。
+/// 内部構造を隠蔽し、外部からのアクセスを簡素化する役割を持つ。
+/// </summary>
 public class InputFacade : IInputFacade
 {
     private InputService _inputService;

@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 
+/// <summary>
+/// 画面遷移した際に、UIが下から上にスライドして表示されるアニメーションを制御するクラス
+/// </summary>
 public class TextRiseAnimation : MonoBehaviour
 {
     [Header("Target")]

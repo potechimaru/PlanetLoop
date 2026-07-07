@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Žg‚Á‚Ä‚È‚¢
+/// </summary>
 public readonly struct ScoreRuleSignal
 {
     public readonly ScoreRuleType Type;

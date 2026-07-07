@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
+/// <summary>
+/// 指定のCanvasGroupのフェードイン・フェードアウトを制御するクラス
+/// </summary>
 [RequireComponent(typeof(CanvasGroup))]
 public class CanvasGroupFader : MonoBehaviour
 {
@@ -26,6 +29,7 @@ public class CanvasGroupFader : MonoBehaviour
         }
     }
 
+    // フェードイン
     public async UniTask FadeInAsync(
         float? duration = null,
         CancellationToken cancellationToken = default)
@@ -59,6 +63,7 @@ public class CanvasGroupFader : MonoBehaviour
         }
     }
 
+    // フェードアウト
     public async UniTask FadeOutAsync(
         float? duration = null,
         CancellationToken cancellationToken = default)
@@ -92,6 +97,13 @@ public class CanvasGroupFader : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// カスタム性能のあるフェード処理を行う
+    /// </summary>
+    /// <param name="targetAlpha">目標の透明度</param>
+    /// <param name="duration">遷移時間</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask FadeToAsync(
         float targetAlpha,
         float duration,
@@ -122,16 +134,19 @@ public class CanvasGroupFader : MonoBehaviour
         }
     }
 
+    // 瞬時に透明にする
     public void ResetAlpha()
     {
         SetAlpha(0f);
     }
 
+    // 瞬時に不透明にする
     public void FullAlpha()
     {
         SetAlpha(1f);
     }
 
+    // 指定の透明度に瞬時に設定する
     public void SetAlpha(float alpha)
     {
         KillTween();

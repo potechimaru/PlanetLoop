@@ -1,9 +1,12 @@
 using UnityEngine;
 
+/// <summary>
+/// g‚Á‚Ä‚È‚¢
+/// </summary>
 public readonly struct GameFinishSignal
 {
     public readonly GameFinishRuleType Type;
-    public readonly object Context;      // ”CˆÓinull‰Âj
+    public readonly object Context;
 
     public GameFinishSignal(GameFinishRuleType type, object context = null)
     {

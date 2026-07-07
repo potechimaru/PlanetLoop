@@ -3,6 +3,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// Playerコンポーネント群をDIコンテナに登録する
+/// </summary>
 public class PlayerInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private PlayerView _playerView;

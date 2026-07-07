@@ -4,6 +4,9 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// スコアをだんだんカウントアップして表示するアニメーションを制御するクラス
+/// </summary>
 public class ScoreCountUpAnimation : MonoBehaviour
 {
     [Header("Refs")]
@@ -30,6 +33,7 @@ public class ScoreCountUpAnimation : MonoBehaviour
             scoreText = GetComponent<TextMeshProUGUI>();
     }
 
+    // アニメーション開始（デフォルトは0から）
     public async UniTask PlayAsync(int targetScore)
     {
         await PlayAsync(0, targetScore);

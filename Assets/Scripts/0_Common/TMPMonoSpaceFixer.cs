@@ -1,6 +1,9 @@
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// TMPのテキストを等幅フォントにするためのクラス
+/// </summary>
 [RequireComponent(typeof(TextMeshProUGUI))]
 public class TMPMonospaceFixer : MonoBehaviour
 {

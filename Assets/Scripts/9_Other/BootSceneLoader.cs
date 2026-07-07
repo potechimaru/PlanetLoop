@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// ゲーム起動時に最初に読み込まれるシーンで、初期シーンを非同期で読み込むクラス
+/// </summary>
 public class BootSceneLoader : MonoBehaviour
 {
     [SerializeField] private RootLifetimeScope _rootLifetimeScope;

@@ -3,6 +3,9 @@ using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// クリック入力を購読可能なイベントとして提供するクラス
+/// </summary>
 public class ClickInputPublisher : MonoBehaviour, IPointerClickHandler
 {
     private readonly Subject<Unit> _onClicked = new();
@@ -10,7 +13,7 @@ public class ClickInputPublisher : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // 左クリックのみ反応させたい場合
+        // 左クリックのみ反応させたいという意思（笑）
         if (eventData.button != PointerEventData.InputButton.Left)
             return;
 

@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// Playerを追従するカメラの制御クラス
+/// </summary>
 public class FollowCamera : MonoBehaviour
 {
     [SerializeField] private Transform _target;        // プレイヤー
@@ -18,7 +21,7 @@ public class FollowCamera : MonoBehaviour
     {
         if (_target == null) return;
 
-        // === 位置追従 ===
+        // 位置追従
         Vector3 desiredPos = _target.position + _offset;
         transform.position = Vector3.SmoothDamp(
             transform.position,
@@ -27,16 +30,16 @@ public class FollowCamera : MonoBehaviour
             _smoothTime
         );
 
-        // === 向き制御 ===
+        // 向き制御
         UpdateRotation();
     }
 
     private void UpdateRotation()
     {
-        // ① プレイヤーを見る方向
+        // プレイヤーを見る方向
         Vector3 toTarget = (_target.position - transform.position).normalized;
 
-        // ② ブラックホール方向
+        // ブラックホール方向
         Vector3 toBlackHole = Vector3.zero;
 
         if (_blackHole != null)
@@ -48,7 +51,7 @@ public class FollowCamera : MonoBehaviour
             toBlackHole = toTarget;
         }
 
-        // ③ プレイヤー方向をベースに、ブラックホール方向へ少し寄せる
+        // プレイヤー方向をベースに、ブラックホール方向へ少し寄せる
         Vector3 blendedDir = Vector3.RotateTowards(
             toTarget,
             toBlackHole,
@@ -56,7 +59,7 @@ public class FollowCamera : MonoBehaviour
             0f
         );
 
-        // ④ 向き適用
+        // 向き適用
         transform.rotation = Quaternion.LookRotation(blendedDir, Vector3.up);
     }
 }

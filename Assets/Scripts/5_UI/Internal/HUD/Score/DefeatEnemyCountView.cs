@@ -3,6 +3,9 @@ using TMPro;
 
 public interface IDefeatEnemyCountView : IHUDCountView { }
 
+/// <summary>
+/// 倒した敵の数を表示するViewクラス。
+/// </summary>
 public class DefeatEnemyCountView : MonoBehaviour, IDefeatEnemyCountView
 {
     [SerializeField] private TextMeshProUGUI _text;

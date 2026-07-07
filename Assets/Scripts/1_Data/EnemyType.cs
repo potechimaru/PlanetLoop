@@ -1,3 +1,6 @@
+/// <summary>
+/// “G‚ÌŽí—Þ‚ð’è‹`‚·‚é—ñ‹“Œ^
+/// </summary>
 public enum EnemyType
 {
     Enemy1,

@@ -2,6 +2,10 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// プレイヤーがブラックホールの外側制限もしくは内側に入ったかどうかを検知するクラス
+/// プレイヤーはゲームオーバーとなる。また、ブラックホールの外側制限に入った場合は、画面が赤くなる演出を行う。
+/// </summary>
 public class BlackHoleDetector : MonoBehaviour
 {
     [Header("Player")]
@@ -156,6 +160,9 @@ public class BlackHoleDetector : MonoBehaviour
         _onPlayerExitedOuterLimit.Dispose();
     }
 
+    /// <summary>
+    /// 禁止領域の可視化用Gizmosを描画
+    /// </summary>
     private void OnDrawGizmos()
     {
         if (!_showGizmos) return;

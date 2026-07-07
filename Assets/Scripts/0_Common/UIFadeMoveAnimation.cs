@@ -4,6 +4,10 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
+/// <summary>
+/// 移動しながらフェードも加えるアニメーションクラス
+/// バウンスなし。
+/// </summary>
 public class UIFadeMoveAnimation : MonoBehaviour
 {
     public enum MoveDirection

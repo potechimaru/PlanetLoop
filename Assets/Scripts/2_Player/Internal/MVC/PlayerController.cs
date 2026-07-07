@@ -24,6 +24,8 @@ public class PlayerController : ITickable
     private Subject<Unit> _onPlayerDead = new Subject<Unit>();
     public IObservable<Unit> OnPlayerDead => _onPlayerDead;
 
+    private ChargeLevel _previousChargeLevel = ChargeLevel.Normal;
+
     public PlayerController(
     PlayerView view,
     IPlayerExternalFacade playerExternalFacade,
@@ -95,6 +97,9 @@ public class PlayerController : ITickable
 
         _playerExternalFacade.OnPlayerHitObstacle.Subscribe(_ =>
         {
+            if (TryGuardObstacle())
+                return;
+
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
         });
 
@@ -110,19 +115,15 @@ public class PlayerController : ITickable
 
         _playerExternalFacade.OnPlayerTouchedEnemy.Subscribe(enemyHandle =>
         {
-            if (TryGuardEnemyContact())
-            {
-                _playerExternalFacade.DefeatEnemy(enemyHandle);
-                return;
-            }
-
-            _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
+            _playerExternalFacade.DefeatEnemy(enemyHandle);
         });
     }
 
     private void CancelChargeAndReturnMove()
     {
         _model.GuardCount = 0;
+
+        _playerExternalFacade.StopLoopSE();
 
         _model.InitializeMoveSpeed();
         _model.InitializeJumpSpeed();
@@ -167,10 +168,11 @@ public class PlayerController : ITickable
     {
         RefreshGuardCount();
 
+        _playerExternalFacade.StopLoopSE();
+
         _view.HideJumpNormalGuide();
         _mover.StartJump();
     }
-
     public bool TickJump()
     {
         return _mover.TickJump(Time.deltaTime);
@@ -180,6 +182,9 @@ public class PlayerController : ITickable
     {
         _model.CurrentChargeDuaration = 0f;
         _model.GuardCount = 0;
+
+        _previousChargeLevel = ChargeLevel.Normal;
+        _playerExternalFacade.StopLoopSE();
     }
 
     public void TickCharge()
@@ -188,7 +193,32 @@ public class PlayerController : ITickable
         _model.ApplyChargeJumpSpeed();
         _model.ApplyChargeMoveSpeed();
 
-        _view.SetAuraColor(_model.CurrentChargeLevel);
+        ChargeLevel currentLevel = _model.CurrentChargeLevel;
+
+        if (currentLevel != _previousChargeLevel)
+        {
+            switch (currentLevel)
+            {
+                case ChargeLevel.Charge1:
+                    _playerExternalFacade.StopLoopSE();
+                    _playerExternalFacade.StartLoopSE(SEType.Charge1);
+                    break;
+
+                case ChargeLevel.Charge2:
+                    _playerExternalFacade.StopLoopSE();
+                    _playerExternalFacade.StartLoopSE(SEType.Charge2);
+                    break;
+
+                case ChargeLevel.Normal:
+                default:
+                    _playerExternalFacade.StopLoopSE();
+                    break;
+            }
+
+            _previousChargeLevel = currentLevel;
+        }
+
+        _view.SetAuraColor(currentLevel);
         _view.ShowJumpNormalGuide(_mover.GetOuterNormal());
     }
 
@@ -235,6 +265,31 @@ public class PlayerController : ITickable
         return true;
     }
 
+    private bool TryGuardObstacle()
+    {
+        if (_model.GuardCount <= 0)
+            return false;
+
+        _model.GuardCount--;
+
+        switch (_model.GuardCount)
+        {
+            case 1:
+                _view.SetAuraColor(ChargeLevel.Charge1);
+                _model.SetCharge1JumpSpeed();
+                _model.SetCharge1MoveSpeed();
+                break;
+
+            case 0:
+                _view.SetAuraColor(ChargeLevel.Normal);
+                _model.InitializeMoveSpeed();
+                _model.InitializeJumpSpeed();
+                break;
+        }
+
+        return true;
+    }
+
     private bool TryGuardEnemyContact()
     {
         if (_model.GuardCount <= 0)
@@ -263,7 +318,9 @@ public class PlayerController : ITickable
     public void Dead()
     {
         _onPlayerDead.OnNext(Unit.Default);
+        _playerExternalFacade.PlaySE(SEType.PlayerDead);
         _view.PlayDeadEffect().Forget();
         _view.HideJumpNormalGuide();
+        _playerExternalFacade.StopLoopSE();
     }
 }

@@ -6,6 +6,11 @@ public class RootLifetimeScope : LifetimeScope
 {
     private static RootLifetimeScope _instance;
 
+    [SerializeField] private AudioPlayer _audioPlayer;
+
+    [SerializeField] private AudioVolumeSlider _bgmVolumeSlider;
+    [SerializeField] private AudioVolumeSlider _seVolumeSlider;
+
     protected override void Awake()
     {
         if (_instance != null && _instance != this)
@@ -41,6 +46,17 @@ public class RootLifetimeScope : LifetimeScope
         builder.Register<TitleState>(Lifetime.Singleton);
         builder.Register<ModeSelectState>(Lifetime.Singleton);
         builder.Register<GameState>(Lifetime.Singleton);
+
+        builder.RegisterComponent(_audioPlayer);
+        builder.Register<AudioManager>(Lifetime.Singleton);
+
+        builder.RegisterBuildCallback(container =>
+        {
+            container.Inject(_bgmVolumeSlider);
+            container.Inject(_seVolumeSlider);
+        });
+
+
     }
 
     protected override void OnDestroy()

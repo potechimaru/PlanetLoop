@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// プレイヤーからみてどこにブラックホールがあるかを示す矢印UIを制御するクラス
+/// </summary>
 public class BlackHoleDirectionCompass : MonoBehaviour
 {
     [Header("Refs")]

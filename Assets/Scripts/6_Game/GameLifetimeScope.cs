@@ -3,6 +3,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// 全てのコンポーネント群を束ねるライフタイムスコープ
+/// </summary>
 public class GameLifetimeScope : LifetimeScope
 {
     [SerializeField] private GameStateInstaller _gameStateInstaller;
@@ -10,7 +13,7 @@ public class GameLifetimeScope : LifetimeScope
     [SerializeField] private OrbitInstaller _orbitInstaller;
     [SerializeField] private UIInstaller _uiInstaller;
     [SerializeField] private InputInstaller _inputInstaller;
-    [SerializeField] private BlachHoleInstaller _blachHoleInstaller;
+    [SerializeField] private BlackHoleInstaller _blachHoleInstaller;
     [SerializeField] private PointObjectInstaller _pointObjectInstaller;
     [SerializeField] private EnemyInstaller _enemyInstaller;
     [SerializeField] private ObstacleInstaller _obstacleInstaller;

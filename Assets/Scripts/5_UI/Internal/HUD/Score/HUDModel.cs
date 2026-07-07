@@ -1,6 +1,9 @@
 using System;
 using UniRx;
 
+/// <summary>
+/// HUDのModelクラス。統計データはここで管理される。
+/// </summary>
 public class HUDModel
 {
     private readonly ReactiveProperty<int> _score = new ReactiveProperty<int>(0);
@@ -29,7 +32,7 @@ public class HUDModel
 
 
     private readonly int _NEW_ORBIT_SCORE = 30;
-    private readonly int _DEFEAT_ENEMY_SCORE = 100;
+    private readonly int _DEFEAT_ENEMY_SCORE = 150;
 
     private readonly int _LOW_POINT_OBJECT_SCORE = 5;
     private readonly int _NORMAL_POINT_OBJECT_SCORE = 20;
@@ -40,7 +43,7 @@ public class HUDModel
 
     public float OffsetY { get; } = 1.5f;
 
-    public int EnemyCountToReset { get; } = 2;
+    public int EnemyCountToReset { get; } = 20;
 
     public void SetScore(int value)
     {

@@ -49,15 +49,30 @@ public class EnemySpawnDirector : MonoBehaviour
 
     private void Start()
     {
-        var initialTypes = GetInitialSpawnTypes();
-
-        _currentSpawnTypes.Clear();
-        _currentSpawnTypes.AddRange(initialTypes);
+        SetCurrentSpawnTypes(0);
 
         SpawnInitialEnemies();
 
         SpawnLoopAsync(_destroyToken).Forget();
         UnlockEnemyTypesLoopAsync(_destroyToken).Forget();
+    }
+
+    private void SetCurrentSpawnTypes(int startIndex)
+    {
+        _currentSpawnTypes.Clear();
+
+        var allTypes = GetSpawnProgressionTypes();
+
+        if (allTypes.Count == 0)
+            return;
+
+        int firstIndex = Mathf.Clamp(startIndex, 0, allTypes.Count - 1);
+        int secondIndex = Mathf.Clamp(startIndex + 1, 0, allTypes.Count - 1);
+
+        _currentSpawnTypes.Add(allTypes[firstIndex]);
+
+        if (secondIndex != firstIndex)
+            _currentSpawnTypes.Add(allTypes[secondIndex]);
     }
 
     private void SpawnInitialEnemies()
@@ -68,20 +83,20 @@ public class EnemySpawnDirector : MonoBehaviour
         }
     }
 
-    private List<EnemyType> GetInitialSpawnTypes()
-    {
-        var initialTypes = new List<EnemyType>();
+    //private List<EnemyType> GetInitialSpawnTypes()
+    //{
+    //    var initialTypes = new List<EnemyType>();
 
-        foreach (EnemyType type in Enum.GetValues(typeof(EnemyType)))
-        {
-            if (!unlockOrder.Contains(type))
-            {
-                initialTypes.Add(type);
-            }
-        }
+    //    foreach (EnemyType type in Enum.GetValues(typeof(EnemyType)))
+    //    {
+    //        if (!unlockOrder.Contains(type))
+    //        {
+    //            initialTypes.Add(type);
+    //        }
+    //    }
 
-        return initialTypes;
-    }
+    //    return initialTypes;
+    //}
 
     private async UniTaskVoid UnlockEnemyTypesLoopAsync(CancellationToken token)
     {
@@ -94,12 +109,7 @@ public class EnemySpawnDirector : MonoBehaviour
                     cancellationToken: token
                 );
 
-                EnemyType type = unlockOrder[i];
-
-                if (!_currentSpawnTypes.Contains(type))
-                {
-                    _currentSpawnTypes.Add(type);
-                }
+                SetCurrentSpawnTypes(i + 1);
             }
         }
         catch (OperationCanceledException)
@@ -166,5 +176,21 @@ public class EnemySpawnDirector : MonoBehaviour
         }
 
         enemy.SetSpawnPoint(spawnPoint);
+    }
+
+    private List<EnemyType> GetSpawnProgressionTypes()
+    {
+        var types = new List<EnemyType>
+    {
+        EnemyType.Enemy1
+    };
+
+        foreach (var type in unlockOrder)
+        {
+            if (!types.Contains(type))
+                types.Add(type);
+        }
+
+        return types;
     }
 }

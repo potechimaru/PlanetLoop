@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// 生存時間をだんだんカウントアップして表示するアニメーションを制御するクラス
+/// </summary>
 public class TimeCountUpAnimation : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _timeText;

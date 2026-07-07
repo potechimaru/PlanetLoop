@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// BlackHoleのDistortionShaderに対し、画面上でのBlackHoleの位置を教えるクラス
+/// </summary>
 public class BackgroundDistortionCenterSetter : MonoBehaviour
 {
     [SerializeField] private Camera targetCamera;

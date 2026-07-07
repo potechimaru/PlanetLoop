@@ -1,6 +1,9 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Enemy2,4で汎用的に使うAttackStrategy。プレイヤーの方向に3方向に弾を撃つ。
+/// </summary>
 public sealed class ThreeWayAttackStrategy : IAttackStrategy
 {
     private readonly EnemyController _ctx;

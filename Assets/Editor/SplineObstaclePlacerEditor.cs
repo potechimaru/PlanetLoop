@@ -1,6 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 
+/// <summary>
+/// 各SplineにObstacleを自由に配置するためのエディタ拡張クラス
+/// </summary>
 [CustomEditor(typeof(SplineObstaclePlacer))]
 [CanEditMultipleObjects]
 public class SplineObstaclePlacerEditor : Editor

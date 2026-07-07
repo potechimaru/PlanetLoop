@@ -2,7 +2,10 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-public class BlachHoleInstaller : MonoBehaviour, IInstaller
+/// <summary>
+/// BlackHoleコンポーネント群をDIコンテナに登録する
+/// </summary>
+public class BlackHoleInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private BlackHoleGravity _blackHoleGravity;
     [SerializeField] private BlackHoleDetector _blackHoleDetector;

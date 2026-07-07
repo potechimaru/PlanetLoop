@@ -5,6 +5,9 @@ using TMPro;
 using System;
 using System.Threading;
 
+/// <summary>
+/// モード選択画面にて説明文を一文字ずつ表示するアニメーションクラス
+/// </summary>
 [RequireComponent(typeof(TextMeshProUGUI))]
 public class TMPDoTextAnimation : MonoBehaviour
 {

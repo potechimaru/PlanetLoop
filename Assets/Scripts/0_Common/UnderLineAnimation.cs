@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
+/// <summary>
+/// UIの装飾用のアンダーラインのアニメーションを制御するクラス
+/// </summary>
 public class UnderLineAnimation : MonoBehaviour
 {
     [SerializeField] private Image _image;

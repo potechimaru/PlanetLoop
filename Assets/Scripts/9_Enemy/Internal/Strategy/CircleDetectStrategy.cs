@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// EnemyのDetectStrategyで、プレイヤーを円形範囲で判定するStrategyクラス
+/// </summary>
 public sealed class CircleDetectStrategy : IDetectStrategy
 {
     private readonly EnemyController _enemyController;

@@ -3,6 +3,9 @@ using TMPro;
 
 public interface IResetConditionView : IHUDCountView { }
 
+/// <summary>
+/// 既訪問のSpline数のリセットやPointObjectのリセットを行う条件を表示するViewクラス。
+/// </summary>
 public class ResetConditionView : MonoBehaviour, IResetConditionView
 {
     [SerializeField] private TextMeshProUGUI _text;

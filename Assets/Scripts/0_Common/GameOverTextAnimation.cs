@@ -6,6 +6,9 @@ using TMPro;
 using UnityEngine;
 using System.Threading;
 
+/// <summary>
+/// 一文字ずつ落下して表示される「GameOver」テキストのアニメーションを制御するクラス
+/// </summary>
 public class GameOverTextAnimation : MonoBehaviour
 {
     [Header("Text")]
@@ -32,6 +35,9 @@ public class GameOverTextAnimation : MonoBehaviour
         SetupLetters();
     }
 
+    /// <summary>
+    /// ゲーム開始時に、各文字の初期位置とターゲット位置を設定する
+    /// </summary>
     private void SetupLetters()
     {
         _targetPositions.Clear();
@@ -66,6 +72,11 @@ public class GameOverTextAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 落下アニメーションを再生する
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask PlayAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -144,6 +155,9 @@ public class GameOverTextAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// アクティブな文字を変更する。_textの長さに応じて、_letterTextsの表示を切り替える
+    /// </summary>
     public void ChangeActiveLetters()
     {
         int count = Mathf.Min(_text.Length, _letterTexts.Count);

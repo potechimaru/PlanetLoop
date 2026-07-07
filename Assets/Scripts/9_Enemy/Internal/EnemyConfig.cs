@@ -2,7 +2,7 @@
 public class EnemyConfig
 {
     public float DetectRadius = 6f;
-    public float TelegraphTime = 0.9f;
+    public float TelegraphTime = 1.0f;
     public float CooldownTime = 1.2f;
 
     // Move—p

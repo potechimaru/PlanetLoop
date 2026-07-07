@@ -1,5 +1,8 @@
 using Cysharp.Threading.Tasks;
 
+/// <summary>
+/// Enemy1、3で汎用的に使用されるAttackStrategy。プレイヤーの方向に一発だけ弾を撃つ。
+/// </summary>
 public sealed class SingleShotAttackStrategy : IAttackStrategy
 {
     private readonly EnemyController _ctx;

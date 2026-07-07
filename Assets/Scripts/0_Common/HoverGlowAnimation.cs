@@ -2,6 +2,9 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
 
+/// <summary>
+/// ボタンのホバー時にGlowするアニメーションを制御するクラス
+/// </summary>
 public class HoverGlowAnimation : MonoBehaviour
 {
     [Header("Target Image (ShaderGraph Material)")]

@@ -1,5 +1,8 @@
 using Cysharp.Threading.Tasks;
 
+/// <summary>
+/// AttackStrategyで実装するインターフェース
+/// </summary>
 public interface IAttackStrategy
 {
     UniTask OnEnterTelegraph();  // 予告開始時に必要なら初期化

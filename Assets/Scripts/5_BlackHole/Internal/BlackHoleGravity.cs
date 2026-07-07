@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// プレイヤーがブラックホールの重力に引き寄せられる挙動を制御するクラス
+/// </summary>
 public class BlackHoleGravity : MonoBehaviour
 {
     [Header("Radii (world units)")]

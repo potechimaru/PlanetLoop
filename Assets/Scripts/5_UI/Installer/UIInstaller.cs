@@ -2,6 +2,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// UIコンポーネント群をDIコンテナに登録する
+/// </summary>
 public class UIInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private ScoreView _scoreView;

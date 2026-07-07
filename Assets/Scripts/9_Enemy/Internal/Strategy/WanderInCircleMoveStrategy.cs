@@ -1,4 +1,9 @@
 using UnityEngine;
+
+/// <summary>
+/// 使ってないが、敵のMoveStrategyの一つとして円形に徘徊する戦略を実装したクラス
+/// Splineの内側に入ったらダメじゃんと断念（入らないようにすればいいけど要らんなーと）
+/// </summary>
 public sealed class WanderInCircleMoveStrategy : IMoveStrategy
 {
     private readonly EnemyController _ctx;

@@ -10,6 +10,10 @@ public interface IBlackHoleFacade
     IObservable<Unit> OnPlayerExitedOuterLimit { get; }
 }
 
+/// <summary>
+/// BlackHoleコンポーネント群の内部メソッドを外部に公開するFacade。
+/// 内部構造を隠蔽し、外部からのアクセスを簡素化する役割を持つ。
+/// </summary>
 public class BlackHoleFacade : IBlackHoleFacade
 {
     private readonly BlackHoleGravity _blackHoleGravity;

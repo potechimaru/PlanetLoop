@@ -3,6 +3,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// PointObjectコンポーネント群をDIコンテナに登録する
+/// </summary>
 public class PointObjectInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private Transform _linesRoot;

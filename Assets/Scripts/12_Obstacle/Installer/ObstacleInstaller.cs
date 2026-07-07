@@ -3,6 +3,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// Obstacleコンポーネント群をDIコンテナに登録する
+/// </summary>
 public class ObstacleInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private Transform _linesRoot;

@@ -4,6 +4,11 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 
+/// <summary>
+/// ボタンやテキストなどのUIを指定方向にバウンスしながら移動させるアニメーションを制御するクラス
+/// 初めのHUD表示時や、画面遷移時にUIを表示する際に使用することを想定
+/// バウンスが特徴。
+/// </summary>
 public class UIBounceMoveAnimation : MonoBehaviour
 {
     public enum MoveDirection

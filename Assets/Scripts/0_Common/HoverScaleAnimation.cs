@@ -1,6 +1,9 @@
 using UnityEngine;
 using DG.Tweening;
 
+/// <summary>
+/// モード選択画面にてボタンのホバー時に拡大するアニメーションを制御するクラス
+/// </summary>
 public class HoverScaleAnimation : MonoBehaviour
 {
     [Header("Target")]

@@ -2,6 +2,9 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// HUDのPresenterクラス。HUDModelのデータをHUDViewに反映させる役割を担う。
+/// </summary>
 public class HUDPresenter : IDisposable
 {
     private readonly HUDModel _model;
@@ -79,7 +82,7 @@ public class HUDPresenter : IDisposable
         _model.OnEnemyResetThresholdReached
             .Subscribe(_ =>
             {
-                _uiExternalFacade.ResetAllOrbits();
+                //_uiExternalFacade.ResetAllOrbits();
                 _uiExternalFacade.ResetAllPoints();
             })
             .AddTo(_disposables);
@@ -87,6 +90,7 @@ public class HUDPresenter : IDisposable
         _uiExternalFacade.OnNewOrbitAttached
             .Subscribe(_ =>
             {
+                _uiExternalFacade.PlaySE(SEType.NewOrbitAttached);
                 AddScore(ScoreRuleType.NewOrbit, _playerTransform.position);
             })
             .AddTo(_disposables);
@@ -101,6 +105,7 @@ public class HUDPresenter : IDisposable
         _uiExternalFacade.OnPointCollected
             .Subscribe(type =>
             {
+                _uiExternalFacade.PlaySE(SEType.PointObjectCollected);
                 AddScore(ConvertToScoreRuleType(type), _playerTransform.position);
             })
             .AddTo(_disposables);
@@ -122,6 +127,7 @@ public class HUDPresenter : IDisposable
         _uiExternalFacade.OnEnemyDefeated
             .Subscribe(_ =>
             {
+                _uiExternalFacade.PlaySE(SEType.EnemyDefeated);
                 AddScore(ScoreRuleType.DefeatEnemy, _playerTransform.position);
             })
             .AddTo(_disposables);

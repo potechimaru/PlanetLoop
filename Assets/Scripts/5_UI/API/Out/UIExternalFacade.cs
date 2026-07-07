@@ -23,7 +23,15 @@ public interface IUIExternalFacade
 
     IObservable<Unit> OnEnemyDefeated { get; }
 
+    // Audio
+    void PlaySE(SEType sEType);
+
 }
+
+/// <summary>
+/// UIコンポーネント群が外部のメソッドを呼び出すためのFacadeクラス。
+/// このクラスを通じて、ゲームの状態やイベントにアクセスすることができる。
+/// </summary>
 public class UIExternalFacade : IUIExternalFacade
 {
     private readonly IPointObjectFacade _pointObjectFacade;
@@ -33,13 +41,16 @@ public class UIExternalFacade : IUIExternalFacade
 
     private readonly GameSessionService _gameSessionService;
 
-    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade ,GameSessionService gameSessionService)
+    private readonly AudioManager _audioManager;
+
+    public UIExternalFacade(IPointObjectFacade pointObjectFacade, IOrbitFacade orbitFacade, IEnemyFacade enemyFacade, IPlayerFacade playerFacade ,GameSessionService gameSessionService, AudioManager audioManager)
     {
         _pointObjectFacade = pointObjectFacade;
         _orbitFacade = orbitFacade;
         _enemyFacade = enemyFacade;
         _playerFacade = playerFacade;
         _gameSessionService = gameSessionService;
+        _audioManager = audioManager;
     }
 
     // Player
@@ -68,7 +79,11 @@ public class UIExternalFacade : IUIExternalFacade
         _orbitFacade.ResetAllOrbits();
     }
 
-
+    // Audio
+    public void PlaySE(SEType sEType)
+    {
+        _audioManager.PlaySE(sEType);
+    }
 
 
 }

@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// ローディングシーンで「Loading...」のようにドットが増えていくアニメーションを制御するクラス
+/// </summary>
 public class LoadingDotsAnimation : MonoBehaviour
 {
     [Header("Text")]
@@ -53,7 +56,7 @@ public class LoadingDotsAnimation : MonoBehaviour
         _cts?.Dispose();
         _cts = null;
 
-        // 停止時はベーステキストに戻す（必要なければ削除OK）
+        // 停止時はベーステキストに戻す
         if (targetText != null)
         {
             targetText.text = baseText;

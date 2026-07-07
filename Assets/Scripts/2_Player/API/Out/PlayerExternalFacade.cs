@@ -39,11 +39,20 @@ public interface IPlayerExternalFacade
     // Obstacle
     IObservable<Unit> OnPlayerHitObstacle { get; }
 
+    // Audio
+
+    void PlaySE(SEType sEType);
+    void StartLoopSE(SEType sEType);
+    void StopLoopSE();
+
 
 
 }
 
-
+/// <summary>
+/// Playerコンポーネント群が外部のメソッドを呼び出すためのFacadeクラス。
+/// このクラスを通じて、ゲームの状態やイベントにアクセスすることができる。
+/// </summary>
 public class PlayerExternalFacade : IPlayerExternalFacade
 {
     private readonly IInputFacade _inputFacade;
@@ -52,6 +61,7 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     private readonly IPointObjectFacade _pointObjectFacade;
     private readonly IEnemyFacade _enemyFacade;
     private readonly IObstacleFacade _obstacleFacade;
+    private readonly AudioManager _audioManager;
 
 
     public PlayerExternalFacade(
@@ -60,7 +70,8 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         IBlackHoleFacade blackHoleFacade,
         IPointObjectFacade pointObjectFacade,
         IEnemyFacade enemyFacade,
-        IObstacleFacade obstacleFacade
+        IObstacleFacade obstacleFacade,
+        AudioManager audioManager
         )
     {
         _inputFacade = inputFacade;
@@ -69,6 +80,7 @@ public class PlayerExternalFacade : IPlayerExternalFacade
         _pointObjectFacade = pointObjectFacade;
         _enemyFacade = enemyFacade;
         _obstacleFacade = obstacleFacade;
+        _audioManager = audioManager;
 
 
     }
@@ -141,5 +153,22 @@ public class PlayerExternalFacade : IPlayerExternalFacade
     // Obstacle
     public IObservable<Unit> OnPlayerHitObstacle
         => _obstacleFacade.OnPlayerHitObstacle;
+
+    // Audio
+
+    public void PlaySE(SEType sEType)
+    {
+        _audioManager.PlaySE(sEType);
+    }
+
+    public void StartLoopSE(SEType sEType)
+    {
+        _audioManager.StartLoopSE(sEType);
+    }
+
+    public void StopLoopSE()
+    {
+        _audioManager.StopLoopSE();
+    }
 
 }

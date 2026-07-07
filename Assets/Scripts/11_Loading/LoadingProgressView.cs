@@ -1,6 +1,9 @@
 ﻿using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// ローディング画面の進捗表示を制御するクラス
+/// </summary>
 public class LoadingProgressView : MonoBehaviour
 {
     [Header("Text")]

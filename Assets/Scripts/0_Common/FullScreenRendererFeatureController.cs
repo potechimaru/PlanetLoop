@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
+/// <summary>
+/// 
+/// </summary>
 public class FullScreenRendererFeatureController : MonoBehaviour
 {
     [Header("Renderer Data")]

@@ -3,6 +3,9 @@ using UniRx;
 using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
+/// <summary>
+/// PointŠl“¾‚ÌUI‚ğ¶¬‚·‚éFactoryB‘½í—ŞB
+/// </summary>
 public sealed class PlayUIFactory
 {
     [Header("Pools")]

@@ -12,7 +12,7 @@ internal class PlayerSplineMover
 
     private readonly PlayerSpawnOverlapResolver _spawnOverlapResolver;
 
-    private const float SpawnCheckRadius = 1.5f;
+    private const float SpawnCheckRadius = 0.3f;
     private const float SpawnSearchStep = 0.2f;
     private const int SpawnSearchMaxStep = 50;
 

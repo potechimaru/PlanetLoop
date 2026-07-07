@@ -27,6 +27,10 @@ public interface IGameStateExternalFacade
 
 }
 
+/// <summary>
+/// GameStateコンポーネント群が外部のメソッドを呼び出すためのFacadeクラス。
+/// このクラスを通じて、ゲームの状態やイベントにアクセスすることができる。
+/// </summary>
 public class GameStateExternalFacade: IGameStateExternalFacade
 {
     private readonly IPlayerFacade _playerFacade;

@@ -1,6 +1,9 @@
 using DG.Tweening;
 using UnityEngine;
 
+/// <summary>
+/// 敵の待機や、Playerの回転の向きを教えるHelperUIのための回転するアニメーションを制御するクラス
+/// </summary>
 public class ContinuousRotateAnimation : MonoBehaviour
 {
     [Header("Refs")]
@@ -36,6 +39,7 @@ public class ContinuousRotateAnimation : MonoBehaviour
         KillTween();
     }
 
+    // 回転アニメーション開始（ループ）
     public void StartRotate()
     {
         KillTween();
@@ -54,9 +58,12 @@ public class ContinuousRotateAnimation : MonoBehaviour
             .SetLink(gameObject, LinkBehaviour.KillOnDestroy);
     }
 
+    /// <summary>
+    /// 画像をY軸で反転させる
+    /// </summary>
     public void FlipY()
     {
-        Debug.Log("FlipY called");
+        //Debug.Log("FlipY called");
 
         _isFlipped = !_isFlipped;
 

@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
+/// <summary>
+/// GameOpening‚Ì‘Ñ‚ÌHeight‚ğ§Œä‚·‚éƒNƒ‰ƒX
+/// </summary>
 [RequireComponent(typeof(RectTransform))]
 public class HeightChangeAnimation : MonoBehaviour
 {

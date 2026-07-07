@@ -7,11 +7,15 @@ public class OpeningState : IGameState
     public ReactiveCommand<GameStateKey> NextState { get; } = new();
     private readonly IGameStateExternalFacade _gameStateExternalFacade;
     private readonly GameUIManager _gameUIManager;
+    private readonly SaveDataService _saveDataService;
+    private readonly AudioManager _audioManager;
 
-    public OpeningState(IGameStateExternalFacade gameStateExternalFacade, GameUIManager gameUIManager)
+    public OpeningState(IGameStateExternalFacade gameStateExternalFacade, GameUIManager gameUIManager, SaveDataService saveDataService, AudioManager audioManager)
     {
         _gameStateExternalFacade = gameStateExternalFacade;
         _gameUIManager = gameUIManager;
+        _saveDataService = saveDataService;
+        _audioManager = audioManager;
     }
 
     public async UniTask Enter()
@@ -21,7 +25,18 @@ public class OpeningState : IGameState
         _gameStateExternalFacade.SetAllDetectionEnabled(false);
         Time.timeScale = 0f;
         await _gameUIManager.GameOpening();
-        await _gameUIManager.ShowPreGame();
+        //if(_saveDataService.IsFirstPlay())
+        //{
+            _audioManager.PlayBGM(BGMType.Game);
+            await _gameUIManager.ShowTutorial();
+            await _gameUIManager.WaitUntilTutorialClosed();
+            _saveDataService.MarkTutorialShown();
+        //}
+        //else 
+        //{
+        //    _gameStateExternalFacade.PlayBGM(BGMType.Game);
+        //}
+            await _gameUIManager.ShowPreGame();
     }
     public async UniTask Exit()
     {

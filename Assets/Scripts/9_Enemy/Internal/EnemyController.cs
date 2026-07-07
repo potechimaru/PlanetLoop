@@ -67,6 +67,7 @@ public sealed class EnemyController
     {
         if (_view == null) return;
         _view.ShowTelegraph(dirNormalized);
+        //_enemyExternalFacade.PlaySE(SEType.EnemyLockOn);
     }
 
     public void HideTelegraph()
@@ -79,6 +80,7 @@ public sealed class EnemyController
     {
         if (_view == null) return;
         _view.ShowTelegraphs(directions);
+        //_enemyExternalFacade.PlaySE(SEType.EnemyLockOn);
     }
 
     public void HideTelegraphs()

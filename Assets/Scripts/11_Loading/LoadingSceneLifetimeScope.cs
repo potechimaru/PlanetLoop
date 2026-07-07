@@ -2,6 +2,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// ローディングシーンのLifetimeScope
+/// </summary>
 public class LoadingSceneLifetimeScope : LifetimeScope
 {
     [SerializeField] private LoadingSceneController _controller;

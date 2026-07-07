@@ -1,3 +1,6 @@
+/// <summary>
+/// Žg‚Á‚Ä‚È‚¢
+/// </summary>
 public enum GameFinishRuleType
 {
     PlayerDead,

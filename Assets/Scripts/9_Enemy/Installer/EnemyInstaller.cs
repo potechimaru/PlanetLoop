@@ -3,6 +3,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// Enemyコンポーネント群をDIコンテナに登録する
+/// </summary>
 public class EnemyInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private SingleBulletPool _singleBulletPool;

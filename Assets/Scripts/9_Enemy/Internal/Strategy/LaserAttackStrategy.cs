@@ -1,6 +1,9 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Enemy5‚ÌAttackStrategy‚Å‚ ‚éƒŒ[ƒU[UŒ‚‚ÌStrategy
+/// </summary>
 public sealed class LaserAttackStrategy : IAttackStrategy
 {
     private readonly EnemyController _controller;

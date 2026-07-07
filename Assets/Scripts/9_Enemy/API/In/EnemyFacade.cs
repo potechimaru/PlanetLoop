@@ -19,6 +19,10 @@ public interface IEnemyFacade
     void DefeatEnemy(IEnemyContactHandle enemyHandle);
 }
 
+/// <summary>
+/// Enemyコンポーネント群の内部メソッドを外部に公開するFacade。
+/// 内部構造を隠蔽し、外部からのアクセスを簡素化する役割を持つ。
+/// </summary>
 public class EnemyFacade : IEnemyFacade
 {
     private readonly EnemyManager _enemyManager;

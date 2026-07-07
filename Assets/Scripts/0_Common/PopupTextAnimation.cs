@@ -5,6 +5,9 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// ポイント獲得時に表示されるポイントの概要を示すUIのアニメーションを制御するクラス
+/// </summary>
 [RequireComponent(typeof(RectTransform))]
 public class PopupTextAnimation : MonoBehaviour
 {
@@ -14,7 +17,7 @@ public class PopupTextAnimation : MonoBehaviour
 
     [Header("Animation")]
     [SerializeField] private float duration = 0.4f;
-    [SerializeField] private Ease ease = Ease.OutBack; // ポップ感
+    [SerializeField] private Ease ease = Ease.OutBack; // ポップ感を出す
     [SerializeField] private float startScale = 0f;
     [SerializeField] private float endScale = 1f;
 
@@ -49,7 +52,7 @@ public class PopupTextAnimation : MonoBehaviour
             _tween = target
                 .DOScale(endScale, duration)
                 .SetEase(ease)
-                .SetUpdate(true); // TimeScale無視
+                .SetUpdate(true); // 時間停止無効（強い）（うん）
 
             using (ct.Register(() => _tween?.Kill()))
             {

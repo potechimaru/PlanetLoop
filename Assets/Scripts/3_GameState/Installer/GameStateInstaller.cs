@@ -2,6 +2,9 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// GameStateコンポーネント群をDIコンテナに登録する
+/// </summary>
 public class GameStateInstaller : MonoBehaviour, IInstaller
 {
     [SerializeField] private GameUIManager _gameUIManager;

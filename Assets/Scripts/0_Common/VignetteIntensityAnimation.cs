@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
+/// <summary>
+/// フルスクリーンのビネットやグリッチ効果をアニメーションさせるクラス（GameOpening）
+/// </summary>
 public class VignetteIntensityAnimation : MonoBehaviour
 {
     [Header("Volume")]

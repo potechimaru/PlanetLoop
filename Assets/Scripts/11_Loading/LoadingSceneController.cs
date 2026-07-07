@@ -4,6 +4,9 @@ using UnityEngine.SceneManagement;
 using VContainer;
 using VContainer.Unity;
 
+/// <summary>
+/// ローディング画面遷移時に次のシーン遷移処理を始めるクラス
+/// </summary>
 public class LoadingSceneController : MonoBehaviour
 {
     [Inject] private SceneLoadRequest _sceneLoadRequest;
