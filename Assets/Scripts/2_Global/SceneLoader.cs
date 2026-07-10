@@ -49,7 +49,7 @@ public class SceneLoader
     public async UniTask RetryGameAsync()
     {
         string currentSceneName = GetSceneName(_gameModeSelectionReader.CurrentSelectedMode);
-        _sceneLoadRequest.SetNextScene(currentSceneName);
+        _sceneLoadRequest.SetNextScene(currentSceneName, true);
         using (LifetimeScope.EnqueueParent(_globalScope))
         {
             await SceneManager.LoadSceneAsync(LoadingSceneName).ToUniTask();

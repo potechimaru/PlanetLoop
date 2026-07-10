@@ -196,6 +196,16 @@ public class HUDPresenter : IDisposable
         return _model.Score.Value;
     }
 
+    public int GetDefeatEnemyCount()
+    {
+        return _model.DefeatEnemyCount.Value;
+    }
+
+    public int GetVisitedSplineCount()
+    {
+        return _model.VisitedSplineCount.Value;
+    }
+
     public float GetElapsedTime()
     {
         return _elapsedTime;

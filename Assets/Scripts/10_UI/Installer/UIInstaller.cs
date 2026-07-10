@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using VContainer;
 using VContainer.Unity;
 
@@ -24,6 +25,9 @@ public class UIInstaller : MonoBehaviour, IInstaller
     [SerializeField] private LowPointPool _lowPointPool;
 
     [SerializeField] private VisitedSplineCountView _visitedSplineCountView;
+
+    [SerializeField] private AudioVolumeSlider _bgmVolumeSlider;
+    [SerializeField] private AudioVolumeSlider _seVolumeSlider;
 
     [SerializeField] private Transform _playerTransform;
 
@@ -66,6 +70,12 @@ public class UIInstaller : MonoBehaviour, IInstaller
             // Subscribeするためにインスタンスを解決しておく
             container.Resolve<PlayUIFactory>();
             container.Resolve<HUDPresenter>();
+        });
+
+        builder.RegisterBuildCallback(container =>
+        {
+            container.Inject(_bgmVolumeSlider);
+            container.Inject(_seVolumeSlider);
         });
 
 

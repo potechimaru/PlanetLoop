@@ -13,13 +13,17 @@ public class TitleState : IAppState
     public IObservable<Unit> OnEntered => _onEntered;
     public IObservable<Unit> OnExited => _onExited;
 
-    public TitleState()
+    private readonly AudioManager _audioManager;
+
+    public TitleState(AudioManager audioManager)
     {
+        _audioManager = audioManager;
     }
 
     public async UniTask Enter()
     {
         _onEntered.OnNext(Unit.Default);
+        _audioManager.PlayBGM(BGMType.Title);
         await UniTask.CompletedTask;
     }
 

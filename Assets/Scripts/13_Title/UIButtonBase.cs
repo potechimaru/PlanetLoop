@@ -22,6 +22,14 @@ public abstract class UIButtonBase : MonoBehaviour,
     private bool _isPointerInside;
     private bool _isHoverActive;
 
+    private bool _isButtonActive = true;
+
+    public virtual bool IsButtonActive
+    {
+        get => _isButtonActive;
+        set => _isButtonActive = value;
+    }
+
     private readonly Subject<Unit> _onClicked = new();
 
     protected virtual void Awake()
@@ -30,18 +38,21 @@ public abstract class UIButtonBase : MonoBehaviour,
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!IsButtonActive) return;
         _isPointerInside = true;
         ScheduleHoverEnter();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!IsButtonActive) return;
         _isPointerInside = false;
         ScheduleHoverExit();
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (!IsButtonActive) return;
         HandleClick(eventData);
         _onClicked.OnNext(Unit.Default);
     }

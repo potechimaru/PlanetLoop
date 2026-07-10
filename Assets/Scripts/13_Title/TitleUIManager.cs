@@ -11,8 +11,6 @@ public interface ITitleUIManager
     UniTask EnterTitleAnimation();
     UniTask ExitTitleAnimation();
     UniTask EnterModeSelectAnimation();
-    void ShowSettingAnimation();
-    void HideSettingAnimation();
 }
 
 public class TitleUIManager : MonoBehaviour, ITitleUIManager
@@ -37,11 +35,15 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
     [SerializeField] private CanvasGroupFader _OKCanvasGroupFader;
     [SerializeField] private CanvasGroupFader _modeNameCanvasGroupFader;
     [SerializeField] private CanvasGroupFader _modeDescriptionCanvasGroupFader;
+    [SerializeField] private TextMeshProUGUI _highScore;
 
     [Header("ExitModeSelectAnimation")]
     [SerializeField] private List<UIBounceMoveAnimation> _exitModeSelectBounceAnimations;
     [SerializeField] private CameraApproachAnimation _cameraApproachAnimation;
     [SerializeField] private CanvasGroupFader _blackBackFader;
+
+    [Header("SettingAnimation")]
+    [SerializeField] private TutorialPanelAnimation _settingPanelAnimation;
 
     [Header("ButtonSubscription")]
     [SerializeField] private StartButton _startButton;
@@ -49,30 +51,38 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
     [SerializeField] private RightSelectButton _rightSelectButton;
     [SerializeField] private LeftSelectButton _leftSelectButton;
     [SerializeField] private OKButton _OKButton;
+    [SerializeField] private ClickInputPublisher _settingBackClickInputPublisher;
 
     private IGameModeManager _gameModeManager;
     private TitleState _titleState;
     private ModeSelectState _modeSelectState;
     private IAppStateChangeRequester _stateChangeRequester;
+    private AudioManager _audioManager;
+    private SaveDataService _saveDataService;
 
     private bool _isModeChanging;
     private bool _initialized;
+    private bool _isSettingOpen = false;
 
     [Inject]
     public void Construct(
     IGameModeManager gameModeManager,
     TitleState titleState,
     ModeSelectState modeSelectState,
-    IAppStateChangeRequester stateChangeRequester)
+    IAppStateChangeRequester stateChangeRequester,
+    AudioManager audioManager,
+    SaveDataService saveDataService)
     {
-        Debug.Log("[TitleUIManager] Construct called", this);
+        //Debug.Log("[TitleUIManager] Construct called", this);
 
         _gameModeManager = gameModeManager;
         _titleState = titleState;
         _modeSelectState = modeSelectState;
         _stateChangeRequester = stateChangeRequester;
+        _audioManager = audioManager;
+        _saveDataService = saveDataService;
 
-        Debug.Log($"TitleState Null: {_titleState == null}", this);
+        //Debug.Log($"TitleState Null: {_titleState == null}", this);
 
         Initialize();
     }
@@ -89,6 +99,7 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
             _startButton.OnClicked
                 .Subscribe(_ =>
                 {
+                    _audioManager.PlaySE(SEType.Click);
                     _stateChangeRequester.Request(AppStateKey.ModeSelectState);
                 })
                 .AddTo(this);
@@ -97,8 +108,27 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
         if (_gearButton != null)
         {
             _gearButton.OnClicked
-                .Subscribe(_ => ShowSettingAnimation())
+                .Subscribe(_ => {
+                    _audioManager.PlaySE(SEType.Click);
+                    
+                    if (_isSettingOpen)
+                        HideSetting().Forget();
+                    else
+                        ShowSetting().Forget();
+                })
                 .AddTo(this);
+        }
+
+        if (_settingBackClickInputPublisher != null)
+        {
+            _settingBackClickInputPublisher.OnClicked
+            .Subscribe(_ =>
+            {
+                _audioManager.PlaySE(SEType.Click);
+                if (_isSettingOpen)
+                    HideSetting().Forget();
+            })
+            .AddTo(this);
         }
 
         if (_rightSelectButton != null)
@@ -107,6 +137,7 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
                 .Subscribe(_ =>
                 {
                     if (_isModeChanging) return;
+                    _audioManager.PlaySE(SEType.Click);
                     RightChangeModeAnimation().Forget();
                 })
                 .AddTo(this);
@@ -118,6 +149,7 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
                 .Subscribe(_ =>
                 {
                     if (_isModeChanging) return;
+                    _audioManager.PlaySE(SEType.Click);
                     LeftChangeModeAnimation().Forget();
                 })
                 .AddTo(this);
@@ -128,6 +160,7 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
             _OKButton.OnClicked
                 .Subscribe(_ =>
                 {
+                    _audioManager.PlaySE(SEType.Click);
                     ExitModeSelectAnimation().Forget();
                 })
                 .AddTo(this);
@@ -136,38 +169,42 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
         if (_gameModeManager != null)
         {
             _gameModeManager.OnSelectedModeChanged
-                .Subscribe(mode =>
+    .Subscribe(mode =>
+    {
+        if (_gameModeDatabase == null)
+            return;
+
+        var modeData = _gameModeDatabase.GetModeData(mode);
+
+        if (modeData == null)
+            return;
+
+        if (_modeDescriptionTextAnimation != null)
+        {
+            if (_enterModeSelectDescriptionPanel != null &&
+                _enterModeSelectDescriptionPanel.gameObject.activeInHierarchy)
+            {
+                FadeModeDescription(modeData).Forget();
+                FadeModeName(modeData).Forget();
+            }
+            else
+            {
+                _modeDescriptionTextAnimation.SetTargetText(modeData.Description);
+
+                if (_modeNameCanvasGroupFader != null)
                 {
-                    if (_gameModeDatabase == null)
-                        return;
+                    var text =
+                        _modeNameCanvasGroupFader.GetComponent<TextMeshProUGUI>();
 
-                    var modeData = _gameModeDatabase.GetModeData(mode);
+                    if (text != null)
+                        text.text = modeData.DisplayName;
+                }
+            }
+        }
 
-                    if (modeData == null)
-                        return;
-
-                    if (_modeDescriptionTextAnimation == null)
-                        return;
-
-                    if (_enterModeSelectDescriptionPanel != null &&
-                        _enterModeSelectDescriptionPanel.gameObject.activeInHierarchy)
-                    {
-                        FadeModeDescription(modeData).Forget();
-                        FadeModeName(modeData).Forget();
-                    }
-                    else
-                    {
-                        _modeDescriptionTextAnimation.SetTargetText(modeData.Description);
-
-                        if (_modeNameCanvasGroupFader != null)
-                        {
-                            var text = _modeNameCanvasGroupFader.GetComponent<TextMeshProUGUI>();
-                            if (text != null)
-                                text.text = modeData.DisplayName;
-                        }
-                    }
-                })
-                .AddTo(this);
+        UpdateOKButtonState(mode, animated: true);
+    })
+    .AddTo(this);
         }
 
 
@@ -261,6 +298,8 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
         if (_enterModeSelectSplineMoveAnimation != null)
             await _enterModeSelectSplineMoveAnimation.PlayAsync();
 
+        _highScore.text = _saveDataService.GetHighScore(_gameModeManager.CurrentSelectedMode).ToString();
+
         if (_gameModeCarouselController != null)
         {
             _gameModeCarouselController.ActiveSlot();
@@ -347,7 +386,10 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
 
         try
         {
+
             await _gameModeCarouselController.RotateRightAsync();
+
+            _highScore.text = _saveDataService.GetHighScore(_gameModeManager.CurrentSelectedMode).ToString();
 
             if (_modeDescriptionTextAnimation == null)
                 return;
@@ -375,7 +417,11 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
 
         try
         {
+            
+
             await _gameModeCarouselController.RotateLeftAsync();
+
+            _highScore.text = _saveDataService.GetHighScore(_gameModeManager.CurrentSelectedMode).ToString();
 
             if (_modeDescriptionTextAnimation == null)
                 return;
@@ -391,11 +437,64 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
         }
     }
 
-    public void ShowSettingAnimation()
+    private async UniTask ShowSetting()
     {
+        if (_settingPanelAnimation == null || _isSettingOpen)
+            return;
+
+        _isSettingOpen = true;
+
+        _settingPanelAnimation.gameObject.SetActive(true);
+        await _settingPanelAnimation.OpenAsync();
     }
 
-    public void HideSettingAnimation()
+    private async UniTask HideSetting()
     {
+        if (_settingPanelAnimation == null || !_isSettingOpen)
+            return;
+
+        await _settingPanelAnimation.CloseAsync();
+
+        _isSettingOpen = false;
     }
+
+    public void ChangeOKButtonActive()
+    {
+        _OKButton.IsButtonActive = !_OKButton.IsButtonActive;
+        if (_OKButton.IsButtonActive)
+        {
+            _OKCanvasGroupFader.FadeToAsync(1f, 0.2f).Forget();
+        }
+        else
+        {
+            _OKCanvasGroupFader.FadeToAsync(0.5f, 0.2f).Forget();
+        }
+
+    }
+
+    private void UpdateOKButtonState(GameModeType mode, bool animated)
+    {
+        if (_OKButton == null)
+            return;
+
+        bool isComingSoon = _gameModeManager.JudgeComminSoonGameMode(mode);
+
+        _OKButton.IsButtonActive = !isComingSoon;
+
+        if (_OKCanvasGroupFader == null)
+            return;
+
+        float targetAlpha = isComingSoon ? 0.5f : 1f;
+
+        if (!animated || !_OKCanvasGroupFader.gameObject.activeInHierarchy)
+        {
+            _OKCanvasGroupFader.SetAlpha(targetAlpha);
+            return;
+        }
+
+        _OKCanvasGroupFader
+            .FadeToAsync(targetAlpha, 0.2f)
+            .Forget();
+    }
+
 }

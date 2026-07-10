@@ -2,8 +2,10 @@ using UnityEngine;
 
 public class SaveDataService
 {
-    private const string KEY_PREFIX = "HighScore_";
-    private const string FIRST_PLAY_KEY = "IsFirstPlay";
+    private const string KEY_PREFIX = "HighScore_Endless";
+    private const string VISITED_SPLINE_COUNT_KEY_PREFIX = "MaxVisitedSplineCount_Endless";
+    private const string DEFEATED_ENEMY_COUNT_KEY_PREFIX = "MaxDefeatedEnemyCount_Endless";
+    private const string FIRST_PLAY_KEY = "IsFirstPlay_Endless";
 
     private const string BGM_VOLUME_KEY = "BGMVolume";
     private const string SE_VOLUME_KEY = "SEVolume";
@@ -23,6 +25,60 @@ public class SaveDataService
             PlayerPrefs.Save();
             Debug.Log($"[Save] New high score for {mode}: {score}");
         }
+    }
+
+    public int GetMaxVisitedSplineCount(GameModeType mode)
+    {
+        return PlayerPrefs.GetInt(
+            VISITED_SPLINE_COUNT_KEY_PREFIX + mode,
+            0);
+    }
+
+    public void SetMaxVisitedSplineCount(
+        GameModeType mode,
+        int visitedSplineCount)
+    {
+        int current = GetMaxVisitedSplineCount(mode);
+
+        if (visitedSplineCount <= current)
+            return;
+
+        PlayerPrefs.SetInt(
+            VISITED_SPLINE_COUNT_KEY_PREFIX + mode,
+            visitedSplineCount);
+
+        PlayerPrefs.Save();
+
+        Debug.Log(
+            $"[Save] New max visited spline count for {mode}: " +
+            $"{visitedSplineCount}");
+    }
+
+    public int GetMaxDefeatedEnemyCount(GameModeType mode)
+    {
+        return PlayerPrefs.GetInt(
+            DEFEATED_ENEMY_COUNT_KEY_PREFIX + mode,
+            0);
+    }
+
+    public void SetMaxDefeatedEnemyCount(
+        GameModeType mode,
+        int defeatedEnemyCount)
+    {
+        int current = GetMaxDefeatedEnemyCount(mode);
+
+        if (defeatedEnemyCount <= current)
+            return;
+
+        PlayerPrefs.SetInt(
+            DEFEATED_ENEMY_COUNT_KEY_PREFIX + mode,
+            defeatedEnemyCount);
+
+        PlayerPrefs.Save();
+
+        Debug.Log(
+            $"[Save] New max defeated enemy count for {mode}: " +
+            $"{defeatedEnemyCount}");
     }
 
     public void SetLastSelectedMode(GameModeType mode)

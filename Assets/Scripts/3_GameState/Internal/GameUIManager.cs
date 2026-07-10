@@ -2,10 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using TMPro;
 using UniRx;
 using UnityEngine;
 using VContainer;
-
+using UnityEngine.UI;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private VignetteIntensityAnimation _gameOpeningVignetteAnimation;
     [SerializeField] private CanvasGroupFader _gameOpeningCanvasGroupFade;
     [SerializeField] private HeightChangeAnimation _gameOpeningHeightChangeAnimation;
+    [SerializeField] private TextMeshProUGUI _gameOpeningHighScore;
 
     [Header("Tutorial")]
     [SerializeField] private TutorialPanelAnimation _tutorialAnimation;
@@ -30,12 +32,16 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private UIFadeMoveAnimation _timeFadeMoveAnimation;
     [SerializeField] private UIFadeMoveAnimation _titleButtonFadeMoveAnimation;
     [SerializeField] private UIFadeMoveAnimation _restartButtonFadeMoveAnimation;
+    [SerializeField] private UIFadeMoveAnimation _visitedSplineCountFadeMoveAnimation;
+    [SerializeField] private UIFadeMoveAnimation _enemyDefeatedCountFadeMoveAnimation;
     [SerializeField] private CanvasGroupFader _resultCanvasGroupFader;
     [SerializeField] private List<UnderLineAnimation> _resultUnderLineAnimations;
     [SerializeField] private CanvasGroupFader _HUDCanvasGroupFader;
     [SerializeField] private CanvasGroupFader _helperUICanvasGroupFader;
     [SerializeField] private ScoreCountUpAnimation _scoreCountUpAnimation;
     [SerializeField] private TimeCountUpAnimation _timeCountUpAnimation;
+    [SerializeField] private TextMeshProUGUI _VisitedSplineCountText;
+    [SerializeField] private TextMeshProUGUI _EnemyDefeatedCountText;
 
     [Header("Setting")] 
     [SerializeField] private TutorialPanelAnimation _settingAnimation;
@@ -46,6 +52,7 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private ClickInputPublisher _tutorialNextClickInputPublisher;
     [SerializeField] private ClickInputPublisher _tutorialBackClickInputPublisher;
     [SerializeField] private ClickInputPublisher _settingClickInputPublisher;
+    [SerializeField] private ClickInputPublisher _settingBackClickInputPublisher;
     [SerializeField] private ClickInputPublisher _hintClickInputPublisher;
     [SerializeField] private ToTitleButton _toTitleButton;
     [SerializeField] private RetryButton _retryButton;
@@ -54,6 +61,8 @@ public class GameUIManager : MonoBehaviour
     [Inject] private IGameStateChangeRequester _gameStateChangeRequester;
     [Inject] private SceneLoader sceneLoader;
     [Inject] private IAppStateChangeRequester appStateChangeRequester;
+    [Inject] private SaveDataService _saveDataService;
+    [Inject] private IGameModeSelectionReader _gameModeSelectionReader;
 
     [Inject] private AudioManager _audioManager;
 
@@ -97,6 +106,7 @@ public class GameUIManager : MonoBehaviour
         try
         {
             _audioManager.PlaySE(SEType.PreOpeningNoise);
+            _gameOpeningHighScore .text = _saveDataService.GetHighScore(_gameModeSelectionReader.CurrentSelectedMode).ToString();
             await _gameOpeningVignetteAnimation.PlayAsync(ct);
 
             ct.ThrowIfCancellationRequested();
@@ -303,6 +313,9 @@ public class GameUIManager : MonoBehaviour
         {
             if (this == null) return;
 
+            _VisitedSplineCountText.text = _gameStateExternalFacade.GetVisitedSplineCount().ToString();
+            _EnemyDefeatedCountText.text = _gameStateExternalFacade.GetDefeatedEnemyCount().ToString();
+
             if (_gameOpeningCanvasGroupFade != null)
             {
                 _gameOpeningCanvasGroupFade.gameObject.SetActive(true);
@@ -338,6 +351,8 @@ public class GameUIManager : MonoBehaviour
             {
                 _scoreFadeMoveAnimation.gameObject.SetActive(true);
                 _timeFadeMoveAnimation.gameObject.SetActive(true);
+                _visitedSplineCountFadeMoveAnimation.gameObject.SetActive(true);
+                _enemyDefeatedCountFadeMoveAnimation.gameObject.SetActive(true);
 
                 if (_scoreCountUpAnimation != null)
                     _scoreCountUpAnimation.PlayAsync(_gameStateExternalFacade.GetScore()).Forget();
@@ -347,7 +362,9 @@ public class GameUIManager : MonoBehaviour
 
                 await UniTask.WhenAll(
                     _scoreFadeMoveAnimation.PlayAsync(ct),
-                    _timeFadeMoveAnimation.PlayAsync(ct)
+                    _timeFadeMoveAnimation.PlayAsync(ct),
+                    _visitedSplineCountFadeMoveAnimation.PlayAsync(ct),
+                    _enemyDefeatedCountFadeMoveAnimation.PlayAsync(ct)
                 );
             }
 
@@ -538,6 +555,15 @@ public class GameUIManager : MonoBehaviour
                     HideSetting().Forget();
                 else
                     ShowSetting().Forget();
+            })
+            .AddTo(_preGameDisposables);
+
+        _settingBackClickInputPublisher.OnClicked
+            .Subscribe(_ =>
+            {
+                _audioManager.PlaySE(SEType.Click);
+                if (_isSettingOpen)
+                    HideSetting().Forget();
             })
             .AddTo(_preGameDisposables);
     }

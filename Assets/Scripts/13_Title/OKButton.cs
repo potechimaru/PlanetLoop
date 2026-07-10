@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using UnityEngine.UI;
 
 public class OKButton : UIButtonBase
 {
@@ -17,6 +18,8 @@ public class OKButton : UIButtonBase
     [SerializeField] private Ease clickEase = Ease.OutQuad;
     [SerializeField] private Ease clickReturnEase = Ease.OutCubic;
 
+    [SerializeField] private Image _commingSoon;
+
     private Tween _clickTween;
     private Vector3 _initialScale;
 
@@ -31,20 +34,35 @@ public class OKButton : UIButtonBase
             _initialScale = target.localScale;
     }
 
+    public override bool IsButtonActive
+    {
+        get => base.IsButtonActive;
+        set
+        {
+            base.IsButtonActive = value;
+
+            if (_commingSoon != null)
+                _commingSoon.gameObject.SetActive(!value);
+        }
+    }
+
     protected override void HandleHoverEnter()
     {
+        if (!IsButtonActive) return;
         _hoverGlow?.PlayHoverEnter();
         _hoverScale?.PlayHoverEnter();
     }
 
     protected override void HandleHoverExit()
     {
+        if (!IsButtonActive) return;
         _hoverGlow?.PlayHoverExit();
         _hoverScale?.PlayHoverExit();
     }
 
     protected override void HandleClick(PointerEventData eventData)
     {
+        if (!IsButtonActive) return;
         if (target == null) return;
 
         _hoverScale?.Kill();

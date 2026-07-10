@@ -6,6 +6,10 @@ public interface IUIFacade
     bool IsMaxLongJumpedCount();
     int GetScore();
 
+    int GetDefeatEnemyCount();
+
+    int GetVisitedSplineCount();
+
     float GetElapsedTime();
 
     void StartTimer();
@@ -33,6 +37,16 @@ public class UIFacade : IUIFacade
     public int GetScore()
     {
         return _hudPresenter.GetScore();
+    }
+
+    public int GetDefeatEnemyCount()
+    {
+        return _hudPresenter.GetDefeatEnemyCount();
+    }
+
+    public int GetVisitedSplineCount()
+    {
+        return _hudPresenter.GetVisitedSplineCount();
     }
 
     public float GetElapsedTime()

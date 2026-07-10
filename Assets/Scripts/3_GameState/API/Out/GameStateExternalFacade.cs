@@ -17,6 +17,9 @@ public interface IGameStateExternalFacade
 
     int GetScore();
 
+    int GetVisitedSplineCount();
+    int GetDefeatedEnemyCount();    
+
     float GetElapsedTime();
 
     IObservable<Unit> OnPlayerDead { get; }
@@ -90,6 +93,16 @@ public class GameStateExternalFacade: IGameStateExternalFacade
         return _UIFacade.GetScore();
     }
 
+    public int GetVisitedSplineCount()
+    {
+        return _UIFacade.GetVisitedSplineCount();
+    }
+
+    public int GetDefeatedEnemyCount()
+    {
+        return _UIFacade.GetDefeatEnemyCount();
+    }
+
     public float GetElapsedTime()
     {
         return _UIFacade.GetElapsedTime();
@@ -97,8 +110,25 @@ public class GameStateExternalFacade: IGameStateExternalFacade
 
     public void EndGame()
     {
-        _gameSessionService.EndGame(_UIFacade.GetScore());
-        _saveDataService.SetHighScore(_gameSessionService.LastResult.Mode, _gameSessionService.LastResult.Score);
+        int score = _UIFacade.GetScore();
+        int visitedSplineCount = _UIFacade.GetVisitedSplineCount();
+        int defeatedEnemyCount = _UIFacade.GetDefeatEnemyCount();
+
+        _gameSessionService.EndGame(score);
+
+        GameModeType mode = _gameSessionService.LastResult.Mode;
+
+        _saveDataService.SetHighScore(
+            mode,
+            score);
+
+        _saveDataService.SetMaxVisitedSplineCount(
+            mode,
+            visitedSplineCount);
+
+        _saveDataService.SetMaxDefeatedEnemyCount(
+            mode,
+            defeatedEnemyCount);
     }
 
     public void StartPointObjectListening()

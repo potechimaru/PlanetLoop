@@ -15,6 +15,8 @@ public interface IGameModeManager
     void RotateLeft();
 
     IReadOnlyList<ClosedSplineLine> GetCurrentSplineAssignments(IReadOnlyList<ClosedSplineLine> slotSplines);
+
+    bool JudgeComminSoonGameMode(GameModeType gameModeType);
 }
 
 public class GameModeManager : IGameModeManager, IDisposable
@@ -60,7 +62,7 @@ public class GameModeManager : IGameModeManager, IDisposable
 
         _selectedMode.Value = _entries[_selectedIndex].GameMode;
 
-        Debug.Log($"RotateRight: CurrentSelectedMode={CurrentSelectedMode}");
+        //Debug.Log($"RotateRight: CurrentSelectedMode={CurrentSelectedMode}");
     }
 
     public void RotateLeft()
@@ -72,7 +74,7 @@ public class GameModeManager : IGameModeManager, IDisposable
 
         _selectedMode.Value = _entries[_selectedIndex].GameMode;
 
-        Debug.Log($"RotateLeft: CurrentSelectedMode={CurrentSelectedMode}");
+        //Debug.Log($"RotateLeft: CurrentSelectedMode={CurrentSelectedMode}");
     }
 
     public IReadOnlyList<ClosedSplineLine> GetCurrentSplineAssignments(IReadOnlyList<ClosedSplineLine> slotSplines)
@@ -97,6 +99,15 @@ public class GameModeManager : IGameModeManager, IDisposable
         }
 
         return result;
+    }
+
+    public bool JudgeComminSoonGameMode(GameModeType gameModeType)
+    {
+        if (gameModeType == GameModeType.Endless)
+        {
+            return false;
+        }
+        return true;
     }
 
     public void Dispose()

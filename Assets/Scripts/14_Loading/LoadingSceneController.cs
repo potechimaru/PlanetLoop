@@ -12,6 +12,7 @@ public class LoadingSceneController : MonoBehaviour
     [Inject] private SceneLoadRequest _sceneLoadRequest;
     [Inject] private RootLifetimeScope _rootLifetimeScope;
     [Inject] private IAppStateChangeRequester _appStateChangeRequester;
+    [Inject] private AudioManager _audioManager;
 
     [SerializeField] private LoadingProgressView _loadingView;
     [SerializeField] private CanvasGroupFader _blackBack;
@@ -30,6 +31,12 @@ public class LoadingSceneController : MonoBehaviour
             Debug.LogError("NextSceneName が設定されていません。");
             return;
         }
+
+        if (nextSceneName != "Title＆SelectScene" &&
+        !_sceneLoadRequest.IsRetry)
+            {
+                _audioManager.StopBGM();
+            }
 
         AsyncOperation operation;
 
@@ -69,5 +76,7 @@ public class LoadingSceneController : MonoBehaviour
         {
             _appStateChangeRequester.Request(AppStateKey.Game);
         }
+
+        _sceneLoadRequest.Clear();
     }
 }
