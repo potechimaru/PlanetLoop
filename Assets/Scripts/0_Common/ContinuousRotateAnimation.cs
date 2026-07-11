@@ -63,8 +63,6 @@ public class ContinuousRotateAnimation : MonoBehaviour
     /// </summary>
     public void FlipY()
     {
-        //Debug.Log("FlipY called");
-
         _isFlipped = !_isFlipped;
 
         // ‰ñ“]Tween’âŽ~

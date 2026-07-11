@@ -5,9 +5,9 @@ using System;
 using System.Threading;
 
 /// <summary>
-/// ボタンやテキストなどのUIを指定方向にバウンスしながら移動させるアニメーションを制御するクラス
-/// 初めのHUD表示時や、画面遷移時にUIを表示する際に使用することを想定
-/// バウンスが特徴。
+/// ?{?^????e?L?X?g????UI???w???????o?E???X???????????????A?j???[?V?????????N???X
+/// ?????HUD?\??????A???J?????UI??\????????g?p???邱???z??
+/// ?o?E???X???????B
 /// </summary>
 public class UIBounceMoveAnimation : MonoBehaviour
 {
@@ -50,8 +50,8 @@ public class UIBounceMoveAnimation : MonoBehaviour
     }
 
     /// <summary>
-    /// Exitアニメーション
-    /// 初期位置 -> 少し逆方向 -> 指定方向へ画面外
+    /// Exit?A?j???[?V????
+    /// ??????u -> ?????t???? -> ?w?????????O
     /// </summary>
     public async UniTask PlayExitAsync(CancellationToken cancellationToken = default)
     {
@@ -83,7 +83,6 @@ public class UIBounceMoveAnimation : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            Debug.Log($"{nameof(UIBounceMoveAnimation)} Exit canceled");
         }
         catch (Exception ex)
         {
@@ -92,8 +91,8 @@ public class UIBounceMoveAnimation : MonoBehaviour
     }
 
     /// <summary>
-    /// Enterアニメーション
-    /// 指定方向の画面外 -> 少し逆方向側の手前 -> 初期位置
+    /// Enter?A?j???[?V????
+    /// ?w?????????O -> ?????t?????????O -> ??????u
     /// </summary>
     public async UniTask PlayEnterAsync(CancellationToken cancellationToken = default)
     {
@@ -107,7 +106,7 @@ public class UIBounceMoveAnimation : MonoBehaviour
         Vector2 enterStartPos = basePos + dir * moveDistance;
         Vector2 preEnterPos = basePos - dir * preMoveDistance;
 
-        // まず画面外に置く
+        // ??????O??u??
         target.anchoredPosition = enterStartPos;
 
         var seq = DOTween.Sequence()
@@ -126,7 +125,6 @@ public class UIBounceMoveAnimation : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            Debug.Log($"{nameof(UIBounceMoveAnimation)} Enter canceled");
         }
         catch (Exception ex)
         {
@@ -149,7 +147,7 @@ public class UIBounceMoveAnimation : MonoBehaviour
     }
 
     /// <summary>
-    /// 即時Exit再生
+    /// ????Exit???
     /// </summary>
     public void PlayExit()
     {
@@ -157,7 +155,7 @@ public class UIBounceMoveAnimation : MonoBehaviour
     }
 
     /// <summary>
-    /// 即時Enter再生
+    /// ????Enter???
     /// </summary>
     public void PlayEnter()
     {

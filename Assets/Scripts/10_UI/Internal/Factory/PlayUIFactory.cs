@@ -4,7 +4,7 @@ using UnityEngine;
 using static UnityEditor.PlayerSettings;
 
 /// <summary>
-/// Point獲得時のUIを生成するFactory。多種類。
+/// Point?l??????UI???????Factory?B?????B
 /// </summary>
 public sealed class PlayUIFactory
 {
@@ -19,7 +19,7 @@ public sealed class PlayUIFactory
 
     private IUIExternalFacade _uIExternalFacade;
 
-    private float _offsetY = 1.5f; // UIのYオフセット（例: 敵撃破ポイントがキャラクターの頭上に表示されるように）
+    private float _offsetY = 1.5f; // UI??Y?I?t?Z?b?g?i??: ?G???j?|?C???g???L?????N?^?[??????\??????????j
 
     public PlayUIFactory(DefeatEnemyPointPool enemyDefeatedPointPool,
                         NewOrbitPointPool newOrbitPointPool,
@@ -50,12 +50,10 @@ public sealed class PlayUIFactory
 
         //_uIExternalFacade.OnEnemyDefeated
         //    .Subscribe(pos => Spawn(PlayUIType.DefeatEnemyPoint, new Vector2(pos.x, pos.y + _offsetY)));
-
-        //Debug.Log("PlayUIFactory initialized and subscribed to OnNewOrbitAttached event.");
     }
 
     /// <summary>
-    /// 指定UIを出現（UIの anchoredPosition 指定）
+    /// ?w??UI???o???iUI?? anchoredPosition ?w??j
     /// </summary>
     public void Spawn(PlayUIType type, Vector2 anchoredPos, RectTransform parent = null)
     {
@@ -79,27 +77,21 @@ public sealed class PlayUIFactory
             case PlayUIType.PointVeryHigh:
                 if (_veryHighPointPool == null) return;
                 _veryHighPointPool.Rent(anchoredPos, parent).Forget();
-                //Debug.Log($"Spawned VeryHighPoint at {anchoredPos} with parent {parent?.name ?? "null"}");
                 break;
 
             case PlayUIType.PointHigh:
-                //Debug.Log($"High Point Pool :{_highPointPool == null}");
                 if (_highPointPool == null) return;
                 _highPointPool.Rent(anchoredPos, parent).Forget();
-                //Debug.Log($"Spawned HighPoint at {anchoredPos} with parent {parent?.name ?? "null"}");
                 break;
 
             case PlayUIType.PointLow:
-                //Debug.Log($"Low Point Pool :{_highPointPool == null}");
                 if (_lowPointPool == null) return;
                 _lowPointPool.Rent(anchoredPos, parent).Forget();
-                //Debug.Log($"Spawned LowPoint at {anchoredPos} with parent {parent?.name ?? "null"}");
                 break;
 
             case PlayUIType.PointMedium:
                 if (_mediumPointPool == null) return;
                 _mediumPointPool.Rent(anchoredPos, parent).Forget();
-                //Debug.Log($"Spawned MediumPoint at {anchoredPos} with parent {parent?.name ?? "null"}");
                 break;
 
             default:
@@ -108,8 +100,8 @@ public sealed class PlayUIFactory
     }
 
     /// <summary>
-    /// World座標から出したい場合（ScreenSpace-Overlay想定）
-    /// ※CanvasがScreenSpace-Camera/WorldSpaceの場合は変換が変わるので注意
+    /// World???W????o?????????iScreenSpace-Overlay?z??j
+    /// ??Canvas??ScreenSpace-Camera/WorldSpace??????????????????
     /// </summary>
     //public RectTransform SpawnFromWorld(
     //    PlayUIType type,

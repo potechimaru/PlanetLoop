@@ -1,7 +1,9 @@
-using UnityEngine;
-using DG.Tweening;
+using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using UnityEngine;
 
 public class EnemyView : MonoBehaviour
 {
@@ -101,21 +103,42 @@ public class EnemyView : MonoBehaviour
         _rotateTween = null;
     }
 
-    public async UniTask PlayDisappearParticleAsync()
+    public async UniTask PlayDisappearParticleAsync(CancellationToken cancellationToken = default)
     {
         if (_particleSystem == null) return;
 
-        _particleSystem.Play();
+        try
+        {
+            _particleSystem.Play();
 
-        await UniTask.WaitUntil(() =>
-            !_particleSystem.IsAlive(true)
-        );
+            await UniTask.WaitUntil(
+                () => _particleSystem == null || !_particleSystem.IsAlive(true),
+                cancellationToken: cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
-    public async UniTask PlayDisappearAnimationAsync()
+    public async UniTask PlayDisappearAnimationAsync(CancellationToken cancellationToken = default)
     {
         if (_disappearAnimation == null) return;
-        await _disappearAnimation.PlayAsync();
+
+        try
+        {
+            await _disappearAnimation.PlayAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
     public void SetRenderingEnabled(bool enabled)

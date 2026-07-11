@@ -22,8 +22,6 @@ public class GameSessionService
             Mode = CurrentMode,
             Score = CurrentScore
         };
-
-        //Debug.Log($"Game ended. Mode: {CurrentMode}, Score: {CurrentScore}");
     }
 }
 

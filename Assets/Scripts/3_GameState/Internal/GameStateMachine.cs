@@ -18,8 +18,6 @@ public class GameStateMachine : IStartable, ITickable, IDisposable
         IGameStateChangeRequestSource requestSource,
         IGameStateExternalFacade gameStateExternalFacade)
     {
-        //Debug.Log("GameStateMachine Constructor");
-
         RegisterState(GameStateKey.Opening, openingState);
         RegisterState(GameStateKey.Play, playState);
         RegisterState(GameStateKey.Result, resultState);
@@ -36,7 +34,6 @@ public class GameStateMachine : IStartable, ITickable, IDisposable
 
     public void Start()
     {
-        //Debug.Log("GameStateMachine Start");
         ChangeState(GameStateKey.Opening);
     }
 

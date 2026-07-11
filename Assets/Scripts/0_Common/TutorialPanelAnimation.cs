@@ -1,10 +1,11 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
 /// <summary>
-/// ƒQ[ƒ€à–¾‰æ–Ê‚ğŠJ•Â‚·‚éÛ‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ğ§Œä‚·‚éƒNƒ‰ƒX
+/// ?Q?[???????????J?‚?????A?j???[?V??????????N???X
 /// </summary>
 public class TutorialPanelAnimation : MonoBehaviour
 {
@@ -36,7 +37,7 @@ public class TutorialPanelAnimation : MonoBehaviour
 
         if (panel == null)
         {
-            Debug.LogError("[TutorialPanelAnimation] panel ‚ª–¢İ’è‚Å‚·B", this);
+            Debug.LogError("[TutorialPanelAnimation] panel ???????³??B", this);
             return false;
         }
 
@@ -45,7 +46,7 @@ public class TutorialPanelAnimation : MonoBehaviour
         return true;
     }
 
-    public async UniTask OpenAsync()
+    public async UniTask OpenAsync(CancellationToken cancellationToken = default)
     {
         if (!Initialize())
             return;
@@ -64,8 +65,14 @@ public class TutorialPanelAnimation : MonoBehaviour
                 .SetUpdate(true)
                 .SetLink(gameObject);
 
-            //Debug.Log($"[TutorialPanelAnimation] OpenAsync: Starting tween with duration {openDuration} and overshoot {openOvershoot}", this);
-            await _currentTween.AsyncWaitForCompletion();
+            using (cancellationToken.Register(() => _currentTween?.Kill()))
+            {
+                await _currentTween.AsyncWaitForCompletion();
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _currentTween?.Kill();
         }
         catch (Exception e)
         {
@@ -77,7 +84,7 @@ public class TutorialPanelAnimation : MonoBehaviour
         }
     }
 
-    public async UniTask CloseAsync()
+    public async UniTask CloseAsync(CancellationToken cancellationToken = default)
     {
         if (!Initialize())
             return;
@@ -96,9 +103,16 @@ public class TutorialPanelAnimation : MonoBehaviour
                 .SetUpdate(true)
                 .SetLink(gameObject);
 
-            await _currentTween.AsyncWaitForCompletion();
+            using (cancellationToken.Register(() => _currentTween?.Kill()))
+            {
+                await _currentTween.AsyncWaitForCompletion();
+            }
 
             gameObject.SetActive(false);
+        }
+        catch (OperationCanceledException)
+        {
+            _currentTween?.Kill();
         }
         catch (Exception e)
         {

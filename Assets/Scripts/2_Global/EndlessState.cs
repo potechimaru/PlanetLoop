@@ -22,7 +22,6 @@ public class GameState : IAppState
 
     public async UniTask Exit()
     {
-        Debug.Log("Exiting Endless State");
         await UniTask.CompletedTask;
     }
 

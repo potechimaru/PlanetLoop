@@ -76,57 +76,70 @@ public class LaserBeam : MonoBehaviour
         Vector3 direction,
         CancellationToken cancellationToken)
     {
-        _isHit = false;
-
-        _disappearTween?.Kill();
-        _disappearTween = null;
-
-        direction = direction.normalized;
-
-        transform.position = startPos + direction * fireOffset;
-        transform.right = direction;
-
-        EnableLaserVisuals();
-
-        if (capsuleCollider != null)
-            capsuleCollider.enabled = true;
-
-        SetWidthScale(1f);
-
-        float elapsed = 0f;
-
-        while (elapsed < growDuration)
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            _isHit = false;
 
-            elapsed += Time.deltaTime;
+            _disappearTween?.Kill();
+            _disappearTween = null;
 
-            float t = Mathf.Clamp01(elapsed / growDuration);
-            float currentLength = maxLength * t;
+            direction = direction.normalized;
 
-            SetLaserLength(currentLength);
+            transform.position = startPos + direction * fireOffset;
+            transform.right = direction;
+
+            EnableLaserVisuals();
+
+            if (capsuleCollider != null)
+                capsuleCollider.enabled = true;
+
             SetWidthScale(1f);
 
-            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            float elapsed = 0f;
+
+            while (elapsed < growDuration)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                elapsed += Time.deltaTime;
+
+                float t = Mathf.Clamp01(elapsed / growDuration);
+                float currentLength = maxLength * t;
+
+                SetLaserLength(currentLength);
+                SetWidthScale(1f);
+
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            SetLaserLength(maxLength);
+            SetWidthScale(1f);
+
+            float activeElapsed = 0f;
+
+            while (activeElapsed < activeDuration)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                activeElapsed += Time.deltaTime;
+
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            await DisappearAsync(cancellationToken);
+
+            ReturnToPool();
         }
-
-        SetLaserLength(maxLength);
-        SetWidthScale(1f);
-
-        float activeElapsed = 0f;
-
-        while (activeElapsed < activeDuration)
+        catch (OperationCanceledException)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            activeElapsed += Time.deltaTime;
-
-            await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            _disappearTween?.Kill();
+            ReturnToPool();
         }
-
-        await DisappearAsync(cancellationToken);
-
-        ReturnToPool();
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+            ReturnToPool();
+        }
     }
 
     private async UniTask DisappearAsync(CancellationToken cancellationToken)
@@ -161,6 +174,11 @@ public class LaserBeam : MonoBehaviour
         {
             _disappearTween?.Kill();
             throw;
+        }
+        catch (Exception ex)
+        {
+            _disappearTween?.Kill();
+            Debug.LogException(ex);
         }
 
         SetWidthScale(0f);

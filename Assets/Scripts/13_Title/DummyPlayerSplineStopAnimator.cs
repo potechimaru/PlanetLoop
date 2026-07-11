@@ -106,7 +106,6 @@ public class DummyPlayerSplineStopAnimator : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            Debug.Log($"{nameof(DummyPlayerSplineStopAnimator)} canceled.");
         }
         catch (Exception ex)
         {

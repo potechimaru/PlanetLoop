@@ -45,7 +45,6 @@ public class OpeningState : IGameState
     {
         Time.timeScale = 1f;
         _gameStateExternalFacade.SetAllDetectionEnabled(true);
-        //Debug.Log("Exiting Opening State");
         await UniTask.CompletedTask;
     }
     public async UniTask Tick()

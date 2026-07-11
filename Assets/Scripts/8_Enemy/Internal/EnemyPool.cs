@@ -80,9 +80,7 @@ public class EnemyPool : MonoBehaviour
         enemy.transform.SetPositionAndRotation(position, rotation);
 
         enemy.gameObject.SetActive(true);
-        //Debug.Log($"[EnemyPool] PlayerTransform: {_playerTransform != null}");
         enemy.InitializeForSpawn(_playerTransform);
-        //Debug.Log($"[EnemyPool] Rent: {enemyType} at {position}");
 
         return enemy;
     }

@@ -16,8 +16,6 @@ public class TitleLifetimeScope : LifetimeScope
 
     protected override void Configure(IContainerBuilder builder)
     {
-        Debug.Log("[TitleLifetimeScope] Configure called", this);
-
         builder.RegisterComponent(_uiManager)
                .As<ITitleUIManager>();
 

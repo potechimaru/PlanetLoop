@@ -53,13 +53,6 @@ public class AttachEvent
     {
         if (!currentSpline.IsNewOrbit) return;
 
-        //Debug.Log(
-        //    $"[CheckNewOrbitAttached] attached name={currentSpline.name}, " +
-        //    $"id={currentSpline.SplineID}, " +
-        //    $"isStart={currentSpline.IsStartSpline}, " +
-        //    $"instance={currentSpline.GetInstanceID()}"
-        //);
-
         currentSpline.FlashLandingMaterial();
         _onNewOrbitAttached.OnNext(Unit.Default);
     }

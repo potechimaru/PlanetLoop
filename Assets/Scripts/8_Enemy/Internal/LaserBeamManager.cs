@@ -24,7 +24,6 @@ public sealed class LaserBeamManager : IDisposable
             .Subscribe(_ =>
             {
                 _onPlayerHitByLaser.OnNext(Unit.Default);
-                Debug.Log("[LaserBeamManager] プレイヤーがレーザーに当たりました。");
             })
             .AddTo(_disposables);
     }

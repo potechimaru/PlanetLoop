@@ -65,7 +65,6 @@ public class SplineMoveAnimation : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            Debug.Log("SplineMoveAnimation canceled");
         }
         catch (Exception ex)
         {

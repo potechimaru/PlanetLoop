@@ -57,8 +57,6 @@ public class DummyPlayerSplineAnimator : MonoBehaviour
         // Play時に毎回取り直す
         Initialize();
 
-        //Debug.Log($"DummyPlayerSplineAnimator Play: totalLength={_totalLength}, duration={duration}");
-
         if (_totalLength <= 1e-6f)
         {
             Debug.LogWarning("DummyPlayerSplineAnimator: spline total length is 0.");

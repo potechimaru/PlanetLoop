@@ -1,9 +1,11 @@
+using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// 生存時間をだんだんカウントアップして表示するアニメーションを制御するクラス
+/// ??????????????J?E???g?A?b?v????\??????A?j???[?V?????????N???X
 /// </summary>
 public class TimeCountUpAnimation : MonoBehaviour
 {
@@ -11,25 +13,37 @@ public class TimeCountUpAnimation : MonoBehaviour
     [SerializeField] private float duration = 1.5f;
     [SerializeField] private float characterWidth = 40f;
 
-    public async UniTask PlayAsync(float targetSeconds)
+    public async UniTask PlayAsync(float targetSeconds, CancellationToken cancellationToken = default)
     {
         if (_timeText == null) return;
 
-        float elapsed = 0f;
-
-        while (elapsed < duration)
+        try
         {
-            elapsed += Time.unscaledDeltaTime;
+            float elapsed = 0f;
 
-            float t = Mathf.Clamp01(elapsed / duration);
-            float current = Mathf.Lerp(0f, targetSeconds, t);
+            while (elapsed < duration)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
 
-            SetTime(current);
+                elapsed += Time.unscaledDeltaTime;
 
-            await UniTask.Yield(PlayerLoopTiming.Update);
+                float t = Mathf.Clamp01(elapsed / duration);
+                float current = Mathf.Lerp(0f, targetSeconds, t);
+
+                SetTime(current);
+
+                await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+            }
+
+            SetTime(targetSeconds);
         }
-
-        SetTime(targetSeconds);
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
     private void SetTime(float seconds)

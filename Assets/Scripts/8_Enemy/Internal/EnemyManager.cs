@@ -120,7 +120,6 @@ public class EnemyManager : IDisposable
 
     private void NotifyEnemyCountChanged()
     {
-        //Debug.Log($"Enemy Count Changed! Defeated: {_defeatedCount}, Total: {_totalEnemyCount}");
         _enemyCount.Value = (_defeatedCount, _totalEnemyCount);
     }
 

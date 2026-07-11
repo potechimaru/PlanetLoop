@@ -265,8 +265,6 @@ public class GameUIManager : MonoBehaviour
             // 画面外に置き終わってから見せる
             _HUDCanvasGroupFader.gameObject.SetActive(true);
             _HUDCanvasGroupFader.FadeInAsync(0.5f, ct).Forget();
-            //Debug.Log("HUD appear");
-
 
             for (int i = 0; i < _preGameHUDAnimation.Count; i++)
             {

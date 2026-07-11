@@ -19,11 +19,7 @@ public class GameModeCarouselController : MonoBehaviour
     [Inject]
     public void Construct(IGameModeManager gameModeManager)
     {
-        Debug.Log("[GameModeCarouselController] Construct called", this);
-
         _gameModeManager = gameModeManager;
-
-        Debug.Log($"GameModeManager Null: {_gameModeManager == null}", this);
     }
 
     public async UniTask PlayFormationAsync(CancellationToken cancellationToken = default)
@@ -36,6 +32,9 @@ public class GameModeCarouselController : MonoBehaviour
             await PlayAssignmentsAsync(
                 DummyPlayerSplineStopAnimator.MoveDirection.Forward,
                 cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
         }
         catch (Exception ex)
         {
@@ -63,6 +62,9 @@ public class GameModeCarouselController : MonoBehaviour
             await PlayAssignmentsAsync(
                 DummyPlayerSplineStopAnimator.MoveDirection.Backward,
                 cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
         }
         catch (Exception ex)
         {
@@ -94,6 +96,9 @@ public class GameModeCarouselController : MonoBehaviour
             await PlayAssignmentsAsync(
                 DummyPlayerSplineStopAnimator.MoveDirection.Forward,
                 cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
         }
         catch (Exception ex)
         {
@@ -206,7 +211,7 @@ public class GameModeCarouselController : MonoBehaviour
         if (orderedEntries.Count != orderedSlots.Count)
         {
             throw new InvalidOperationException(
-                $"{nameof(GameModeCarouselController)}: GameModeDummyEntry”({orderedEntries.Count}) ‚Æ GameModeSlotView”({orderedSlots.Count}) ‚ªˆê’v‚µ‚Ä‚¢‚Ü‚¹‚ñB");
+                $"{nameof(GameModeCarouselController)}: GameModeDummyEntry??({orderedEntries.Count}) ?? GameModeSlotView??({orderedSlots.Count}) ????v??????????B");
         }
 
         var slotSplines = orderedSlots.Select(x => x.Spline).ToList();

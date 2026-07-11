@@ -84,10 +84,5 @@ public class TutorialPageController : MonoBehaviour
                     ? activeDotColor
                     : inactiveDotColor;
         }
-
-        Debug.Log(
-            $"[TutorialPageController] ShowPage: {_currentPageIndex + 1}/{pageEntries.Count}",
-            this
-        );
     }
 }

@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using TMPro;
 using UniRx;
 using UnityEngine;
@@ -73,16 +74,12 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
     AudioManager audioManager,
     SaveDataService saveDataService)
     {
-        //Debug.Log("[TitleUIManager] Construct called", this);
-
         _gameModeManager = gameModeManager;
         _titleState = titleState;
         _modeSelectState = modeSelectState;
         _stateChangeRequester = stateChangeRequester;
         _audioManager = audioManager;
         _saveDataService = saveDataService;
-
-        //Debug.Log($"TitleState Null: {_titleState == null}", this);
 
         Initialize();
     }
@@ -230,13 +227,23 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
         if (_modeNameCanvasGroupFader == null)
             return;
 
-        await _modeNameCanvasGroupFader.FadeOutAsync();
+        try
+        {
+            await _modeNameCanvasGroupFader.FadeOutAsync();
 
-        var text = _modeNameCanvasGroupFader.GetComponent<TextMeshProUGUI>();
-        if (text != null)
-            text.text = gameModeData.DisplayName;
+            var text = _modeNameCanvasGroupFader.GetComponent<TextMeshProUGUI>();
+            if (text != null)
+                text.text = gameModeData.DisplayName;
 
-        await _modeNameCanvasGroupFader.FadeInAsync();
+            await _modeNameCanvasGroupFader.FadeInAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} FadeModeName Error: {ex}", this);
+        }
     }
 
     private async UniTask FadeModeDescription(GameModeData gameModeData)
@@ -244,134 +251,184 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
         if (_modeDescriptionCanvasGroupFader == null)
             return;
 
-        await _modeDescriptionCanvasGroupFader.FadeOutAsync();
+        try
+        {
+            await _modeDescriptionCanvasGroupFader.FadeOutAsync();
 
-        if (_modeDescriptionTextAnimation != null)
-            _modeDescriptionTextAnimation.SetTargetText(gameModeData.Description);
+            if (_modeDescriptionTextAnimation != null)
+                _modeDescriptionTextAnimation.SetTargetText(gameModeData.Description);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} FadeModeDescription Error: {ex}", this);
+        }
     }
 
     public async UniTask EnterTitleAnimation()
     {
-        var tasks = new List<UniTask>();
-
-        foreach (var anim in _underLineAnimations)
+        try
         {
-            if (anim != null)
-                anim.Play();
-        }
+            var tasks = new List<UniTask>();
 
-        foreach (var anim in _textRiseAnimations)
+            foreach (var anim in _underLineAnimations)
+            {
+                if (anim != null)
+                    anim.Play();
+            }
+
+            foreach (var anim in _textRiseAnimations)
+            {
+                if (anim != null)
+                    tasks.Add(anim.PlayAsync());
+            }
+
+            if (_dummyPlayerSplineAnimator != null)
+                _dummyPlayerSplineAnimator.Play();
+
+            await UniTask.WhenAll(tasks);
+        }
+        catch (OperationCanceledException)
         {
-            if (anim != null)
-                tasks.Add(anim.PlayAsync());
         }
-
-        if (_dummyPlayerSplineAnimator != null)
-            _dummyPlayerSplineAnimator.Play();
-
-        await UniTask.WhenAll(tasks);
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} EnterTitleAnimation Error: {ex}", this);
+        }
     }
 
     public async UniTask ExitTitleAnimation()
     {
-        var tasks = new List<UniTask>();
-
-        foreach (var anim in _uiExitBounceAnimations)
+        try
         {
-            if (anim != null)
-                tasks.Add(anim.PlayExitAsync());
+            var tasks = new List<UniTask>();
+
+            foreach (var anim in _uiExitBounceAnimations)
+            {
+                if (anim != null)
+                    tasks.Add(anim.PlayExitAsync());
+            }
+
+            await UniTask.WhenAll(tasks);
+
+            foreach (var anim in _uiExitBounceAnimations)
+            {
+                if (anim != null)
+                    anim.gameObject.SetActive(false);
+            }
         }
-
-        await UniTask.WhenAll(tasks);
-
-        foreach (var anim in _uiExitBounceAnimations)
+        catch (OperationCanceledException)
         {
-            if (anim != null)
-                anim.gameObject.SetActive(false);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} ExitTitleAnimation Error: {ex}", this);
         }
     }
 
     public async UniTask EnterModeSelectAnimation()
     {
-        var tasks = new List<UniTask>();
-
-        if (_enterModeSelectSplineMoveAnimation != null)
-            await _enterModeSelectSplineMoveAnimation.PlayAsync();
-
-        _highScore.text = _saveDataService.GetHighScore(_gameModeManager.CurrentSelectedMode).ToString();
-
-        if (_gameModeCarouselController != null)
+        try
         {
-            _gameModeCarouselController.ActiveSlot();
-            tasks.Add(_gameModeCarouselController.PlayFormationAsync());
-        }
+            var tasks = new List<UniTask>();
 
-        foreach (var anim in _enterModeSelectBounceAnimations)
-        {
-            if (anim == null)
-                continue;
+            if (_enterModeSelectSplineMoveAnimation != null)
+                await _enterModeSelectSplineMoveAnimation.PlayAsync();
 
-            anim.gameObject.SetActive(true);
-            tasks.Add(anim.PlayEnterAsync());
-        }
+            _highScore.text = _saveDataService.GetHighScore(_gameModeManager.CurrentSelectedMode).ToString();
 
-        if (_enterModeSelectDescriptionPanel != null)
-        {
-            _enterModeSelectDescriptionPanel.gameObject.SetActive(true);
-            tasks.Add(_enterModeSelectDescriptionPanel.FadeInAsync());
-        }
-
-        if (_OKTextRiseAnimation != null)
-        {
-            if (_OKCanvasGroupFader != null)
+            if (_gameModeCarouselController != null)
             {
-                _OKCanvasGroupFader.gameObject.SetActive(true);
-                tasks.Add(_OKCanvasGroupFader.FadeInAsync());
+                _gameModeCarouselController.ActiveSlot();
+                tasks.Add(_gameModeCarouselController.PlayFormationAsync());
             }
 
-            tasks.Add(_OKTextRiseAnimation.PlayAsync());
+            foreach (var anim in _enterModeSelectBounceAnimations)
+            {
+                if (anim == null)
+                    continue;
+
+                anim.gameObject.SetActive(true);
+                tasks.Add(anim.PlayEnterAsync());
+            }
+
+            if (_enterModeSelectDescriptionPanel != null)
+            {
+                _enterModeSelectDescriptionPanel.gameObject.SetActive(true);
+                tasks.Add(_enterModeSelectDescriptionPanel.FadeInAsync());
+            }
+
+            if (_OKTextRiseAnimation != null)
+            {
+                if (_OKCanvasGroupFader != null)
+                {
+                    _OKCanvasGroupFader.gameObject.SetActive(true);
+                    tasks.Add(_OKCanvasGroupFader.FadeInAsync());
+                }
+
+                tasks.Add(_OKTextRiseAnimation.PlayAsync());
+            }
+
+            await UniTask.WhenAll(tasks);
+
+            if (_enterModeSelectFloatLoopAnimation != null)
+                _enterModeSelectFloatLoopAnimation.Play();
+
+            if (_modeDescriptionTextAnimation != null)
+            {
+                _modeDescriptionTextAnimation.gameObject.SetActive(true);
+                _modeDescriptionTextAnimation.PlayAsync().Forget();
+            }
         }
-
-        await UniTask.WhenAll(tasks);
-
-        if (_enterModeSelectFloatLoopAnimation != null)
-            _enterModeSelectFloatLoopAnimation.Play();
-
-        if (_modeDescriptionTextAnimation != null)
+        catch (OperationCanceledException)
         {
-            _modeDescriptionTextAnimation.gameObject.SetActive(true);
-            _modeDescriptionTextAnimation.PlayAsync().Forget();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} EnterModeSelectAnimation Error: {ex}", this);
         }
     }
 
     public async UniTask ExitModeSelectAnimation()
     {
-        var tasks = new List<UniTask>();
-
-        foreach (var anim in _exitModeSelectBounceAnimations)
+        try
         {
-            if (anim != null)
-                tasks.Add(anim.PlayExitAsync());
+            var tasks = new List<UniTask>();
+
+            foreach (var anim in _exitModeSelectBounceAnimations)
+            {
+                if (anim != null)
+                    tasks.Add(anim.PlayExitAsync());
+            }
+
+            if (_cameraApproachAnimation != null)
+                tasks.Add(_cameraApproachAnimation.PlayAsync());
+
+            if (_blackBackFader != null)
+            {
+                _blackBackFader.gameObject.SetActive(true);
+                tasks.Add(_blackBackFader.FadeInAsync());
+            }
+
+            await UniTask.WhenAll(tasks);
+
+            foreach (var anim in _exitModeSelectBounceAnimations)
+            {
+                if (anim != null)
+                    anim.gameObject.SetActive(false);
+            }
+
+            _stateChangeRequester.Request(AppStateKey.Game);
         }
-
-        if (_cameraApproachAnimation != null)
-            tasks.Add(_cameraApproachAnimation.PlayAsync());
-
-        if (_blackBackFader != null)
+        catch (OperationCanceledException)
         {
-            _blackBackFader.gameObject.SetActive(true);
-            tasks.Add(_blackBackFader.FadeInAsync());
         }
-
-        await UniTask.WhenAll(tasks);
-
-        foreach (var anim in _exitModeSelectBounceAnimations)
+        catch (Exception ex)
         {
-            if (anim != null)
-                anim.gameObject.SetActive(false);
+            Debug.LogError($"{nameof(TitleUIManager)} ExitModeSelectAnimation Error: {ex}", this);
         }
-
-        _stateChangeRequester.Request(AppStateKey.Game);
     }
 
     public async UniTask RightChangeModeAnimation()
@@ -398,6 +455,13 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
 
             if (_modeDescriptionCanvasGroupFader != null)
                 _modeDescriptionCanvasGroupFader.FullAlpha();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} RightChangeModeAnimation Error: {ex}", this);
         }
         finally
         {
@@ -431,6 +495,13 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
             if (_modeDescriptionCanvasGroupFader != null)
                 _modeDescriptionCanvasGroupFader.FullAlpha();
         }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} LeftChangeModeAnimation Error: {ex}", this);
+        }
         finally
         {
             _isModeChanging = false;
@@ -444,8 +515,18 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
 
         _isSettingOpen = true;
 
-        _settingPanelAnimation.gameObject.SetActive(true);
-        await _settingPanelAnimation.OpenAsync();
+        try
+        {
+            _settingPanelAnimation.gameObject.SetActive(true);
+            await _settingPanelAnimation.OpenAsync();
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} ShowSetting Error: {ex}", this);
+        }
     }
 
     private async UniTask HideSetting()
@@ -453,9 +534,19 @@ public class TitleUIManager : MonoBehaviour, ITitleUIManager
         if (_settingPanelAnimation == null || !_isSettingOpen)
             return;
 
-        await _settingPanelAnimation.CloseAsync();
+        try
+        {
+            await _settingPanelAnimation.CloseAsync();
 
-        _isSettingOpen = false;
+            _isSettingOpen = false;
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"{nameof(TitleUIManager)} HideSetting Error: {ex}", this);
+        }
     }
 
     public void ChangeOKButtonActive()

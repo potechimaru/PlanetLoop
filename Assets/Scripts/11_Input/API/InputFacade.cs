@@ -17,8 +17,8 @@ public interface IInputFacade
 }
 
 /// <summary>
-/// Inputコンポーネント群の内部メソッドを外部に公開するFacade。
-/// 内部構造を隠蔽し、外部からのアクセスを簡素化する役割を持つ。
+/// Input?R???|?[?l???g?Q????????\?b?h???O??????J????Facade?B
+/// ?????\?????B?????A?O???????A?N?Z?X????f???????????????B
 /// </summary>
 public class InputFacade : IInputFacade
 {
@@ -37,7 +37,6 @@ public class InputFacade : IInputFacade
     {
         _jumpReleasedDisposable = _inputService.OnJumpReleased.Subscribe( _=>
         {
-            //Debug.Log("InputFacade Jump");
             OnJumpReleased?.Invoke();
         });
     }
@@ -62,7 +61,6 @@ public class InputFacade : IInputFacade
     {
         _moveDisposable = _inputService.OnMove.Subscribe( _=>
         {
-            //Debug.Log($"InputFacade Move: {dir}");
             OnMove?.Invoke();
         });
     }

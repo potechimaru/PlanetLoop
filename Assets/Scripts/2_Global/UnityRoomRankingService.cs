@@ -28,11 +28,6 @@ public class UnityroomRankingService
             defeatedEnemyCount,
             ScoreboardWriteMode.HighScoreDesc);
 #else
-        //Debug.Log(
-        //    $"[UnityroomRanking] Editor‚Å‚Í‘—M‚µ‚Ü‚¹‚ñB " +
-        //    $"Score={highScore}, " +
-        //    $"Visited={visitedSplineCount}, " +
-        //    $"Defeated={defeatedEnemyCount}");
 #endif
     }
 }

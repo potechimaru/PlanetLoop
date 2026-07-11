@@ -23,7 +23,6 @@ public class SaveDataService
         {
             PlayerPrefs.SetInt(KEY_PREFIX + mode, score);
             PlayerPrefs.Save();
-            //Debug.Log($"[Save] New high score for {mode}: {score}");
         }
     }
 
@@ -48,10 +47,6 @@ public class SaveDataService
             visitedSplineCount);
 
         PlayerPrefs.Save();
-
-        //Debug.Log(
-        //    $"[Save] New max visited spline count for {mode}: " +
-        //    $"{visitedSplineCount}");
     }
 
     public int GetMaxDefeatedEnemyCount(GameModeType mode)
@@ -75,10 +70,6 @@ public class SaveDataService
             defeatedEnemyCount);
 
         PlayerPrefs.Save();
-
-        //Debug.Log(
-        //    $"[Save] New max defeated enemy count for {mode}: " +
-        //    $"{defeatedEnemyCount}");
     }
 
     public void SetLastSelectedMode(GameModeType mode)

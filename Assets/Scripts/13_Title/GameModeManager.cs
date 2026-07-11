@@ -45,7 +45,7 @@ public class GameModeManager : IGameModeManager, IDisposable
 
         if (_entries.Count == 0)
         {
-            throw new InvalidOperationException($"{nameof(GameModeManager)}: GameModeDummyEntry ‚ª1‚Â‚à‚ ‚è‚Ü‚¹‚ñB");
+            throw new InvalidOperationException($"{nameof(GameModeManager)}: GameModeDummyEntry ??1???????????B");
         }
 
         _selectedIndex = 0;
@@ -61,8 +61,6 @@ public class GameModeManager : IGameModeManager, IDisposable
         _selectedIndex = (_selectedIndex + 1) % _entries.Count;
 
         _selectedMode.Value = _entries[_selectedIndex].GameMode;
-
-        //Debug.Log($"RotateRight: CurrentSelectedMode={CurrentSelectedMode}");
     }
 
     public void RotateLeft()
@@ -73,8 +71,6 @@ public class GameModeManager : IGameModeManager, IDisposable
         _selectedIndex = (_selectedIndex - 1 + _entries.Count) % _entries.Count;
 
         _selectedMode.Value = _entries[_selectedIndex].GameMode;
-
-        //Debug.Log($"RotateLeft: CurrentSelectedMode={CurrentSelectedMode}");
     }
 
     public IReadOnlyList<ClosedSplineLine> GetCurrentSplineAssignments(IReadOnlyList<ClosedSplineLine> slotSplines)
@@ -87,7 +83,7 @@ public class GameModeManager : IGameModeManager, IDisposable
         if (slotSplines.Count != _entries.Count)
         {
             throw new InvalidOperationException(
-                $"{nameof(GameModeManager)}: slotSplines”({slotSplines.Count}) ‚Æ GameModeDummyEntry”({_entries.Count}) ‚ªˆê’v‚µ‚Ä‚¢‚Ü‚¹‚ñB");
+                $"{nameof(GameModeManager)}: slotSplines??({slotSplines.Count}) ?? GameModeDummyEntry??({_entries.Count}) ????v??????????B");
         }
 
         var result = new ClosedSplineLine[_entries.Count];
