@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 /// <summary>
-/// Enemyコンポーネント群をDIコンテナに登録する
+/// Enemy?R???|?[?l???g?Q??DI?R???e?i??o?^????
 /// </summary>
 public class EnemyInstaller : MonoBehaviour, IInstaller
 {
@@ -36,10 +37,11 @@ public class EnemyInstaller : MonoBehaviour, IInstaller
 
         builder.Register<EnemyManager>(Lifetime.Singleton)
                .AsSelf()
+               .As<IDisposable>()
                .WithParameter<IEnumerable<Enemy>>(enemies);
 
-        builder.Register<EnemyBulletManager>(Lifetime.Singleton);
-        builder.Register<LaserBeamManager>(Lifetime.Singleton);
+        builder.Register<EnemyBulletManager>(Lifetime.Singleton).AsSelf().As<IDisposable>();
+        builder.Register<LaserBeamManager>(Lifetime.Singleton).AsSelf().As<IDisposable>();
 
         builder.Register<EnemyFacade>(Lifetime.Singleton).As<IEnemyFacade>();
         builder.Register<EnemyExternalFacade>(Lifetime.Singleton).As<IEnemyExternalFacade>();
@@ -55,7 +57,7 @@ public class EnemyInstaller : MonoBehaviour, IInstaller
 
         builder.RegisterBuildCallback(container =>
         {
-            // EnemyManagerでEnemyをサーチするため、ここで一度Resolveしておく
+            // EnemyManager??Enemy???T?[?`??????A???????xResolve???????
             container.Resolve<EnemyManager>();
         });
     }

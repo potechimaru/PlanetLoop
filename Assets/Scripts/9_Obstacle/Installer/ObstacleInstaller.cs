@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 /// <summary>
-/// Obstacleコンポーネント群をDIコンテナに登録する
+/// Obstacle?R???|?[?l???g?Q??DI?R???e?i??o?^????
 /// </summary>
 public class ObstacleInstaller : MonoBehaviour, IInstaller
 {
@@ -16,6 +17,7 @@ public class ObstacleInstaller : MonoBehaviour, IInstaller
 
         builder.Register<ObstacleManager>(Lifetime.Singleton)
                .AsSelf()
+               .As<IDisposable>()
                .WithParameter<IEnumerable<Obstacle>>(obstacle);
 
         builder.Register<ObstacleFacade>(Lifetime.Singleton).As<IObstacleFacade>();

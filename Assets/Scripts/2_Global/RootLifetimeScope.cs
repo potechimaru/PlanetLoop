@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 public class RootLifetimeScope : LifetimeScope
 {
@@ -29,19 +30,23 @@ public class RootLifetimeScope : LifetimeScope
         builder.Register<SaveDataService>(Lifetime.Singleton);
 
         builder.Register<GameModeSelectionService>(Lifetime.Singleton)
+            .AsSelf()
             .As<IGameModeSelectionReader>()
-            .As<IGameModeSelectionWriter>();
+            .As<IGameModeSelectionWriter>()
+            .As<IDisposable>();
 
         builder.Register<AppStateRequestHub>(Lifetime.Singleton)
+            .AsSelf()
             .As<IAppStateChangeRequestSource>()
-            .As<IAppStateChangeRequester>();
+            .As<IAppStateChangeRequester>()
+            .As<IDisposable>();
 
         builder.Register<SceneLoader>(Lifetime.Singleton);
         builder.Register<SceneLoadRequest>(Lifetime.Singleton);
 
         builder.RegisterEntryPoint<AppStateMachine>(Lifetime.Singleton);
-        builder.Register<TitleState>(Lifetime.Singleton);
-        builder.Register<ModeSelectState>(Lifetime.Singleton);
+        builder.Register<TitleState>(Lifetime.Singleton).AsSelf().As<IDisposable>();
+        builder.Register<ModeSelectState>(Lifetime.Singleton).AsSelf().As<IDisposable>();
         builder.Register<GameState>(Lifetime.Singleton);
 
         builder.RegisterComponent(_audioPlayer);

@@ -86,5 +86,11 @@ public class EnemyTelegraphGuide : MonoBehaviour
     private void OnDestroy()
     {
         _blinkTween?.Kill();
+
+        if (_material != null)
+        {
+            Destroy(_material);
+            _material = null;
+        }
     }
 }

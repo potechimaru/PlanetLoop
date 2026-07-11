@@ -18,8 +18,15 @@ public class PlayerView : MonoBehaviour
 
     //[SerializeField] private ContinuousRotateAnimation _continuousRotateAnimation;
 
+    private MeshRenderer _auraRenderer;
+
     public ClosedSplineLine Spline => _spline;
     public bool UseLocalPlaneXY => _useLocalPlaneXY;
+
+    private void Awake()
+    {
+        _auraRenderer = GetComponentInChildren<MeshRenderer>();
+    }
 
     public void SetPosition(Vector3 worldPos)
     {
@@ -47,7 +54,8 @@ public class PlayerView : MonoBehaviour
                 material = _auraMaterialRed;
                 break;
         }
-        GetComponentInChildren<MeshRenderer>().material = material;
+        if (_auraRenderer != null)
+            _auraRenderer.sharedMaterial = material;
     }
 
     public void ShowJumpNormalGuide(Vector3 normal)
@@ -67,7 +75,7 @@ public class PlayerView : MonoBehaviour
         var emitter = spline.GetComponent<SplineBurstEmitter>();
         if (emitter == null) return;
 
-        // ’…’n‹ß‚­—p + Spline‘S‘Ì—pií—Ş•ª‚¯Ï‚İ‚ÌEmitter‘z’èj
+        // n?p + SplineS?pi???Emitterzj
         emitter.BurstLocalAtDistance(distance);
 
         if (spline.IsNewOrbit && !spline.IsStartSpline)

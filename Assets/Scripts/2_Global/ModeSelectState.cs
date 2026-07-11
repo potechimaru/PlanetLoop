@@ -3,7 +3,7 @@ using System;
 using UniRx;
 using UnityEngine;
 
-public class ModeSelectState : IAppState
+public class ModeSelectState : IAppState, IDisposable
 {
     public ReactiveCommand<AppStateKey> NextState { get; } = new();
 
@@ -25,5 +25,11 @@ public class ModeSelectState : IAppState
     {
         _onExited.OnNext(Unit.Default);
         await UniTask.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _onEntered.Dispose();
+        _onExited.Dispose();
     }
 }

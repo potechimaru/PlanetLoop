@@ -1,9 +1,10 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 /// <summary>
-/// GameStateコンポーネント群をDIコンテナに登録する
+/// GameState?R???|?[?l???g?Q??DI?R???e?i??o?^????
 /// </summary>
 public class GameStateInstaller : MonoBehaviour, IInstaller
 {
@@ -18,7 +19,11 @@ public class GameStateInstaller : MonoBehaviour, IInstaller
         builder.Register<GameStateExternalFacade>(Lifetime.Singleton).As<IGameStateExternalFacade>();
         builder.Register<GameStateFacade>(Lifetime.Singleton).As<IGameStateFacade>();
 
-        builder.Register<GameStateRequestHub>(Lifetime.Singleton).As<IGameStateChangeRequester>().As<IGameStateChangeRequestSource>();
+        builder.Register<GameStateRequestHub>(Lifetime.Singleton)
+            .AsSelf()
+            .As<IGameStateChangeRequester>()
+            .As<IGameStateChangeRequestSource>()
+            .As<IDisposable>();
 
         builder.RegisterComponent(_gameUIManager);
 

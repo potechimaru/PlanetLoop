@@ -1,15 +1,16 @@
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 /// <summary>
-/// Inputコンポーネント群をDIコンテナに登録する
+/// Input?R???|?[?l???g?Q??DI?R???e?i??o?^????
 /// </summary>
 public class InputInstaller : MonoBehaviour, IInstaller
 {
     public void Install(IContainerBuilder builder)
     {
-        builder.Register<InputService>(Lifetime.Singleton);
-        builder.Register<InputFacade>(Lifetime.Singleton).As<IInputFacade>();
+        builder.Register<InputService>(Lifetime.Singleton).AsSelf().As<IDisposable>();
+        builder.Register<InputFacade>(Lifetime.Singleton).AsSelf().As<IInputFacade>().As<IDisposable>();
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UniRx;
 
-public class EnemyBulletManager
+public sealed class EnemyBulletManager : IDisposable
 {
     private readonly Subject<Unit> _onPlayerHitByEnemyBullet = new();
     private readonly CompositeDisposable _disposables = new();
@@ -16,7 +16,7 @@ public class EnemyBulletManager
     {
         if (bullet == null) return;
 
-        // Pool‚Å“¯‚¶’e‚ğÄ—˜—p‚·‚éê‡A“ñdSubscribe–h~
+        // Pool‚Å“¯‚¶’e‚ğÄ—˜—p‚·‚éê‡A“ñdSubscribe–h~
         if (!_registeredBullets.Add(bullet)) return;
 
         bullet.OnHitPlayer

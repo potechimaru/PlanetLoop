@@ -13,7 +13,7 @@ public class PlayerInstaller : MonoBehaviour, IInstaller
     public void Install(IContainerBuilder builder)
     {
         builder.Register<PlayerStateMachine>(Lifetime.Singleton).As<IDisposable>().AsSelf();
-        builder.Register<PlayerController>(Lifetime.Singleton).As<ITickable>().AsSelf();
+        builder.Register<PlayerController>(Lifetime.Singleton).As<ITickable>().AsSelf().As<IDisposable>();
 
         // ControllerˆÈŠO’¼ÚQÆ‹Ö~
         builder.RegisterComponent(_playerView);

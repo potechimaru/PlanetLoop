@@ -80,5 +80,11 @@ public class HoverGlowAnimation : MonoBehaviour
     private void OnDestroy()
     {
         _tween?.Kill();
+
+        if (_materialInstance != null)
+        {
+            Destroy(_materialInstance);
+            _materialInstance = null;
+        }
     }
 }

@@ -4,7 +4,7 @@ using UniRx;
 using UnityEngine;
 using VContainer.Unity;
 
-public class PlayerController : ITickable
+public class PlayerController : ITickable, IDisposable
 {
     private readonly PlayerModel _model;
     private readonly PlayerView _view;
@@ -14,6 +14,8 @@ public class PlayerController : ITickable
     private readonly PlayerSpawnOverlapResolver _spawnOverlapResolver;
 
     private PlayerStateMachine _playerStateMachine;
+
+    private readonly CompositeDisposable _playerSubscriptions = new();
 
     private Subject<Unit> _onLongJumped = new Subject<Unit>();
     public IObservable<Unit> OnLongJumped => _onLongJumped;
@@ -88,12 +90,12 @@ public class PlayerController : ITickable
                 return;
 
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
-        });
+        }).AddTo(_playerSubscriptions);
 
         _playerExternalFacade.OnPlayerHitByLaserBeam.Subscribe(_ =>
         {
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
-        });
+        }).AddTo(_playerSubscriptions);
 
         _playerExternalFacade.OnPlayerHitObstacle.Subscribe(_ =>
         {
@@ -101,22 +103,22 @@ public class PlayerController : ITickable
                 return;
 
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
-        });
+        }).AddTo(_playerSubscriptions);
 
         _playerExternalFacade.OnPlayerEnteredBlackHole.Subscribe(_ =>
         {
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
-        });
+        }).AddTo(_playerSubscriptions);
 
         _playerExternalFacade.OnPlayerExitedOuterLimit.Subscribe(_ =>
         {
             _playerStateMachine.ChangeState(PlayerStateKey.GameOver);
-        });
+        }).AddTo(_playerSubscriptions);
 
         _playerExternalFacade.OnPlayerTouchedEnemy.Subscribe(enemyHandle =>
         {
             _playerExternalFacade.DefeatEnemy(enemyHandle);
-        });
+        }).AddTo(_playerSubscriptions);
     }
 
     private void CancelChargeAndReturnMove()
@@ -322,5 +324,13 @@ public class PlayerController : ITickable
         _view.PlayDeadEffect().Forget();
         _view.HideJumpNormalGuide();
         _playerExternalFacade.StopLoopSE();
+    }
+
+    public void Dispose()
+    {
+        _playerSubscriptions.Dispose();
+        _onLongJumped.Dispose();
+        _onNewOrbitAttached.Dispose();
+        _onPlayerDead.Dispose();
     }
 }

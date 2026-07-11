@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 public class TitleLifetimeScope : LifetimeScope
 {
@@ -19,7 +20,10 @@ public class TitleLifetimeScope : LifetimeScope
         builder.RegisterComponent(_uiManager)
                .As<ITitleUIManager>();
 
-        builder.Register<GameModeManager>(Lifetime.Singleton).As<IGameModeManager>()
+        builder.Register<GameModeManager>(Lifetime.Singleton)
+               .AsSelf()
+               .As<IGameModeManager>()
+               .As<IDisposable>()
                .WithParameter<IEnumerable<GameModeDummyEntry>>(_gameModeDummyEntries);
 
         builder.RegisterComponent(_gameModeCarouselController);

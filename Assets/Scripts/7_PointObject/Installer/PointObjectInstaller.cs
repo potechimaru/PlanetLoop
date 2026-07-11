@@ -2,9 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 /// <summary>
-/// PointObjectコンポーネント群をDIコンテナに登録する
+/// PointObject?R???|?[?l???g?Q??DI?R???e?i??o?^????
 /// </summary>
 public class PointObjectInstaller : MonoBehaviour, IInstaller
 {
@@ -16,6 +17,7 @@ public class PointObjectInstaller : MonoBehaviour, IInstaller
 
         builder.Register<PointObjectManager>(Lifetime.Singleton)
                .AsSelf()
+               .As<IDisposable>()
                .WithParameter<IEnumerable<PointObject>>(pointObject);
 
         builder.Register<PointObjectFacade>(Lifetime.Singleton).As<IPointObjectFacade>();

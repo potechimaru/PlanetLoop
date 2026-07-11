@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 using VContainer.Unity;
+using System;
 
 /// <summary>
 /// UIコンポーネント群をDIコンテナに登録する
@@ -33,7 +34,7 @@ public class UIInstaller : MonoBehaviour, IInstaller
 
     public void Install(IContainerBuilder builder)
     {
-        builder.Register<HUDPresenter>(Lifetime.Singleton).WithParameter(_playerTransform);
+        builder.Register<HUDPresenter>(Lifetime.Singleton).AsSelf().As<IDisposable>().WithParameter(_playerTransform);
         builder.RegisterComponent(_scoreView);
         builder.RegisterComponent(_defeatEnemyCountView)
             .As<IDefeatEnemyCountView>();

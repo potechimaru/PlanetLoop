@@ -3,7 +3,7 @@ using System;
 using UniRx;
 using UnityEngine;
 
-public class TitleState : IAppState
+public class TitleState : IAppState, IDisposable
 {
     public ReactiveCommand<AppStateKey> NextState { get; } = new();
 
@@ -33,4 +33,9 @@ public class TitleState : IAppState
         await UniTask.CompletedTask;
     }
 
+    public void Dispose()
+    {
+        _onEntered.Dispose();
+        _onExited.Dispose();
+    }
 }
