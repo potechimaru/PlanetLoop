@@ -69,6 +69,11 @@ public class ClosedSplineLine : MonoBehaviour
 
     private float _distanceOffset = 0f;
 
+    private MeshRenderer[] _pointMeshRenderers;
+    private bool _isPointRenderingEnabled = true;
+
+    private SplinePointData[] _pointDataCache;
+
     /* =====================================
      * “à•”
      * ===================================== */
@@ -117,13 +122,19 @@ public class ClosedSplineLine : MonoBehaviour
     private void OnEnable()
     {
         EnsureRenderer();
+
         if (Application.isPlaying && normalMaterial == null)
         {
             normalMaterial = _lineRenderer.material;
         }
-        Rebuild();
-    }
 
+        Rebuild();
+
+        if (Application.isPlaying)
+        {
+            CachePointData();
+        }
+    }
 #if UNITY_EDITOR
     private void Update()
     {
@@ -146,6 +157,58 @@ public class ClosedSplineLine : MonoBehaviour
         }
     }
 #endif
+
+    private void CachePointData()
+    {
+        Transform parent =
+            _spawnParent != null
+                ? _spawnParent
+                : transform;
+
+        _pointDataCache =
+            parent.GetComponentsInChildren<SplinePointData>(true);
+    }
+
+    private void CachePointMeshRenderers()
+    {
+        Transform parent =
+            _spawnParent != null
+                ? _spawnParent
+                : transform;
+
+        _pointMeshRenderers =
+            parent.GetComponentsInChildren<MeshRenderer>(true);
+    }
+
+    public void SetPointRenderingEnabled(bool enabled)
+    {
+        if (_isPointRenderingEnabled == enabled)
+            return;
+
+        _isPointRenderingEnabled = enabled;
+
+        if (_pointMeshRenderers == null)
+        {
+            CachePointMeshRenderers();
+        }
+
+        if (_pointMeshRenderers == null)
+            return;
+
+        for (int i = 0; i < _pointMeshRenderers.Length; i++)
+        {
+            if (_pointMeshRenderers[i] == null)
+                continue;
+
+            _pointMeshRenderers[i].enabled = enabled;
+        }
+    }
+
+    public void SetPointActivityEnabled(bool enabled)
+    {
+        SetPointRotationEnabled(enabled);
+        SetPointRenderingEnabled(enabled);
+    }
 
     private void EnsureRenderer()
     {
@@ -299,30 +362,39 @@ public class ClosedSplineLine : MonoBehaviour
         if (_totalLength <= 0f)
             return;
 
-        _distanceOffset += rotationSpeed * Time.deltaTime;
-        _distanceOffset = Mathf.Repeat(_distanceOffset, _totalLength);
-
-        Transform parent = _spawnParent != null ? _spawnParent : transform;
-
-        int childCount = parent.childCount;
-        if (childCount == 0)
-            return;
-
-        for (int i = 0; i < childCount; i++)
+        if (_pointDataCache == null ||
+            _pointDataCache.Length == 0)
         {
-            Transform child = parent.GetChild(i);
+            return;
+        }
 
-            var data = child.GetComponent<SplinePointData>();
+        _distanceOffset += rotationSpeed * Time.deltaTime;
+        _distanceOffset =
+            Mathf.Repeat(_distanceOffset, _totalLength);
+
+        for (int i = 0; i < _pointDataCache.Length; i++)
+        {
+            SplinePointData data = _pointDataCache[i];
+
             if (data == null)
                 continue;
 
-            float d = data.BaseDistance + _distanceOffset;
+            float d =
+                data.BaseDistance + _distanceOffset;
 
-            Vector3 pos = EvaluateByDistance(d);
-            Vector3 normal = EvaluateNormalByDistance(d);
+            Vector3 pos =
+                EvaluateByDistance(d);
 
-            child.position = pos;
-            child.rotation = Quaternion.FromToRotation(Vector3.up, normal);
+            Vector3 normal =
+                EvaluateNormalByDistance(d);
+
+            Transform pointTransform = data.transform;
+
+            pointTransform.position = pos;
+            pointTransform.rotation =
+                Quaternion.FromToRotation(
+                    Vector3.up,
+                    normal);
         }
     }
 

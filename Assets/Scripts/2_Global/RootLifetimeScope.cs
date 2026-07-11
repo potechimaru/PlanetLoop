@@ -47,6 +47,8 @@ public class RootLifetimeScope : LifetimeScope
         builder.RegisterComponent(_audioPlayer);
         builder.Register<AudioManager>(Lifetime.Singleton);
 
+        builder.Register<UnityroomRankingService>(Lifetime.Singleton);
+
 
     }
 

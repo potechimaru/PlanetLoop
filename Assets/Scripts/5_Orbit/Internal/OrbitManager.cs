@@ -143,14 +143,16 @@ public class OrbitManager : IDisposable
 
         foreach (var line in _lines)
         {
-            if (line == null) continue;
+            if (line == null)
+                continue;
 
             float sqrDistance =
                 (line.transform.position - playerPosition).sqrMagnitude;
 
-            bool shouldRotate = sqrDistance <= activeRadiusSqr;
+            bool shouldActive =
+                sqrDistance <= activeRadiusSqr;
 
-            line.SetPointRotationEnabled(shouldRotate);
+            line.SetPointActivityEnabled(shouldActive);
         }
     }
 

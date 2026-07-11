@@ -90,11 +90,21 @@ public class Enemy : MonoBehaviour, IEnemyContactHandle
 
     public void SetSimulationEnabled(bool enabled)
     {
+        if (_isSimulationEnabled == enabled)
+            return;
+
         _isSimulationEnabled = enabled;
+
+        _enemyController?.SetRenderingEnabled(enabled);
 
         if (!enabled)
         {
             _enemyController?.HideTelegraph();
+            _enemyController?.StopRotateDecoration();
+        }
+        else
+        {
+            _enemyController?.RotateDecoration();
         }
     }
 

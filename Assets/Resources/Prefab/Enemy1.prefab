@@ -5705,3 +5705,6 @@ MonoBehaviour:
   _rotateSpeed: 120
   _disappearAnimation: {fileID: 6397676098984113566}
   _particleSystem: {fileID: 3712236546329726196}
+  _spriteRenderers:
+  - {fileID: 6853585774215219870}
+  - {fileID: 187600423684790159}

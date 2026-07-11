@@ -43,8 +43,9 @@ public class GameStateExternalFacade: IGameStateExternalFacade
 
     private readonly GameSessionService _gameSessionService;
     private readonly SaveDataService _saveDataService;
+    private readonly UnityroomRankingService _unityroomRankingService;
 
-    public GameStateExternalFacade(IPlayerFacade playerFacade, IEnemyFacade enemyFacade, IUIFacade UIFacade, IPointObjectFacade pointObjectFacade, GameSessionService gameSessionService, SaveDataService saveDataService)
+    public GameStateExternalFacade(IPlayerFacade playerFacade, IEnemyFacade enemyFacade, IUIFacade UIFacade, IPointObjectFacade pointObjectFacade, GameSessionService gameSessionService, SaveDataService saveDataService, UnityroomRankingService unityroomRankingService)
     {
         _playerFacade = playerFacade;
         _enemyFacade = enemyFacade;
@@ -52,6 +53,7 @@ public class GameStateExternalFacade: IGameStateExternalFacade
         _pointObjectFacade = pointObjectFacade;
         _gameSessionService = gameSessionService;
         _saveDataService = saveDataService;
+        _unityroomRankingService = unityroomRankingService;
     }
 
     public void RegisterInputSubscriptions()
@@ -118,6 +120,7 @@ public class GameStateExternalFacade: IGameStateExternalFacade
 
         GameModeType mode = _gameSessionService.LastResult.Mode;
 
+        // ÉçÅ[ÉJÉãï€ë∂
         _saveDataService.SetHighScore(
             mode,
             score);
@@ -128,6 +131,12 @@ public class GameStateExternalFacade: IGameStateExternalFacade
 
         _saveDataService.SetMaxDefeatedEnemyCount(
             mode,
+            defeatedEnemyCount);
+
+        // unityroomÇ÷ëóêM
+        _unityroomRankingService.SendResults(
+            score,
+            visitedSplineCount,
             defeatedEnemyCount);
     }
 

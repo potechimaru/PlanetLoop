@@ -116,6 +116,14 @@ public sealed class EnemyController
         await _view.PlayDisappearParticleAsync();
     }
 
+    public void SetRenderingEnabled(bool enabled)
+    {
+        if (_view == null)
+            return;
+
+        _view.SetRenderingEnabled(enabled);
+    }
+
     public Transform Self => _self;
     public Transform Player => _player;
     public float DetectRadius => _config.DetectRadius;

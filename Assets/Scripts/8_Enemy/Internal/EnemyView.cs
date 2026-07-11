@@ -15,6 +15,11 @@ public class EnemyView : MonoBehaviour
     [SerializeField] private EnemyDisappearAnimation _disappearAnimation;
     [SerializeField] private ParticleSystem _particleSystem;
 
+    [Header("Rendering")]
+    [SerializeField] private SpriteRenderer[] _spriteRenderers;
+
+    private bool _isRenderingEnabled = true;
+
     private Tween _rotateTween;
 
     private void Awake()
@@ -24,6 +29,12 @@ public class EnemyView : MonoBehaviour
             telegraphs = new List<EnemyTelegraphGuide>(
                 GetComponentsInChildren<EnemyTelegraphGuide>(true)
             );
+        }
+
+        if (_spriteRenderers == null || _spriteRenderers.Length == 0)
+        {
+            _spriteRenderers =
+                GetComponentsInChildren<SpriteRenderer>(true);
         }
 
         HideTelegraph();
@@ -105,6 +116,25 @@ public class EnemyView : MonoBehaviour
     {
         if (_disappearAnimation == null) return;
         await _disappearAnimation.PlayAsync();
+    }
+
+    public void SetRenderingEnabled(bool enabled)
+    {
+        if (_isRenderingEnabled == enabled)
+            return;
+
+        _isRenderingEnabled = enabled;
+
+        if (_spriteRenderers == null)
+            return;
+
+        for (int i = 0; i < _spriteRenderers.Length; i++)
+        {
+            if (_spriteRenderers[i] == null)
+                continue;
+
+            _spriteRenderers[i].enabled = enabled;
+        }
     }
 
     private void OnDestroy()
