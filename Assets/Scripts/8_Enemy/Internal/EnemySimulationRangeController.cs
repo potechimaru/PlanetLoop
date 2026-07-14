@@ -4,6 +4,9 @@ using System.Threading;
 using UnityEngine;
 using VContainer;
 
+/// <summary>
+/// EnemyがPlayerの近くにいないときに動きを止めるためのコントローラークラス。
+/// </summary>
 public class EnemySimulationRangeController : MonoBehaviour
 {
     [SerializeField] private Transform player;

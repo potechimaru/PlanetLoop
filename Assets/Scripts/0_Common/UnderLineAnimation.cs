@@ -21,6 +21,9 @@ public class UnderLineAnimation : MonoBehaviour
             _image = GetComponent<Image>();
     }
 
+    /// <summary>
+    /// Ä¶
+    /// </summary>
     public void Play()
     {
         if (_image == null) return;

@@ -2,7 +2,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// プレイヤーの生存時間を表示するViewクラス。デジタル形式。
+/// プレイヤーの生存時間を表示するViewクラス。デジタル時計形式。
 /// </summary>
 public class TimerView : MonoBehaviour
 {

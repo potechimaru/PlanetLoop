@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Spline上にパーティクルをバーストさせるためのコンポーネント。Splineの特定の距離や全体に対してパーティクルを発生させることができる。
+/// 新しいSplineに飛び乗った時のGlobalエフェクト、飛び乗った時常時発動させるLocalエフェクトに分かれる。
+/// </summary>
 public class SplineBurstEmitter : MonoBehaviour
 {
     [Header("Refs")]

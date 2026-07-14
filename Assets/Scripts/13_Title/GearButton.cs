@@ -3,6 +3,10 @@ using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using DG.Tweening;
 
+/// <summary>
+/// 設定のギアアイコンを回転させるUIボタンのクラス。ユーザーがボタンにホバーしたときにギアが回転する。
+/// 「Setting」のCanvasが表示される。
+/// </summary>
 public class GearButton : UIButtonBase
 {
     [Header("Target")]
@@ -67,6 +71,9 @@ public class GearButton : UIButtonBase
         onClick?.Invoke();
     }
 
+    /// <summary>
+    /// ギアアイコンを回転させるアニメーションを開始する
+    /// </summary>
     private void PlayRotate()
     {
         if (target == null)
@@ -91,6 +98,9 @@ public class GearButton : UIButtonBase
             .SetEase(rotateEase);
     }
 
+    /// <summary>
+    /// ホバーを解除したらギアアイコンを元の角度に戻すアニメーションを開始する
+    /// </summary>
     private void ReturnToInitialRotation()
     {
         if (target == null)

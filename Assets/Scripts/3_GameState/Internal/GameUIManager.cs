@@ -8,6 +8,9 @@ using UnityEngine;
 using VContainer;
 using UnityEngine.UI;
 
+/// <summary>
+/// EndlessModeのゲームUI、アニメーションを管理するクラス
+/// </summary>
 public class GameUIManager : MonoBehaviour
 {
     [Header("GameOpening")]

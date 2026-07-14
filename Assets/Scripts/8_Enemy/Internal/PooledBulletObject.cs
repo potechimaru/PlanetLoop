@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// EnemyBulletにアタッチされるコンポーネント。プールに戻すためのインターフェースを保持する。
+/// </summary>
 public class PooledBulletObject : MonoBehaviour
 {
     private IBulletReturner _returner;

@@ -2,6 +2,10 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 
+/// <summary>
+/// 今は使っていない。PlayerがPointObjectを獲得する時に、PointObjectをPlayerの位置まで移動させるためのクラス。
+/// 全く見えないので、今は使っていない。将来的に使うかもしれないので残しておく。
+/// </summary>
 public class PointCollectMover : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 10f;
@@ -18,6 +22,12 @@ public class PointCollectMover : MonoBehaviour
         MoveAsync(target, _cts.Token).Forget();
     }
 
+    /// <summary>
+    /// 移動開始
+    /// </summary>
+    /// <param name="target">Player</param>
+    /// <param name="token"></param>
+    /// <returns></returns>
     private async UniTask MoveAsync(
         Transform target,
         CancellationToken token)

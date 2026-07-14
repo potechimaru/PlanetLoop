@@ -1,3 +1,7 @@
+
+/// <summary>
+/// Žg‚Á‚Ä‚È‚¢
+/// </summary>
 public class DefeatEnemyEvent
 {
     private readonly IEnemyExternalFacade _enemyExternalFacade;

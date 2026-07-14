@@ -4,6 +4,10 @@ using DG.Tweening;
 using UniRx;
 using System;
 
+/// <summary>
+/// ボタンのbaseクラス。ボタンのホバー状態とクリックイベントを管理するための抽象クラス。
+/// クリックを発行するだけの時はClickInputPublisherクラスを使ったほうが良い。
+/// </summary>
 public abstract class UIButtonBase : MonoBehaviour,
     IPointerEnterHandler,
     IPointerExitHandler,

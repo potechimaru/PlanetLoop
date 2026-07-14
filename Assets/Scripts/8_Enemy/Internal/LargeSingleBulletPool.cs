@@ -2,6 +2,10 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
+
+/// <summary>
+/// 大きなEnemyBulletをプールするクラス。EnemyBulletの生成と再利用を管理する。
+/// </summary>
 public class LargeSingleBulletPool : MonoBehaviour, IBulletReturner
 {
     [Header("Prefab / Parent")]

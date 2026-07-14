@@ -2,6 +2,9 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using UniRx;
 
+/// <summary>
+/// GameStateのPlay状態を表すクラス。ゲームプレイ中の状態を管理する。
+/// </summary>
 public class PlayState : IGameState
 {
     public ReactiveCommand<GameStateKey> NextState { get; } = new();

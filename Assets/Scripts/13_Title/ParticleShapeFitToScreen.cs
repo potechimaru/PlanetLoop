@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// タイトル画面背景でのパーティクルシステムの形状をカメラの画面サイズに合わせて調整するためのコンポーネント。
+/// </summary>
+
 [ExecuteAlways]
 public class ParticleShapeFitToScreen : MonoBehaviour
 {

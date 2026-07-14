@@ -2,6 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// Enemyの生成を管理するクラス。EnemyPoolを使用して、指定されたEnemyTypeに基づいてEnemyを生成する。
+/// </summary>
 public class EnemyFactory
 {
     private readonly EnemyPool _enemyPool;

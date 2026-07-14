@@ -3,6 +3,9 @@ using VContainer;
 using VContainer.Unity;
 using System;
 
+/// <summary>
+/// ƒQ[ƒ€‘S‘Ì‚É‚¨‚¢‚Ä‹¤—L‚³‚ê‚éˆË‘¶ŠÖŒW‚ğ“o˜^‚·‚éƒ‹[ƒg‚ÌLifetimeScope
+/// </summary>
 public class RootLifetimeScope : LifetimeScope
 {
     private static RootLifetimeScope _instance;

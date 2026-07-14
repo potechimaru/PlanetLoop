@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using DG.Tweening;
 
+/// <summary>
+/// Enemyの攻撃予告線を表示するためのクラス。攻撃範囲や方向を視覚的に示すために使用される。
+/// </summary>
 [RequireComponent(typeof(LineRenderer))]
 public class EnemyTelegraphGuide : MonoBehaviour
 {

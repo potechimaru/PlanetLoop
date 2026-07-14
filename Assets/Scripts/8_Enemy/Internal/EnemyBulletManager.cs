@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UniRx;
 
+/// <summary>
+/// EnemyBulletを管理するクラス。プレイヤーがEnemyBulletに当たったときのイベントを通知する。
+/// </summary>
 public sealed class EnemyBulletManager : IDisposable
 {
     private readonly Subject<Unit> _onPlayerHitByEnemyBullet = new();

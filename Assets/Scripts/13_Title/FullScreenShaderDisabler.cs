@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// タイトルシーンにて、フルスクリーンシェーダーを解除する。
+/// Gameシーンのプレイヤー活動範囲を示す赤いエリアを消す。
+/// </summary>
 public class FullScreenShaderDisabler : MonoBehaviour
 {
     [SerializeField]

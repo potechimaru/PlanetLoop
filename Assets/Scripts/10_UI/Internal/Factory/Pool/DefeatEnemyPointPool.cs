@@ -6,6 +6,10 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// 敵を倒した際に表示されるポイントのプールを管理するクラス。UI要素の再利用を行い、パフォーマンスを向上させる。
+/// ゲーム中のポイント表示計UIはベースPoolクラスを作成したほうが良いと思うからこれはTODO
+/// </summary>
 public class DefeatEnemyPointPool : MonoBehaviour, IPlayUIReturner
 {
     [Header("Prefab / Parent")]

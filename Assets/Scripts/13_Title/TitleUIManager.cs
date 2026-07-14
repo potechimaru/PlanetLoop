@@ -14,6 +14,9 @@ public interface ITitleUIManager
     UniTask EnterModeSelectAnimation();
 }
 
+/// <summary>
+/// TitleシーンのUI管理を行うクラス。タイトル画面のアニメーションやボタン操作、モード選択画面の表示などを管理する。
+/// </summary>
 public class TitleUIManager : MonoBehaviour, ITitleUIManager
 {
     [Header("EnterTitleAnimation")]

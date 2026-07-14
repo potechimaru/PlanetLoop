@@ -5,7 +5,7 @@ using DG.Tweening;
 using UnityEngine;
 
 /// <summary>
-/// ?Q?[???????????J?‚?????A?j???[?V??????????N???X
+/// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚Ìƒpƒlƒ‹‚ÌŠJ•ÂƒAƒjƒ[ƒVƒ‡ƒ“‚ğ§Œä‚·‚éƒNƒ‰ƒXiİ’è‚ÌŠJ•Â‚É‚àg‚Á‚Ä‚¢‚éj
 /// </summary>
 public class TutorialPanelAnimation : MonoBehaviour
 {
@@ -46,6 +46,11 @@ public class TutorialPanelAnimation : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// ƒpƒlƒ‹‚ğŠJ‚­
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask OpenAsync(CancellationToken cancellationToken = default)
     {
         if (!Initialize())
@@ -84,6 +89,11 @@ public class TutorialPanelAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ƒpƒlƒ‹‚ğ•Â‚¶‚é
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask CloseAsync(CancellationToken cancellationToken = default)
     {
         if (!Initialize())

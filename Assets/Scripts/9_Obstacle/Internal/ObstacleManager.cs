@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using UniRx;
 
+/// <summary>
+/// Obstacleを管理するクラス。プレイヤーが障害物に衝突した際のイベントを提供する。
+/// </summary>
 public class ObstacleManager : IDisposable
 {
     private readonly IEnumerable<Obstacle> _obstacles;

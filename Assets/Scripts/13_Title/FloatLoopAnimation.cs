@@ -1,6 +1,9 @@
 using UnityEngine;
 using DG.Tweening;
 
+/// <summary>
+/// GameModeSelectの時、Splineを上下に浮かせるアニメーションをループさせるクラス
+/// </summary>
 public class FloatLoopAnimation : MonoBehaviour
 {
     [SerializeField] private float floatStrength = 0.3f;       // 上下に移動する距離

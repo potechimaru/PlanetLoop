@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 複数のEnemySpawnPointを管理するためのクラス。空いているスポーンポイントをランダムに取得する機能を提供する。
+/// </summary>
 public class EnemySpawnPointGroup : MonoBehaviour
 {
     private readonly List<EnemySpawnPoint> _spawnPoints = new();

@@ -4,6 +4,9 @@ using System.Threading;
 using UnityEngine;
 using VContainer;
 
+/// <summary>
+/// Spline上を回転するポイントの表示をPlayerの周りに制限するためのクラス。
+/// </summary>
 public class OrbitPointRotationRangeController : MonoBehaviour
 {
     [SerializeField] private Transform player;

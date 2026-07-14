@@ -3,6 +3,9 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// Applicationのタイトル画面の状態を表すクラス。AppStateの1つ。
+/// </summary>
 public class TitleState : IAppState, IDisposable
 {
     public ReactiveCommand<AppStateKey> NextState { get; } = new();

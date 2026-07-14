@@ -74,6 +74,11 @@ public class VignetteIntensityAnimation : MonoBehaviour
         _vignette.intensity.overrideState = true;
     }
 
+    /// <summary>
+    /// ビネットとグリッチのアニメーションを再生する
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask PlayAsync(
         CancellationToken cancellationToken = default)
     {

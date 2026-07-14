@@ -6,6 +6,10 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// 新しいSplineに乗った際に表示されるポイントのプールを管理するクラス。UI要素の再利用を行い、パフォーマンスを向上させる。
+/// ゲーム中のポイント表示計UIはベースPoolクラスを作成したほうが良いと思うからこれはTODO
+/// </summary>
 public class NewOrbitPointPool : MonoBehaviour, IPlayUIReturner
 {
     [Header("Prefab / Parent")]

@@ -1,3 +1,7 @@
+
+/// <summary>
+/// Enemyの種類に応じて数値的特徴を設定するためのクラス。インスペクタで設定可能なパラメータを持つ。
+/// </summary>
 [System.Serializable]
 public class EnemyConfig
 {

@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// 直前の結果を保持するサービスクラス
+/// </summary>
 public class GameSessionService
 {
     public GameModeType CurrentMode { get; private set; }

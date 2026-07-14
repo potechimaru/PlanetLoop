@@ -2,6 +2,9 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// プレイヤーが障害物に衝突した際の処理を管理する。ぶつかるとゲームオーバーになる。
+/// </summary>
 public class Obstacle : MonoBehaviour
 {
     private readonly Subject<Obstacle> _onPlayerHit = new();

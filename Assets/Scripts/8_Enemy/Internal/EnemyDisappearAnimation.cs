@@ -5,6 +5,9 @@ using Cysharp.Threading.Tasks.Linq;
 using System.Threading;
 using System;
 
+/// <summary>
+/// Enemyが死ぬ際のアニメーションを管理するクラス。スケールアニメーションを制御する。
+/// </summary>
 public class EnemyDisappearAnimation : MonoBehaviour
 {
     [SerializeField] private Transform target;

@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// EnemyStateのCooldown状態を表すクラス。敵が攻撃後のクールダウン中の状態を管理する。
+/// </summary>
 internal sealed class EnemyCooldownState : IEnemyState
 {
     public ReactiveCommand<EnemyStateKey> NextState { get; } = new();

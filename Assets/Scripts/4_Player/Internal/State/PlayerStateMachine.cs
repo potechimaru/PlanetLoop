@@ -6,6 +6,9 @@ using UniRx;
 using UnityEngine;
 using VContainer.Unity;
 
+/// <summary>
+/// PlayerStateの状態を表す列挙型。プレイヤーの状態遷移を管理するためのキーを定義する。
+/// </summary>
 public enum PlayerStateKey
 {
     Idle,
@@ -15,6 +18,9 @@ public enum PlayerStateKey
     GameOver
 }
 
+/// <summary>
+///プレイヤーの状態遷移を管理するステートマシンを表す。各状態はIPlayerStateインターフェースを実装し、状態遷移のロジックを提供する。
+/// </summary>
 public class PlayerStateMachine : IDisposable
 {
     private readonly Dictionary<PlayerStateKey, IPlayerState> _states = new();

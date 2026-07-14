@@ -1,9 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// PointをSpline上に配置するためのコンポーネント。Splineの形状に沿って障害物を配置する機能を提供する。
+/// </summary>
 [RequireComponent(typeof(ClosedSplineLine))]
 public class SplinePointPlacer : MonoBehaviour
 {
+    /// <summary>
+    /// ByInterval: 指定した間隔でObstacleを配置するモード
+    /// FullLoopEven: Spline全体を均等に分割してObstacleを等間隔に配置するモード
+    /// </summary>
     public enum PlacementMode
     {
         ByInterval,
@@ -160,6 +167,9 @@ public class SplinePointPlacer : MonoBehaviour
     }
 
 #if UNITY_EDITOR
+    /// <summary>
+    /// PointをSplineから削除する。エディタ上での操作用。
+    /// </summary>
     public void ClearImmediate()
     {
         var parent = spawnParent != null ? spawnParent : transform;

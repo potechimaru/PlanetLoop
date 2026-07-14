@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// LaserBeamにアタッチされるコンポーネント。プールに戻すためのインターフェースを保持する。
+/// </summary>
 public sealed class PooledLaserBeamObject : MonoBehaviour
 {
     private ILaserBeamReturner _returner;

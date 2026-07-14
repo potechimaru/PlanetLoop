@@ -3,6 +3,9 @@ using UniRx;
 using UnityEngine;
 using System;
 
+/// <summary>
+/// PlayerStateのJump状態を表すクラス。プレイヤーがジャンプ中の状態を管理する。
+/// </summary>
 internal class JumpState : IPlayerState
 {
     public ReactiveCommand<PlayerStateKey> NextState { get; } = new();

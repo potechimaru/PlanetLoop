@@ -3,6 +3,9 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 using UnityEngine.UI;
 
+/// <summary>
+/// OKボタンのUIを表すクラス。ボタンのホバー、クリックアニメーションを管理する。
+/// </summary>
 public class OKButton : UIButtonBase
 {
     [Header("Target")]

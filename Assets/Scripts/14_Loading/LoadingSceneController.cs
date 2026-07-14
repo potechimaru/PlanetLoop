@@ -40,6 +40,7 @@ public class LoadingSceneController : MonoBehaviour
 
         AsyncOperation operation;
 
+        // シーン遷移中にRootLifetimeScopeを子LifetimeScopeに追加して、依存関係の解決を維持する
         using (LifetimeScope.EnqueueParent(_rootLifetimeScope))
         {
             operation = SceneManager.LoadSceneAsync(nextSceneName);
@@ -68,6 +69,7 @@ public class LoadingSceneController : MonoBehaviour
 
         await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate);
 
+        // 現在はTitle＆SelectSceneとGameSceneの2つしかないので、次のシーンがどちらかでAppStateを切り替える
         if (nextSceneName == "Title＆SelectScene")
         {
             _appStateChangeRequester.Request(AppStateKey.Title);

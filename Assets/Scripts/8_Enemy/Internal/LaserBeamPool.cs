@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
+/// <summary>
+/// Enemy5のレーザービームをプールするクラス。レーザービームの生成と再利用を効率的に管理する。
+/// </summary>
 public sealed class LaserBeamPool : MonoBehaviour, ILaserBeamReturner
 {
     [Header("Prefab / Parent")]

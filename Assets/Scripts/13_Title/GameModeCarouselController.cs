@@ -6,6 +6,10 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VContainer;
 
+
+/// <summary>
+/// GameModeSelectの時、ゲームモードのスロットを回転させるためのコントローラークラス。スロットの表示やアニメーションを管理する。
+/// </summary>
 public class GameModeCarouselController : MonoBehaviour
 {
     [Header("Refs")]
@@ -22,6 +26,11 @@ public class GameModeCarouselController : MonoBehaviour
         _gameModeManager = gameModeManager;
     }
 
+    /// <summary>
+    /// TitleからGameModeSelectに遷移したときに、スロットの配置を初期化するためのメソッド。スロットの位置を即座に更新する。
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask PlayFormationAsync(CancellationToken cancellationToken = default)
     {
         if (_gameModeManager == null)
@@ -42,6 +51,11 @@ public class GameModeCarouselController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// スロットを右に回転させるためのメソッド。スロットの位置をアニメーションで更新する。
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask RotateRightAsync(CancellationToken cancellationToken = default)
     {
         if (_gameModeManager == null || _isAnimating)
@@ -76,6 +90,11 @@ public class GameModeCarouselController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// スロットを左に回転させるためのメソッド。スロットの位置をアニメーションで更新する。
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask RotateLeftAsync(CancellationToken cancellationToken = default)
     {
         if (_gameModeManager == null || _isAnimating)

@@ -3,6 +3,9 @@ using UniRx;
 using UnityEngine;
 using VContainer;
 
+/// <summary>
+/// AppStateの中でゲームプレイ中の状態を表すクラス。
+/// </summary>
 public class GameState : IAppState
 {
     public ReactiveCommand<AppStateKey> NextState { get; } = new();
@@ -15,6 +18,7 @@ public class GameState : IAppState
 
     public async UniTask Enter()
     {
+        // ゲームシーンを非同期でロードする
         _sceneLoader.LoadGameSceneAsync().Forget();
 
         await UniTask.CompletedTask;

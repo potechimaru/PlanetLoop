@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// PointObjectの管理を行うクラス。ポイントオブジェクトの収集イベントを監視し、収集されたポイントの種類を通知する。
+/// </summary>
 public class PointObjectManager : IDisposable
 {
     private readonly CompositeDisposable _disposables = new();

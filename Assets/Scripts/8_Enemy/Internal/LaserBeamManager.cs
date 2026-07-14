@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// Enemy5のレーザービームを管理するクラス。レーザービームの登録とプレイヤーへのヒットイベントを管理する。
+/// </summary>
 public sealed class LaserBeamManager : IDisposable
 {
     private readonly Subject<Unit> _onPlayerHitByLaser = new();

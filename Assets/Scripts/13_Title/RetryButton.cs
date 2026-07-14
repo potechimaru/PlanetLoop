@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
+/// <summary>
+/// リトライボタンのUI挙動を管理するクラス。ホバー時のグローアニメーションやクリック時のスケールアニメーションを制御する。
+/// </summary>
 public class RetryButton : UIButtonBase
 {
     [Header("Target")]

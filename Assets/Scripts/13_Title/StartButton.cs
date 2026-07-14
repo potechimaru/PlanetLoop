@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
+/// <summary>
+/// タイトル画面のボタン。押すとGameModeSelectに入る。
+/// </summary>
 public class StartButton : UIButtonBase
 {
     [Header("Target")]

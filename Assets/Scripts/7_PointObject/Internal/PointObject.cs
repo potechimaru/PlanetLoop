@@ -2,8 +2,13 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// PointObjectそのものにアタッチ。Playerが接触した際に通知を飛ばし、PointObjectManagerに送る。
+/// 接触後は非アクティブ
+/// </summary>
 public class PointObject : MonoBehaviour
 {
+    // ポイントの種類
     [SerializeField] private PointObjectType _type = PointObjectType.Medium;
 
     private readonly Subject<PointObjectType> _onTriggered = new();

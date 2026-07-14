@@ -3,6 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
 
+/// <summary>
+/// 設定画面の音量スライダーを制御するクラス。BGMとSEで使い分ける。
+/// </summary>
 public class AudioVolumeSlider : MonoBehaviour
 {
     public enum VolumeType
@@ -22,6 +25,7 @@ public class AudioVolumeSlider : MonoBehaviour
         if (slider == null || _audioManager == null)
             return;
 
+
         slider.onValueChanged.RemoveListener(OnSliderChanged);
 
         float value = volumeType == VolumeType.BGM
@@ -30,6 +34,7 @@ public class AudioVolumeSlider : MonoBehaviour
 
         SetValue(value);
 
+        // リスナー登録
         slider.onValueChanged.AddListener(OnSliderChanged);
     }
 
@@ -63,6 +68,10 @@ public class AudioVolumeSlider : MonoBehaviour
         RefreshText(normalizedValue);
     }
 
+    /// <summary>
+    /// 0～99の整数値に変換してテキストを更新する
+    /// </summary>
+    /// <param name="normalizedValue"></param>
     public void RefreshText(float normalizedValue)
     {
         int value = Mathf.RoundToInt(normalizedValue * 99f);

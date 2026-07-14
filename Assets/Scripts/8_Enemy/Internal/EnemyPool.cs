@@ -11,6 +11,9 @@ public class EnemyPrefabEntry
     public int initialPoolSize = 5;
 }
 
+/// <summary>
+/// Enemyのプールを管理するクラス。Enemyの生成と再利用を効率的に行うためのオブジェクトプールを提供する。
+/// </summary>
 public class EnemyPool : MonoBehaviour
 {
     [SerializeField] private List<EnemyPrefabEntry> entries = new();
@@ -35,6 +38,10 @@ public class EnemyPool : MonoBehaviour
         BuildPools();
     }
 
+    /// <summary>
+    /// Enemyの種類の数分だけプールを作成する。各EnemyTypeに対して、
+    /// 初期プールサイズ分のEnemyインスタンスを生成し、非アクティブ状態でキューに格納する。
+    /// </summary>
     private void BuildPools()
     {
         foreach (var entry in entries)
@@ -64,6 +71,13 @@ public class EnemyPool : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Enemyをプールから取得する。プールに利用可能なEnemyが存在する場合はそれを返し、存在しない場合は新たに生成する。
+    /// </summary>
+    /// <param name="enemyType">Enemyの種類</param>
+    /// <param name="position">Enemyを出現させる位置</param>
+    /// <param name="rotation">Enemyの回転量</param>
+    /// <returns></returns>
     public Enemy Rent(EnemyType enemyType, Vector3 position, Quaternion rotation)
     {
         if (!_pools.TryGetValue(enemyType, out var queue))
@@ -85,6 +99,10 @@ public class EnemyPool : MonoBehaviour
         return enemy;
     }
 
+    /// <summary>
+    /// Enemyをプールに返却する。返却されたEnemyは非アクティブ状態にされ、プールのキューに戻される。
+    /// </summary>
+    /// <param name="enemy">返すEnemy</param>
     public void Return(Enemy enemy)
     {
         if (enemy == null) return;

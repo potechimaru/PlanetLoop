@@ -4,6 +4,9 @@ using UniRx;
 using UnityEngine;
 using VContainer.Unity;
 
+/// <summary>
+/// ゲーム全体の状態を管理するステートマシン
+/// </summary>
 public class GameStateMachine : IStartable, ITickable, IDisposable
 {
     private readonly Dictionary<GameStateKey, IGameState> _states = new();
@@ -46,6 +49,10 @@ public class GameStateMachine : IStartable, ITickable, IDisposable
             .AddTo(_disposables);
     }
 
+    /// <summary>
+    /// ゲームのステートを変更する
+    /// </summary>
+    /// <param name="key"></param>
     public void ChangeState(GameStateKey key)
     {
         if (!_states.TryGetValue(key, out var nextState))

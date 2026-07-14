@@ -4,6 +4,9 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// Splineを全て管理するクラス。Splineの状態を監視し、プレイヤーがSplineに着地した際の処理や、Splineのカウントを通知する機能を提供する。
+/// </summary>
 public class OrbitManager : IDisposable
 {
     private readonly IReadOnlyList<ClosedSplineLine> _lines;
@@ -46,6 +49,9 @@ public class OrbitManager : IDisposable
         
     }
 
+    /// <summary>
+    /// Playerが開始する際のランダムなStartSplineを設定する。CanBeStartSplineがtrueのSplineの中からランダムに選択される。
+    /// </summary>
     private void SetupRandomStartSpline()
     {
         if (_lines == null || _lines.Count == 0)

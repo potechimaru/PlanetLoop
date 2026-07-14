@@ -5,6 +5,9 @@ using UniRx;
 using UnityEngine;
 using DG.Tweening;
 
+/// <summary>
+/// Enemy5のレーザービームを表すクラス。レーザーの表示、衝突判定、アニメーションを管理する。
+/// </summary>
 public class LaserBeam : MonoBehaviour
 {
     [SerializeField] private LineRenderer lineRenderer;

@@ -3,6 +3,9 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// BGMとSEの再生APIを提供するクラス。BGM、SE、LoopSEがある。
+/// </summary>
 public class AudioManager
 {
     private readonly AudioPlayer _audioPlayer;

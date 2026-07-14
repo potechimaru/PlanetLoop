@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System;
 
+/// <summary>
+/// PlayerがGameOverになった時に、Playerの消えるアニメーションを再生するクラス。
+/// </summary>
 public class PlayerDisappearAnimation : MonoBehaviour
 {
     [SerializeField] private Transform target;

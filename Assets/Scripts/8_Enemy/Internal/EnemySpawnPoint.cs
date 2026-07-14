@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// Enemyがスポーンする位置を表すクラス。スポーンポイントの状態（占有されているかどうか）を管理する。
+/// スポーンする候補点一個につき一つのEnemySpawnPointを用意する。
+/// </summary>
 public class EnemySpawnPoint : MonoBehaviour
 {
     [SerializeField] private Color freeColor = new(0.2f, 1f, 0.2f, 0.8f);

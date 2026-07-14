@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
+/// <summary>
+/// タイトル画面に戻るボタンの挙動を制御するクラス。ホバー時のアニメーションやクリック時のスケール変化を管理する。
+/// </summary>
 public class ToTitleButton : UIButtonBase
 {
     [Header("Target")]

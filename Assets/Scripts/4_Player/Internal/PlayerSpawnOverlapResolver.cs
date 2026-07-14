@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// ゲーム開始時にプレイヤーがスポーンする位置が他のオブジェクトと重なっていないかを判定するクラス。
+/// </summary>
 public class PlayerSpawnOverlapResolver
 {
     private readonly ContactFilter2D _filter;

@@ -5,6 +5,9 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
+/// <summary>
+/// EnemyのViewクラス。Enemyの見た目やエフェクト、テレグラフの表示などを管理する。
+/// </summary>
 public class EnemyView : MonoBehaviour
 {
     [Header("Telegraph Guides")]

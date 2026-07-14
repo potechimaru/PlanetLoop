@@ -1,6 +1,9 @@
 using UnityEngine;
 using TMPro;
 
+/// <summary>
+/// 一番ベースとなるスコア表示のUIのViewクラス。
+/// </summary>
 public class ScoreView : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI _scoreText;

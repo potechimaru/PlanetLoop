@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
+/// <summary>
+/// ゲームモードを選んだ時、カメラが近づきながらブラックアウトするときのアニメーションを制御するクラス
+/// </summary>
 public class CameraApproachAnimation : MonoBehaviour
 {
     [Header("Target")]
@@ -20,6 +23,11 @@ public class CameraApproachAnimation : MonoBehaviour
 
     private Tween _tween;
 
+    /// <summary>
+    /// 再生
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask PlayAsync(CancellationToken cancellationToken = default)
     {
         if (target == null)

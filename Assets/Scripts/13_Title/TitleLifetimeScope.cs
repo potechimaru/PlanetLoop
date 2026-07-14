@@ -4,6 +4,9 @@ using VContainer;
 using VContainer.Unity;
 using System;
 
+/// <summary>
+/// タイトルシーンのLifetimeScopeを表すクラス。タイトルシーンの依存関係を管理する。
+/// </summary>
 public class TitleLifetimeScope : LifetimeScope
 {
     [SerializeField] private TitleUIManager _uiManager;

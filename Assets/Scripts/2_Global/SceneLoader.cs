@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using VContainer.Unity;
 
+/// <summary>
+/// シーンのロードを管理するクラス。Gameシーン、Titleシーン、のシーン遷移を行う。
+/// </summary>
 public class SceneLoader
 {
     private readonly RootLifetimeScope _globalScope;

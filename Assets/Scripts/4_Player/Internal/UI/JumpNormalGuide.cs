@@ -1,5 +1,10 @@
 using UnityEngine;
 
+
+/// <summary>
+/// Playerがチャージ中時、ジャンプの法線方向を示すガイドを表示するクラス
+/// LineRendererで点線のテクスチャを使用して、ジャンプの法線方向を示すガイドを描画する。
+/// </summary>
 [RequireComponent(typeof(LineRenderer))]
 public class JumpNormalGuide : MonoBehaviour
 {

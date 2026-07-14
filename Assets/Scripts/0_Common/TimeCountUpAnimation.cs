@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// ??????????????J?E???g?A?b?v????\??????A?j???[?V?????????N???X
+/// 生存時間をカウントアップ表示するアニメーションを制御するクラス
 /// </summary>
 public class TimeCountUpAnimation : MonoBehaviour
 {
@@ -13,6 +13,12 @@ public class TimeCountUpAnimation : MonoBehaviour
     [SerializeField] private float duration = 1.5f;
     [SerializeField] private float characterWidth = 40f;
 
+    /// <summary>
+    /// 0秒から指定の秒数までカウントアップするアニメーションを再生する
+    /// </summary>
+    /// <param name="targetSeconds">終端時間（どこまでカウントアップするか）</param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask PlayAsync(float targetSeconds, CancellationToken cancellationToken = default)
     {
         if (_timeText == null) return;

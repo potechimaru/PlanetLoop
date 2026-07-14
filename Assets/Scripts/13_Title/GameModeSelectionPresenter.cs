@@ -2,6 +2,9 @@ using System;
 using UniRx;
 using VContainer.Unity;
 
+/// <summary>
+/// GameModeSelectでのGameModeの変更を監視し、Root側へ反映するクラス。
+/// </summary>
 public class GameModeSelectionPresenter : IStartable, IDisposable
 {
     private readonly IGameModeManager _gameModeManager;

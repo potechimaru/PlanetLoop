@@ -33,6 +33,11 @@ public class TMPDoTextAnimation : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// アニメーション開始
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask PlayAsync(CancellationToken cancellationToken = default)
     {
         if (_tmpText == null)

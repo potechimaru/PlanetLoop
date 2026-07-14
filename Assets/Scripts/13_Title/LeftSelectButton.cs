@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
+/// <summary>
+/// GameModeSelectのスロットを左に回転させるためのボタンのクラス。クリック時にスロットを左に回転させるアニメーションを再生する。
+/// </summary>
 public class LeftSelectButton : UIButtonBase
 {
     [Header("Hover Animation")]
@@ -40,6 +43,10 @@ public class LeftSelectButton : UIButtonBase
         _hoverScaleAnimation?.PlayHoverExit();
     }
 
+    /// <summary>
+    /// クリック時にスロットを左に回転させるアニメーションを再生する。
+    /// </summary>
+    /// <param name="eventData"></param>
     protected override void HandleClick(PointerEventData eventData)
     {
         if (target == null) return;

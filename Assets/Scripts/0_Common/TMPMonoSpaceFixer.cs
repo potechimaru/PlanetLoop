@@ -19,6 +19,9 @@ public class TMPMonospaceFixer : MonoBehaviour
         ApplyMonospace();
     }
 
+    /// <summary>
+    /// エディタ上ですぐに反映させるための処理
+    /// </summary>
 #if UNITY_EDITOR
     private void OnValidate()
     {

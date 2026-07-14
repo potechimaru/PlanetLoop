@@ -4,8 +4,12 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 
+/// <summary>
+/// SelectGameModeの時にDummyPlayerを左右に動かすためのアニメーション
+/// </summary>
 public class DummyPlayerSplineStopAnimator : MonoBehaviour
 {
+    // 右、左
     public enum MoveDirection
     {
         Forward,

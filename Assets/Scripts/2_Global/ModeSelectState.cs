@@ -3,6 +3,9 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// ゲームモード選択画面の状態を表す。AppStateの1つ。
+/// </summary>
 public class ModeSelectState : IAppState, IDisposable
 {
     public ReactiveCommand<AppStateKey> NextState { get; } = new();

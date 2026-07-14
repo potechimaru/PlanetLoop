@@ -1,6 +1,9 @@
 using Cysharp.Threading.Tasks;
 using UniRx;
 
+/// <summary>
+/// EnemyStateのIdle状態を表すクラス。敵が何もしていない状態を管理する。
+/// </summary>
 internal sealed class EnemyIdleState : IEnemyState
 {
     public ReactiveCommand<EnemyStateKey> NextState { get; } = new();

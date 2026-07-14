@@ -4,6 +4,9 @@ using System.Linq;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// GameModeManagerのインターフェース。ゲームモードの選択と管理を行うためのメソッドとプロパティを定義する。
+/// </summary>
 public interface IGameModeManager
 {
     GameModeType CurrentSelectedMode { get; }
@@ -19,6 +22,9 @@ public interface IGameModeManager
     bool JudgeComminSoonGameMode(GameModeType gameModeType);
 }
 
+/// <summary>
+/// Title画面でのゲームモード選択を管理するクラス。ゲームモードのリストを保持し、選択されたゲームモードの変更を通知する。
+/// </summary>
 public class GameModeManager : IGameModeManager, IDisposable
 {
     private readonly List<GameModeDummyEntry> _entries;

@@ -1,6 +1,9 @@
 using UnityEngine;
 using DG.Tweening;
 
+/// <summary>
+/// UIのCanvasGroupを使ったフェードイン・フェードアウトアニメーションを制御するクラス。
+/// </summary>
 [RequireComponent(typeof(CanvasGroup))]
 public class FadeAnimation : MonoBehaviour
 {

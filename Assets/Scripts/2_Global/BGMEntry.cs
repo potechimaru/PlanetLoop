@@ -1,6 +1,9 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// BGM‚Ìİ’è‚ğ•Û‚·‚éƒNƒ‰ƒX
+/// </summary>
 [Serializable]
 public class BGMEntry
 {

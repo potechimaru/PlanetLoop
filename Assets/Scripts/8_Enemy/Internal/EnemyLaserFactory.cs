@@ -1,6 +1,9 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// Enemy5がレーザーを発射するためのFactoryクラス。レーザーの生成と初期化を行う。
+/// </summary>
 public class EnemyLaserFactory
 {
     private readonly LaserBeamPool _laserBeamPool;

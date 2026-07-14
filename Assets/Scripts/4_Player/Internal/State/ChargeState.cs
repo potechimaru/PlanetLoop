@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// PlayerStateのCharge状態を表すクラス。プレイヤーがチャージ中の状態を管理する。
+/// </summary>
 public class ChargeState : IPlayerState
 {
     public ReactiveCommand<PlayerStateKey> NextState { get; } = new();

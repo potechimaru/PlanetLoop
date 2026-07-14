@@ -2,6 +2,9 @@ using System;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// Enemyが発射する弾丸の挙動を管理するクラス。弾丸の速度、範囲、プレイヤーとの衝突判定を行う。
+/// </summary>
 public class EnemyBullet : MonoBehaviour
 {
     [SerializeField] private float bulletSpeed = 6f;
@@ -16,6 +19,7 @@ public class EnemyBullet : MonoBehaviour
 
     public IObservable<Unit> OnHitPlayer => _onHitPlayer;
 
+    // 発射
     public void Launch(
         Vector3 dirNormalized,
         Transform rangeCenter,

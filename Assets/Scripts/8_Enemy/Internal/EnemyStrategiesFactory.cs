@@ -1,3 +1,7 @@
+
+/// <summary>
+/// Enemy‚Ìí—Ş‚É‰‚¶‚½í—ª‚ğ¶¬‚·‚éFactoryƒNƒ‰ƒX
+/// </summary>
 public static class EnemyStrategyFactory
 {
 

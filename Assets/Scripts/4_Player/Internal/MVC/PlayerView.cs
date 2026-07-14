@@ -1,127 +1,495 @@
+
 using Cysharp.Threading.Tasks;
 using System;
 using UnityEngine;
 
+/// <summary>
+/// Player‚ÌŒ©‚½–Ú‚ÆTransform‘€ì‚ğ’S“–‚·‚éViewƒNƒ‰ƒXB
+///
+/// å‚ÉˆÈ‰º‚Ìˆ—‚ğ’S“–‚·‚éB
+///
+/// EPlayer‚Ìƒ[ƒ‹ƒhÀ•W‚ğXV‚·‚é
+/// EŒ»İŠ‘®‚µ‚Ä‚¢‚éSpline‚ğ•Û‚·‚é
+/// Eƒ`ƒƒ[ƒWƒŒƒxƒ‹‚É‰‚¶‚ÄƒI[ƒ‰‚Ìƒ}ƒeƒŠƒAƒ‹‚ğ•ÏX‚·‚é
+/// EƒWƒƒƒ“ƒv•ûŒüƒKƒCƒh‚ğ•\¦E”ñ•\¦‚É‚·‚é
+/// ESpline’…’n‚ÌƒGƒtƒFƒNƒg‚ğÄ¶‚·‚é
+/// EPlayer€–S‚ÌƒGƒtƒFƒNƒg‚ÆÁ¸ƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶‚·‚é
+///
+/// Player‚ÌˆÚ“®ŒvZ‚âƒQ[ƒ€ã‚Ìó‘ÔŠÇ—‚Ís‚í‚¸A
+/// PlayerController‚âPlayerSplineMover‚©‚ç“n‚³‚ê‚½Œ‹‰Ê‚ğ
+/// Œ©‚½–Ú‚Ö”½‰f‚·‚é–ğŠ„‚ğ‚ÂB
+/// </summary>
 public class PlayerView : MonoBehaviour
 {
+    /* =========================================================
+     * SplineŠÖ˜Aİ’è
+     * ========================================================= */
+
+    /// <summary>
+    /// Player‚ªŒ»İŠ‘®‚µ‚Ä‚¢‚éSplineB
+    ///
+    /// ƒQ[ƒ€ŠJn‚ÍInspector‚Åİ’è‚³‚ê‚½Spline‚ªg—p‚³‚êA
+    /// •Ê‚ÌSpline‚Ö’…’n‚µ‚½Û‚ÍSetSpline‚É‚æ‚Á‚ÄXV‚³‚ê‚éB
+    /// </summary>
     [Header("Spline")]
-    [SerializeField] private ClosedSplineLine _spline;
-    [SerializeField] private bool _useLocalPlaneXY = true;
-    [SerializeField] private JumpNormalGuide _jumpNormalGuide;
+    [SerializeField]
+    private ClosedSplineLine _spline;
 
-    [SerializeField] private Material _auraMaterialBlue;
-    [SerializeField] private Material _auraMaterialOrange;
-    [SerializeField] private Material _auraMaterialRed;
+    /// <summary>
+    /// Player‚ÌˆÚ“®•½–Ê‚Æ‚µ‚ÄA
+    /// ƒ[ƒJƒ‹XY•½–Ê‚ğg—p‚·‚é‚©‚Ç‚¤‚©B
+    ///
+    /// Œ»İ‚ÌPlayerView“à‚Å‚Í’¼Úg—p‚³‚ê‚Ä‚¢‚È‚¢‚ªA
+    /// ŠO•”ƒNƒ‰ƒX‚©‚çUseLocalPlaneXYƒvƒƒpƒeƒBŒo—R‚ÅQÆ‚Å‚«‚éB
+    /// </summary>
+    [SerializeField]
+    private bool _useLocalPlaneXY = true;
 
-    [SerializeField] private ParticleSystem _deadEffect;
-    [SerializeField] private PlayerDisappearAnimation _playerDisappearAnimation;
+    /// <summary>
+    /// ƒ`ƒƒ[ƒW’†‚ÉPlayer‚ÌƒWƒƒƒ“ƒv—\’è•ûŒü‚ğ•\¦‚·‚éƒKƒCƒhB
+    ///
+    /// Splineã‚ÌŒ»İˆÊ’u‚É‚¨‚¯‚éŠOŒü‚«–@ü•ûŒü‚ğ
+    /// ‹Šo“I‚É•\¦‚·‚éB
+    /// </summary>
+    [SerializeField]
+    private JumpNormalGuide _jumpNormalGuide;
 
-    //[SerializeField] private ContinuousRotateAnimation _continuousRotateAnimation;
 
+    /* =========================================================
+     * ƒI[ƒ‰—pƒ}ƒeƒŠƒAƒ‹
+     * ========================================================= */
+
+    /// <summary>
+    /// ’Êíó‘Ô‚Åg—p‚·‚éPlayerƒI[ƒ‰‚Ìƒ}ƒeƒŠƒAƒ‹B
+    ///
+    /// ChargeLevel.Normal‚É‘Î‰‚·‚éB
+    /// </summary>
+    [SerializeField]
+    private Material _auraMaterialBlue;
+
+    /// <summary>
+    /// Charge1ó‘Ô‚Åg—p‚·‚éPlayerƒI[ƒ‰‚Ìƒ}ƒeƒŠƒAƒ‹B
+    /// </summary>
+    [SerializeField]
+    private Material _auraMaterialOrange;
+
+    /// <summary>
+    /// Charge2ó‘Ô‚Åg—p‚·‚éPlayerƒI[ƒ‰‚Ìƒ}ƒeƒŠƒAƒ‹B
+    /// </summary>
+    [SerializeField]
+    private Material _auraMaterialRed;
+
+
+    /* =========================================================
+     * €–S‰‰oİ’è
+     * ========================================================= */
+
+    /// <summary>
+    /// Player€–S‚ÉÄ¶‚·‚éParticleSystemB
+    ///
+    /// PlayDeadEffect“à‚ÅÄ¶‚³‚êA
+    /// ParticleSystem‚ªŠ®‘S‚ÉI—¹‚·‚é‚Ü‚Å‘Ò‹@‚·‚éB
+    /// </summary>
+    [SerializeField]
+    private ParticleSystem _deadEffect;
+
+    /// <summary>
+    /// Player–{‘Ì‚ğ”ñ•\¦‚Ö•Ï‰»‚³‚¹‚é€–SƒAƒjƒ[ƒVƒ‡ƒ“B
+    ///
+    /// ParticleSystem‚Æ•Às‚µ‚ÄŠJn‚³‚êA
+    /// ƒAƒjƒ[ƒVƒ‡ƒ“Š®—¹Œã‚àParticleSystem‚ªI—¹‚·‚é‚Ü‚Å‘Ò‹@‚·‚éB
+    /// </summary>
+    [SerializeField]
+    private PlayerDisappearAnimation _playerDisappearAnimation;
+
+    /*
+     * Player‚ğŒp‘±“I‚É‰ñ“]‚³‚¹‚éƒAƒjƒ[ƒVƒ‡ƒ“B
+     *
+     * Œ»İ‚Íg—p‚³‚ê‚Ä‚¢‚È‚¢‚½‚ßƒRƒƒ“ƒgƒAƒEƒg‚³‚ê‚Ä‚¢‚éB
+     */
+    //[SerializeField]
+    //private ContinuousRotateAnimation _continuousRotateAnimation;
+
+
+    /* =========================================================
+     * “à•”QÆ
+     * ========================================================= */
+
+    /// <summary>
+    /// Player‚ÌƒI[ƒ‰‚ğ•`‰æ‚µ‚Ä‚¢‚éMeshRendererB
+    ///
+    /// Awake‚ÉqƒIƒuƒWƒFƒNƒg‚©‚çæ“¾‚µA
+    /// SetAuraColor‚Åƒ}ƒeƒŠƒAƒ‹‚ğØ‚è‘Ö‚¦‚éB
+    /// </summary>
     private MeshRenderer _auraRenderer;
 
+
+    /* =========================================================
+     * ŒöŠJƒvƒƒpƒeƒB
+     * ========================================================= */
+
+    /// <summary>
+    /// Player‚ªŒ»İŠ‘®‚µ‚Ä‚¢‚éSpline‚ğæ“¾‚·‚éB
+    /// </summary>
     public ClosedSplineLine Spline => _spline;
+
+    /// <summary>
+    /// Player‚ªƒ[ƒJƒ‹XY•½–Ê‚ğg—p‚·‚éİ’è‚©‚Ç‚¤‚©‚ğæ“¾‚·‚éB
+    /// </summary>
     public bool UseLocalPlaneXY => _useLocalPlaneXY;
 
+
+    /* =========================================================
+     * Unityƒ‰ƒCƒtƒTƒCƒNƒ‹
+     * ========================================================= */
+
+    /// <summary>
+    /// GameObject¶¬‚Éˆê“x‚¾‚¯ŒÄ‚Ño‚³‚ê‚éB
+    ///
+    /// Player‚ÌqƒIƒuƒWƒFƒNƒg‚©‚çA
+    /// ƒI[ƒ‰•\¦‚Ég—p‚·‚éMeshRenderer‚ğæ“¾‚·‚éB
+    /// </summary>
     private void Awake()
     {
-        _auraRenderer = GetComponentInChildren<MeshRenderer>();
+        /*
+         * qŠK‘w“à‚ÅÅ‰‚ÉŒ©‚Â‚©‚Á‚½MeshRenderer‚ğæ“¾‚·‚éB
+         *
+         * Player‚Ìq‚É•¡”‚ÌMeshRenderer‚ª‚ ‚éê‡A
+         * ˆÓ}‚µ‚½Aura‚ÌRenderer‚Å‚Í‚È‚¢‚à‚Ì‚ªæ“¾‚³‚ê‚é‰Â”\«‚ª‚ ‚éB
+         *
+         * ŠmÀ‚ÉAura‚¾‚¯‚ğ‘€ì‚µ‚½‚¢ê‡‚ÍA
+         * Inspector‚©‚ç’¼ÚSerializeField‚ÅQÆ‚·‚é•û–@‚à‚ ‚éB
+         */
+        _auraRenderer =
+            GetComponentInChildren<MeshRenderer>();
     }
 
+
+    /* =========================================================
+     * PlayerÀ•W‚ÌXV
+     * ========================================================= */
+
+    /// <summary>
+    /// Player‚Ìƒ[ƒ‹ƒhÀ•W‚ğİ’è‚·‚éB
+    ///
+    /// •`‰æ‡‚âZƒtƒ@ƒCƒeƒBƒ“ƒO‚ğ”ğ‚¯‚é‚½‚ßA
+    /// “n‚³‚ê‚½À•W‚æ‚èZ•ûŒü‚Ö0.01‚¾‚¯è‘O‚É‚¸‚ç‚µ‚Ä”z’u‚·‚éB
+    /// </summary>
+    /// <param name="worldPos">
+    /// Player‚ğ”z’u‚·‚éŠî€ƒ[ƒ‹ƒhÀ•WB
+    /// </param>
     public void SetPosition(Vector3 worldPos)
     {
-        worldPos = new Vector3(worldPos.x, worldPos.y, worldPos.z - 0.01f);
+        /*
+         * Spline‚â‘¼‚Ì•`‰æƒIƒuƒWƒFƒNƒg‚ÆŠ®‘S‚É“¯‚¶ZÀ•W‚É‚È‚é‚ÆA
+         * •`‰æ‡‚ª•sˆÀ’è‚É‚È‚é‰Â”\«‚ª‚ ‚éB
+         *
+         * ‚»‚Ì‚½‚ßAZÀ•W‚ğ0.01‚¾‚¯¬‚³‚­‚µ‚Ä
+         * Player‚ğ‚í‚¸‚©‚Éè‘O‚Ö”z’u‚µ‚Ä‚¢‚éB
+         */
+        worldPos = new Vector3(
+            worldPos.x,
+            worldPos.y,
+            worldPos.z - 0.01f
+        );
+
+        // ŒvZŒã‚Ìƒ[ƒ‹ƒhÀ•W‚ğTransform‚Ö”½‰f‚·‚éB
         transform.position = worldPos;
     }
 
+
+    /* =========================================================
+     * Š‘®Spline‚ÌXV
+     * ========================================================= */
+
+    /// <summary>
+    /// Player‚ªŒ»İŠ‘®‚µ‚Ä‚¢‚éSpline‚ğXV‚·‚éB
+    ///
+    /// •Ê‚ÌSpline‚Ö’…’n‚µ‚½Û‚ÉA
+    /// PlayerSplineMover‚©‚çŒÄ‚Ño‚³‚ê‚éB
+    /// </summary>
+    /// <param name="spline">
+    /// V‚µ‚­Š‘®‚·‚éSplineB
+    /// </param>
     public void SetSpline(ClosedSplineLine spline)
     {
         _spline = spline;
     }
 
+
+    /* =========================================================
+     * ƒI[ƒ‰•\¦
+     * ========================================================= */
+
+    /// <summary>
+    /// Œ»İ‚Ìƒ`ƒƒ[ƒWƒŒƒxƒ‹‚É‰‚¶‚ÄA
+    /// PlayerƒI[ƒ‰‚Ìƒ}ƒeƒŠƒAƒ‹‚ğ•ÏX‚·‚éB
+    ///
+    /// Normal  FÂ
+    /// Charge1 FƒIƒŒƒ“ƒW
+    /// Charge2 FÔ
+    /// </summary>
+    /// <param name="chargeLevel">
+    /// Œ»İ‚ÌPlayer‚Ìƒ`ƒƒ[ƒWƒŒƒxƒ‹B
+    /// </param>
     internal void SetAuraColor(ChargeLevel chargeLevel)
     {
+        /*
+         * ‘z’èŠO‚ÌChargeLevel‚ª“n‚³‚ê‚½ê‡‚Å‚à
+         * null‚É‚È‚ç‚È‚¢‚æ‚¤A‰Šú’l‚Í’Êíó‘Ô‚ÌÂ‚É‚·‚éB
+         */
         Material material = _auraMaterialBlue;
+
+        // ƒ`ƒƒ[ƒWƒŒƒxƒ‹‚É‘Î‰‚·‚éƒ}ƒeƒŠƒAƒ‹‚ğ‘I‘ğ‚·‚éB
         switch (chargeLevel)
         {
             case ChargeLevel.Normal:
+
                 material = _auraMaterialBlue;
                 break;
+
             case ChargeLevel.Charge1:
+
                 material = _auraMaterialOrange;
                 break;
+
             case ChargeLevel.Charge2:
+
                 material = _auraMaterialRed;
                 break;
         }
+
+        /*
+         * Renderer‚ª³í‚Éæ“¾‚Å‚«‚Ä‚¢‚éê‡‚Ì‚İA
+         * ƒ}ƒeƒŠƒAƒ‹‚ğ•ÏX‚·‚éB
+         *
+         * sharedMaterial‚ğg—p‚µ‚Ä‚¢‚é‚½‚ßA
+         * Rendererê—p‚ÌMaterialƒCƒ“ƒXƒ^ƒ“ƒX‚Í¶¬‚³‚ê‚È‚¢B
+         *
+         * “¯‚¶Material‚ğg—p‚·‚é‘¼Renderer‚É‚à
+         * Material©‘Ì‚Ì•ÏX‚Í‹¤—L‚³‚ê‚é‚ªA
+         * ‚±‚ÌƒR[ƒh‚Å‚ÍQÆæ‚ğØ‚è‘Ö‚¦‚Ä‚¢‚é‚¾‚¯‚È‚Ì‚Å–â‘è‚Í‹N‚«‚É‚­‚¢B
+         */
         if (_auraRenderer != null)
+        {
             _auraRenderer.sharedMaterial = material;
+        }
     }
 
+
+    /* =========================================================
+     * ƒWƒƒƒ“ƒv•ûŒüƒKƒCƒh
+     * ========================================================= */
+
+    /// <summary>
+    /// Player‚ÌƒWƒƒƒ“ƒv—\’è•ûŒü‚ğ¦‚·ƒKƒCƒh‚ğ•\¦‚·‚éB
+    ///
+    /// Player‚ÌŒ»İˆÊ’u‚ÆA
+    /// Splineã‚ÌŠOŒü‚«–@ü•ûŒü‚ğJumpNormalGuide‚Ö“n‚·B
+    /// </summary>
+    /// <param name="normal">
+    /// ƒWƒƒƒ“ƒv—\’è•ûŒü‚Æ‚È‚é–@üƒxƒNƒgƒ‹B
+    /// </param>
     public void ShowJumpNormalGuide(Vector3 normal)
     {
-        _jumpNormalGuide.Show(transform.position, normal);
+        /*
+         * Player‚ÌŒ»İˆÊ’u‚ğƒKƒCƒh‚ÌŠJn’n“_‚Æ‚µA
+         * normal•ûŒü‚ÖƒKƒCƒh‚ğ•\¦‚·‚éB
+         */
+        _jumpNormalGuide.Show(
+            transform.position,
+            normal
+        );
     }
 
+    /// <summary>
+    /// ƒWƒƒƒ“ƒv•ûŒüƒKƒCƒh‚ğ”ñ•\¦‚É‚·‚éB
+    ///
+    /// ƒ`ƒƒ[ƒWI—¹AƒWƒƒƒ“ƒvŠJnA€–S‚È‚Ç‚ÉŒÄ‚Ño‚³‚ê‚éB
+    /// </summary>
     public void HideJumpNormalGuide()
     {
         _jumpNormalGuide.Hide();
     }
 
-    public void PlaySplineAttachFx(ClosedSplineLine spline, float distance, Vector3 hitWorldPos)
+
+    /* =========================================================
+     * Spline’…’nƒGƒtƒFƒNƒg
+     * ========================================================= */
+
+    /// <summary>
+    /// Player‚ªSpline‚Ö’…’n‚µ‚½Û‚ÌƒGƒtƒFƒNƒg‚ğÄ¶‚·‚éB
+    ///
+    /// ’…’n“_‚Éƒ[ƒJƒ‹‚ÈBurstƒGƒtƒFƒNƒg‚ğÄ¶‚µA
+    /// –¢–K–âSpline‚Ö‚Ì‰‰ñ’…’n‚Å‚ ‚ê‚Î
+    /// Spline‘S‘Ì‚ÖL‚ª‚éScatterƒGƒtƒFƒNƒg‚àÄ¶‚·‚éB
+    /// </summary>
+    /// <param name="spline">
+    /// Player‚ª’…’n‚µ‚½SplineB
+    /// </param>
+    /// <param name="distance">
+    /// Splinen“_‚©‚ç’…’n“_‚Ü‚Å‚Ì‹——£B
+    /// </param>
+    /// <param name="hitWorldPos">
+    /// ÚG”»’è‚É‚æ‚Á‚Ä‹‚ß‚ç‚ê‚½’…’n“_‚Ìƒ[ƒ‹ƒhÀ•WB
+    ///
+    /// Œ»İ‚ÌÀ‘•‚Å‚Íg—p‚³‚ê‚Ä‚¢‚È‚¢‚ªA
+    /// BurstAtWorldPos‚È‚Ç‚ğg—p‚·‚éê‡‚É—˜—p‚Å‚«‚éB
+    /// </param>
+    public void PlaySplineAttachFx(
+        ClosedSplineLine spline,
+        float distance,
+        Vector3 hitWorldPos)
     {
-        if (spline == null) return;
+        // ’…’næSpline‚ª‘¶İ‚µ‚È‚¯‚ê‚Îˆ—‚Å‚«‚È‚¢B
+        if (spline == null)
+            return;
 
-        var emitter = spline.GetComponent<SplineBurstEmitter>();
-        if (emitter == null) return;
+        /*
+         * ’…’n‚µ‚½Spline‚©‚çA
+         * ’…’nƒGƒtƒFƒNƒg‚ğŠÇ—‚·‚éSplineBurstEmitter‚ğæ“¾‚·‚éB
+         */
+        var emitter =
+            spline.GetComponent<SplineBurstEmitter>();
 
-        // n?p + SplineS?pi???Emitterzj
+        // SplineBurstEmitter‚ª•t‚¢‚Ä‚¢‚È‚¯‚ê‚Î‰½‚à‚µ‚È‚¢B
+        if (emitter == null)
+            return;
+
+        /*
+         * Splinen“_‚©‚çdistancei‚ñ‚¾’n“_‚ÅA
+         * ƒ[ƒJƒ‹‚È’…’nBurstƒGƒtƒFƒNƒg‚ğÄ¶‚·‚éB
+         */
         emitter.BurstLocalAtDistance(distance);
 
+        /*
+         * ‚±‚ÌSpline‚ª–¢–K–â‚©‚ÂŠJn’n“_‚Å‚Í‚È‚¢ê‡A
+         * Spline‘S‘Ì‚ÉL‚ª‚éƒGƒtƒFƒNƒg‚ğÄ¶‚·‚éB
+         *
+         * IsNewOrbit‚ª‚¢‚Âfalse‚Ö•ÏX‚³‚ê‚é‚©‚É‚æ‚Á‚Ä‚ÍA
+         * ‚±‚ÌğŒ‚ª¬—§‚µ‚È‚¢‰Â”\«‚ª‚ ‚é‚½‚ßA
+         * AttachEvent‘¤‚ÌŒÄ‚Ño‚µ‡‚É‚Í’ˆÓ‚ª•K—vB
+         */
         if (spline.IsNewOrbit && !spline.IsStartSpline)
+        {
             emitter.ScatterGlobal();
-        // emitter.BurstAtWorldPos(hitWorldPos);
+        }
+
+        /*
+         * ÚG’n“_‚Ìƒ[ƒ‹ƒhÀ•W‚ğ’¼Úg‚Á‚Ä
+         * Burst‚ğÄ¶‚·‚éê‡‚ÌŒó•âB
+         *
+         * Œ»İ‚Íg—p‚³‚ê‚Ä‚¢‚È‚¢B
+         */
+        //emitter.BurstAtWorldPos(hitWorldPos);
     }
 
+
+    /* =========================================================
+     * Player€–S‰‰o
+     * ========================================================= */
+
+    /// <summary>
+    /// Player€–S‚ÌƒGƒtƒFƒNƒg‚ÆÁ¸ƒAƒjƒ[ƒVƒ‡ƒ“‚ğÄ¶‚·‚éB
+    ///
+    /// ˆ—‚Ì—¬‚ê‚ÍˆÈ‰ºB
+    ///
+    /// 1. GameObject”jŠü‚ÉƒLƒƒƒ“ƒZƒ‹‚³‚ê‚éCancellationToken‚ğæ“¾
+    /// 2. ParticleSystem‚ğÄ¶
+    /// 3. PlayerDisappearAnimation‚ğÄ¶‚µ‚ÄŠ®—¹‚ğ‘Ò‚Â
+    /// 4. ParticleSystem‚ªŠ®‘S‚ÉI—¹‚·‚é‚Ü‚Å‘Ò‚Â
+    /// 5. Player‚ÌGameObject‚ğ”ñƒAƒNƒeƒBƒu‰»
+    ///
+    /// GameObject‚ª“r’†‚Å”jŠü‚³‚ê‚½ê‡‚ÍA
+    /// OperationCanceledException‚ğ•ß‘¨‚µ‚ÄÃ‚©‚ÉI—¹‚·‚éB
+    /// </summary>
     public async UniTask PlayDeadEffect()
     {
-        var ct = this.GetCancellationTokenOnDestroy();
+        /*
+         * ‚±‚ÌMonoBehaviour‚ª”jŠü‚³‚ê‚½‚Æ‚«‚É
+         * ©“®“I‚ÉƒLƒƒƒ“ƒZƒ‹‚³‚ê‚éCancellationToken‚ğæ“¾‚·‚éB
+         *
+         * ƒV[ƒ“‘JˆÚ’†‚âGameObject”jŠüŒã‚à
+         * ”ñ“¯Šúˆ—‚ªc‚è‘±‚¯‚é‚±‚Æ‚ğ–h‚®B
+         */
+        var ct =
+            this.GetCancellationTokenOnDestroy();
 
         try
         {
-            if (this == null) return;
-            if (_deadEffect == null) return;
+            /*
+             * UnityƒIƒuƒWƒFƒNƒg‚Í”jŠü‚³‚ê‚é‚Æ
+             * C#ã‚Å‚ÍQÆ‚ªc‚Á‚Ä‚¢‚Ä‚àthis == null‚É‚È‚éê‡‚ª‚ ‚éB
+             */
+            if (this == null)
+                return;
 
+            // €–SParticleSystem‚ª–¢İ’è‚È‚çÄ¶‚Å‚«‚È‚¢B
+            if (_deadEffect == null)
+                return;
+
+            // €–Sƒp[ƒeƒBƒNƒ‹‚ğÄ¶‚·‚éB
             _deadEffect.Play();
 
+            /*
+             * Player–{‘Ì‚ÌÁ¸ƒAƒjƒ[ƒVƒ‡ƒ“‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡A
+             * ƒAƒjƒ[ƒVƒ‡ƒ“‚ğŠJn‚µ‚ÄŠ®—¹‚Ü‚Å‘Ò‚ÂB
+             */
             if (_playerDisappearAnimation != null)
             {
                 await _playerDisappearAnimation
                     .PlayAsync()
+
+                    /*
+                     * GameObject‚ª”jŠü‚³‚ê‚½ê‡‚É
+                     * ‘Ò‹@ˆ—‚ğƒLƒƒƒ“ƒZƒ‹‚Å‚«‚é‚æ‚¤‚É‚·‚éB
+                     */
                     .AttachExternalCancellation(ct);
             }
 
+            /*
+             * ParticleSystem‚ªŠ®‘S‚ÉI—¹‚·‚é‚Ü‚Å‘Ò‚ÂB
+             *
+             * IsAlive(true)‚Ìtrue‚ÍA
+             * qParticleSystem‚àŠÜ‚ß‚ÄÄ¶’†‚©Šm”F‚·‚éw’èB
+             *
+             * ParticleSystem©‘Ì‚ª“r’†‚Å”jŠü‚³‚ê‚½ê‡‚à
+             * ‘Ò‹@‚ğI—¹‚Å‚«‚é‚æ‚¤Anullƒ`ƒFƒbƒN‚ğŠÜ‚ß‚Ä‚¢‚éB
+             */
             await UniTask.WaitUntil(
-                () => _deadEffect == null || !_deadEffect.IsAlive(true),
+                () =>
+                    _deadEffect == null
+                    || !_deadEffect.IsAlive(true),
                 cancellationToken: ct
             );
 
-            if (this == null) return;
+            // ‘Ò‹@’†‚É‚±‚ÌGameObject‚ª”jŠü‚³‚ê‚½ê‡‚ÍI—¹‚·‚éB
+            if (this == null)
+                return;
 
+            /*
+             * €–S‰‰o‚ª‚·‚×‚ÄI—¹‚µ‚½‚½‚ßA
+             * Player‚ÌGameObject‘S‘Ì‚ğ”ñƒAƒNƒeƒBƒu‰»‚·‚éB
+             */
             gameObject.SetActive(false);
         }
         catch (OperationCanceledException)
         {
+            /*
+             * GameObject”jŠü‚âƒV[ƒ“‘JˆÚ‚É‚æ‚Á‚Ä
+             * CancellationToken‚ªƒLƒƒƒ“ƒZƒ‹‚³‚ê‚½ê‡B
+             *
+             * ‘z’è“à‚ÌI—¹‚È‚Ì‚ÅAƒGƒ‰[‚Æ‚µ‚Äo—Í‚¹‚¸–³‹‚·‚éB
+             */
         }
         catch (Exception e)
         {
+            /*
+             * ƒLƒƒƒ“ƒZƒ‹ˆÈŠO‚Ì—\Šú‚µ‚È‚¢—áŠO‚ª”­¶‚µ‚½ê‡‚ÍA
+             * UnityƒRƒ“ƒ\[ƒ‹‚ÖƒXƒ^ƒbƒNƒgƒŒ[ƒX•t‚«‚Åo—Í‚·‚éB
+             */
             Debug.LogException(e);
         }
     }
-
-    //public void FlipRotateUI()
-    //{
-    //    _continuousRotateAnimation.FlipY();
-
-    //}
 }
+

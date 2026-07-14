@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// Enemy‚Ìs“®‚ğAPI‚Æ‚µ‚Ä’ñ‹Ÿ‚·‚éƒNƒ‰ƒXBEnemy‚Ìó‘Ô‚âs“®‚ğŠÇ—‚·‚éB
+/// </summary>
 public sealed class EnemyController
 {
     private readonly Transform _self;
@@ -63,6 +66,10 @@ public sealed class EnemyController
         _view.RotateDecoration();
     }
 
+    /// <summary>
+    /// “G‚Ì’e“¹—\‚ğ•\¦
+    /// </summary>
+    /// <param name="dirNormalized"></param>
     public void ShowTelegraph(Vector3 dirNormalized)
     {
         if (_view == null) return;
@@ -76,6 +83,10 @@ public sealed class EnemyController
         _view.HideTelegraph();
     }
 
+    /// <summary>
+    /// •¡”’e‚ğ“¯‚É•ú‚Â“G‚Ì’e“¹—\‚ğ•\¦
+    /// </summary>
+    /// <param name="directions"></param>
     public void ShowTelegraphs(IReadOnlyList<Vector3> directions)
     {
         if (_view == null) return;

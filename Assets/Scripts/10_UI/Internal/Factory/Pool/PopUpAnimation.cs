@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 
+/// <summary>
+/// ポイントを獲得した際に表示されるポップアップのアニメーションを制御するクラス。
+/// </summary>
 public class PopUpAnimation : MonoBehaviour
 {
     [Header("Settings")]
@@ -30,6 +33,11 @@ public class PopUpAnimation : MonoBehaviour
             _canvasGroup = gameObject.AddComponent<CanvasGroup>();
     }
 
+    /// <summary>
+    ///  アニメーション再生
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     public async UniTask PlayAsync(CancellationToken cancellationToken = default)
     {
         if (_rectTransform == null || _canvasGroup == null) return;

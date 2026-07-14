@@ -1,5 +1,9 @@
 using UnityEngine;
 
+
+/// <summary>
+/// PlayerPrefsを使ってゲームのセーブデータを管理するサービス
+/// </summary>
 public class SaveDataService
 {
     private const string KEY_PREFIX = "HighScore_Endless";

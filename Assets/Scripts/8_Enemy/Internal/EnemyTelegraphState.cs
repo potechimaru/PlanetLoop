@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// EnemyStateのTelegraph状態を表すクラス。敵が攻撃の予備動作を行っている状態を管理する。
+/// </summary>
 internal sealed class EnemyTelegraphState : IEnemyState
 {
     public ReactiveCommand<EnemyStateKey> NextState { get; } = new();

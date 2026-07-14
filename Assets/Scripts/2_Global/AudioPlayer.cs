@@ -1,6 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 各BGMやSEのAudioClipを管理するクラス。音量やピッチ、再生速度などの設定もここで行う。
+/// インスペクタにて操作可能
+/// </summary>
 public class AudioPlayer : MonoBehaviour
 {
     [Header("Sources")]

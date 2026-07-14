@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
 /// <summary>
-/// 
+/// 使ってないけど、RendererFeatureの有効化・無効化をInspectorから制御するためのクラス
 /// </summary>
 public class FullScreenRendererFeatureController : MonoBehaviour
 {

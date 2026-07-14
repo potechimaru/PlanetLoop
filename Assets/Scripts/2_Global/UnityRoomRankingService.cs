@@ -1,6 +1,9 @@
 using UnityEngine;
 using unityroom.Api;
 
+/// <summary>
+/// Unityroomのランキングサービスにスコアを送信するためのクラス
+/// </summary>
 public class UnityroomRankingService
 {
     private const int HighScoreBoardNo = 1;

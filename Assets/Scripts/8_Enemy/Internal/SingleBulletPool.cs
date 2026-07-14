@@ -2,6 +2,10 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
+
+/// <summary>
+/// 小さいEnemyBulletのプールを管理するクラス。弾丸の生成と再利用を効率的に行うためのオブジェクトプールを提供する。
+/// </summary>
 public class SingleBulletPool : MonoBehaviour, IBulletReturner
 {
     [Header("Prefab / Parent")]

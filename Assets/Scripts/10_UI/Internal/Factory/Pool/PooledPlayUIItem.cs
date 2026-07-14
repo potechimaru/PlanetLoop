@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// UI自身にアタッチされる、プールに戻すためのインターフェースを持つコンポーネント
+/// </summary>
 public class PooledPlayUIItem : MonoBehaviour
 {
     private IPlayUIReturner _returner;

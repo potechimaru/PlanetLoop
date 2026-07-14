@@ -1,6 +1,9 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+/// <summary>
+/// EnemyBulletを生成するためのファクトリクラス。EnemyAttackTypeに応じて適切なBulletを生成する。
+/// </summary>
 public sealed class EnemyBulletFactory
 {
     [Header("Pools")]

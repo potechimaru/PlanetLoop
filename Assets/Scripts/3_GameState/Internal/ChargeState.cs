@@ -2,6 +2,9 @@ using Cysharp.Threading.Tasks;
 using UniRx;
 using UnityEngine;
 
+/// <summary>
+/// âΩÇÃÇΩÇﬂÇ…Ç§Ç‹ÇÍÇΩÇÒÇæÇÎÇ§ÅH
+/// </summary>
 public class ChargeState
 {
     public ReactiveCommand<GameStateKey> NextState { get; } = new();

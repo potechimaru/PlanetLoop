@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// GameModeの表示データをインスペクタで変更できるようにしている。
+/// </summary>
 [System.Serializable]
 public class GameModeData
 {
@@ -15,6 +18,9 @@ public class GameModeData
     public string Description => description;
 }
 
+/// <summary>
+/// GameModeSelectで表示するゲームモードのデータベースを管理するクラス。ScriptableObjectとして作成され、ゲームモードの情報を保持する。
+/// </summary>
 [CreateAssetMenu(menuName = "Game/Mode Database")]
 public class GameModeDatabase : ScriptableObject
 {

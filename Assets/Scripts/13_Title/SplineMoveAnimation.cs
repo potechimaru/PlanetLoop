@@ -4,6 +4,9 @@ using Cysharp.Threading.Tasks;
 using System;
 using System.Threading;
 
+/// <summary>
+/// GameModeSelectに入った時、Splineを移動させるアニメーションを制御するクラス。
+/// </summary>
 public class SplineMoveAnimation : MonoBehaviour
 {
     [Header("Target")]

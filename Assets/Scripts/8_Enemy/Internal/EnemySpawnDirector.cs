@@ -5,6 +5,9 @@ using System.Threading;
 using UnityEngine;
 using VContainer;
 
+/// <summary>
+/// Enemyのスポーンを管理するクラス。初期スポーン、間隔スポーン、敵タイプのアンロックを制御する。
+/// </summary>
 public class EnemySpawnDirector : MonoBehaviour
 {
     [SerializeField] private EnemySpawnPointGroup spawnPointGroup;

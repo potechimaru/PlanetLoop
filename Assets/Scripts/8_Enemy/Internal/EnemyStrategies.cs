@@ -1,3 +1,6 @@
+/// <summary>
+/// EnemyのStrategyをまとめた構造体。Enemyの行動パターンを管理する。
+/// </summary>
 public struct EnemyStrategies
 {
     public IDetectStrategy Detect;

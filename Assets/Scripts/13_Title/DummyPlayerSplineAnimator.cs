@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using DG.Tweening;
 
+
+/// <summary>
+/// タイトル画面のSplineでDummyPlayerが一周するアニメーション
+/// </summary>
 public class DummyPlayerSplineAnimator : MonoBehaviour
 {
     [Header("Refs")]

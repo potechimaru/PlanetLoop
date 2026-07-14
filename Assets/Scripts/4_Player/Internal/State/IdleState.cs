@@ -3,6 +3,9 @@ using UniRx;
 using UnityEngine;
 using System;
 
+/// <summary>
+/// PlayerStateのIdle状態を表すクラス。プレイヤーが何もしていない状態を管理する。
+/// </summary>
 internal class IdleState : IPlayerState
 {
     public ReactiveCommand<PlayerStateKey> NextState { get; } = new();

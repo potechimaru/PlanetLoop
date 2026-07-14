@@ -1,6 +1,9 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// Žg‚Á‚Ä‚È‚¢
+/// </summary>
 [Serializable]
 public class ObstaclePlacementEntry
 {

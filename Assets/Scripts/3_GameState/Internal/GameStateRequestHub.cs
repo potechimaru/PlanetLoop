@@ -1,11 +1,17 @@
 using System;
 using UniRx;
 
+/// <summary>
+/// 外部コンポーネント群からゲームの状態変更をリクエストするためのインターフェース
+/// </summary>
 public interface IGameStateChangeRequester
 {
     void Request(GameStateKey key);
 }
 
+/// <summary>
+/// コンポネント群内部でゲームの状態変更リクエストを受け取るためのインターフェース
+/// </summary>
 public interface IGameStateChangeRequestSource
 {
     IObservable<GameStateKey> OnRequestChangeState { get; }

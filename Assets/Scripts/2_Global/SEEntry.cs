@@ -1,6 +1,9 @@
 using System;
 using UnityEngine;
 
+/// <summary>
+/// SE（効果音）の設定を保持するクラス。音量、ピッチ、再生速度などの設定をインスペクタで操作可能
+/// </summary>
 [Serializable]
 public class SEEntry
 {

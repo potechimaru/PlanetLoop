@@ -4,6 +4,9 @@ using UnityEngine;
 using UniRx;
 using System;
 
+/// <summary>
+/// PlayerStateのMove状態を表すクラス。プレイヤーが移動中の状態を管理する。
+/// </summary>
 internal class MoveState : IPlayerState
 {
     public ReactiveCommand<PlayerStateKey> NextState { get; } = new();

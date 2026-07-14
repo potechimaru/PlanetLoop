@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// スプライン（点列）と位置との距離判定を行う純粋クラス
+/// Splineと位置との距離判定を行うクラス。使ってない。
 /// </summary>
 internal static class OrbitDistanceEvaluator
 {

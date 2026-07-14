@@ -3,7 +3,7 @@ using UniRx;
 using UnityEngine;
 
 /// <summary>
-/// Point?l??????UI???????Factory?B?????B
+/// POintを獲得したときに表示するUIを生成するFactoryクラス
 /// </summary>
 public sealed class PlayUIFactory
 {
@@ -18,7 +18,7 @@ public sealed class PlayUIFactory
 
     private IUIExternalFacade _uIExternalFacade;
 
-    private float _offsetY = 1.5f; // UI??Y?I?t?Z?b?g?i??: ?G???j?|?C???g???L?????N?^?[??????\??????????j
+    private float _offsetY = 1.5f; // Playerの頭上に表示するためのY軸のオフセット値
 
     public PlayUIFactory(DefeatEnemyPointPool enemyDefeatedPointPool,
                         NewOrbitPointPool newOrbitPointPool,
@@ -52,7 +52,7 @@ public sealed class PlayUIFactory
     }
 
     /// <summary>
-    /// ?w??UI???o???iUI?? anchoredPosition ?w??j
+    /// Pointの種類に応じて、対応するUIを生成する
     /// </summary>
     public void Spawn(PlayUIType type, Vector2 anchoredPos, RectTransform parent = null)
     {

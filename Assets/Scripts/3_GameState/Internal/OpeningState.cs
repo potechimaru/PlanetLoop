@@ -2,6 +2,9 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using UniRx;
 
+/// <summary>
+/// GameStateのOpeningStateを表すクラス。ゲーム開始時のオープニング処理を担当する。
+/// </summary>
 public class OpeningState : IGameState
 {
     public ReactiveCommand<GameStateKey> NextState { get; } = new();
@@ -27,7 +30,8 @@ public class OpeningState : IGameState
         _gameStateExternalFacade.SetAllDetectionEnabled(false);
         Time.timeScale = 0f;
         await _gameUIManager.GameOpening();
-        
+
+        // 開いた事あったらチュートリアルをスキップする
         if (_saveDataService.IsFirstPlay())
         {
             _audioManager.PlayBGM(BGMType.Game);
@@ -43,13 +47,13 @@ public class OpeningState : IGameState
     }
     public async UniTask Exit()
     {
+        // 時間再生
         Time.timeScale = 1f;
         _gameStateExternalFacade.SetAllDetectionEnabled(true);
         await UniTask.CompletedTask;
     }
     public async UniTask Tick()
     {
-        // Logic for the opening state
         await UniTask.CompletedTask;
     }
 }

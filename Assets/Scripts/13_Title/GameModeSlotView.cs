@@ -1,5 +1,9 @@
 using UnityEngine;
 
+/// <summary>
+/// GameModeを意味するDummyPlayerにアタッチするクラス。順番管理とSplineの参照を保持する。
+/// スロットを動かすために必要。
+/// </summary>
 public class GameModeSlotView : MonoBehaviour
 {
     [SerializeField] private ClosedSplineLine _spline;

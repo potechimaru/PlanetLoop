@@ -4,6 +4,10 @@ using UniRx;
 using UnityEngine;
 using VContainer;
 
+/// <summary>
+/// 敵ごとにアタッチされるコンポーネント。敵の状態遷移や挙動を管理する。
+/// 色んな機能をインスタンス化するルート。
+/// </summary>
 public class Enemy : MonoBehaviour, IEnemyContactHandle
 {
     [Header("Refs")]
@@ -39,6 +43,10 @@ public class Enemy : MonoBehaviour, IEnemyContactHandle
 
     private bool _isSimulationEnabled = true;
 
+    /// <summary>
+    /// スポーン時に呼ばれる初期化処理。EnemyControllerやStateMachine、Strategyなどを初期化する。
+    /// </summary>
+    /// <param name="playerTransform"></param>
     public void InitializeForSpawn(Transform playerTransform)
     {
         _isDead = false;
@@ -88,6 +96,11 @@ public class Enemy : MonoBehaviour, IEnemyContactHandle
             new EnemyCooldownState(_enemyController, _move, _attack));
     }
 
+    /// <summary>
+    /// プレイヤーの近くにいない時は動かないようにする。
+    /// あとSpriteRendererの描画も消す。重くなるから。
+    /// </summary>
+    /// <param name="enabled">動かすか</param>
     public void SetSimulationEnabled(bool enabled)
     {
         if (_isSimulationEnabled == enabled)
