@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UniRx;
 
 /// <summary>
-/// EnemyBullet‚ğŠÇ—‚·‚éƒNƒ‰ƒXBƒvƒŒƒCƒ„[‚ªEnemyBullet‚É“–‚½‚Á‚½‚Æ‚«‚ÌƒCƒxƒ“ƒg‚ğ’Ê’m‚·‚éB
+/// EnemyBulletï¿½ï¿½ï¿½Ç—ï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Bï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½EnemyBulletï¿½É“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ‚ï¿½ï¿½ÌƒCï¿½xï¿½ï¿½ï¿½gï¿½ï¿½Ê’mï¿½ï¿½ï¿½ï¿½B
 /// </summary>
 public sealed class EnemyBulletManager : IDisposable
 {
@@ -19,7 +19,6 @@ public sealed class EnemyBulletManager : IDisposable
     {
         if (bullet == null) return;
 
-        // Pool‚Å“¯‚¶’e‚ğÄ—˜—p‚·‚éê‡A“ñdSubscribe–h~
         if (!_registeredBullets.Add(bullet)) return;
 
         bullet.OnHitPlayer

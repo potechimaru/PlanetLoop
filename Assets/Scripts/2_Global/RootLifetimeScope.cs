@@ -4,7 +4,7 @@ using VContainer.Unity;
 using System;
 
 /// <summary>
-/// ゲーム全体において共有される依存関係を登録するルートのLifetimeScope
+/// ・ｽQ・ｽ[・ｽ・ｽ・ｽS・ｽﾌにゑｿｽ・ｽ・ｽ・ｽﾄ具ｿｽ・ｽL・ｽ・ｽ・ｽ・ｽ・ｽﾋ托ｿｽ・ｽﾖ係・ｽ・ｽo・ｽ^・ｽ・ｽ・ｽ驛具ｿｽ[・ｽg・ｽ・ｽLifetimeScope
 /// </summary>
 public class RootLifetimeScope : LifetimeScope
 {

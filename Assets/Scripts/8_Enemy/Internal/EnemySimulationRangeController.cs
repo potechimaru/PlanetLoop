@@ -32,6 +32,11 @@ public class EnemySimulationRangeController : MonoBehaviour
         CheckLoopAsync(_destroyToken).Forget();
     }
 
+    /// <summary>
+    /// –ˆƒtƒŒ[ƒ€Enemy‚ğŠÄ‹‚·‚é
+    /// </summary>
+    /// <param name="ct"></param>
+    /// <returns></returns>
     private async UniTaskVoid CheckLoopAsync(CancellationToken ct)
     {
         try

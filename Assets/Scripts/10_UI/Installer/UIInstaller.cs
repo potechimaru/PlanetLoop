@@ -5,7 +5,7 @@ using VContainer.Unity;
 using System;
 
 /// <summary>
-/// UIƒRƒ“ƒ|[ƒlƒ“ƒgŒQ‚ğDIƒRƒ“ƒeƒi‚É“o˜^‚·‚é
+/// UIï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½gï¿½Qï¿½ï¿½DIï¿½Rï¿½ï¿½ï¿½eï¿½iï¿½É“oï¿½^ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public class UIInstaller : MonoBehaviour, IInstaller
 {
@@ -52,7 +52,7 @@ public class UIInstaller : MonoBehaviour, IInstaller
 
         builder.Register<PlayUIFactory>(Lifetime.Singleton);
 
-        // PlayUIFactoryˆÈŠO‚Í’¼Ú’“ü‚µ‚È‚¢
+        // PlayUIFactoryï¿½ÈŠOï¿½Í’ï¿½ï¿½Ú’ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È‚ï¿½
         builder.RegisterComponent(_newOrbitPointPool);
         builder.RegisterComponent(_enemyDefeatedPointPool);
         builder.RegisterComponent(_longJumpPointPool);
@@ -68,7 +68,7 @@ public class UIInstaller : MonoBehaviour, IInstaller
 
         builder.RegisterBuildCallback(container =>
         {
-            // Subscribe‚·‚é‚½‚ß‚ÉƒCƒ“ƒXƒ^ƒ“ƒX‚ğ‰ğŒˆ‚µ‚Ä‚¨‚­
+            // Subscribeï¿½ï¿½ï¿½é‚½ï¿½ß‚ÉƒCï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
             container.Resolve<PlayUIFactory>();
             container.Resolve<HUDPresenter>();
         });

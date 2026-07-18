@@ -4,7 +4,7 @@ using VContainer;
 using VContainer.Unity;
 
 /// <summary>
-/// PlayerƒRƒ“ƒ|[ƒlƒ“ƒgŒQ‚ğDIƒRƒ“ƒeƒi‚É“o˜^‚·‚é
+/// Playerï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½gï¿½Qï¿½ï¿½DIï¿½Rï¿½ï¿½ï¿½eï¿½iï¿½É“oï¿½^ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public class PlayerInstaller : MonoBehaviour, IInstaller
 {
@@ -15,7 +15,7 @@ public class PlayerInstaller : MonoBehaviour, IInstaller
         builder.Register<PlayerStateMachine>(Lifetime.Singleton).As<IDisposable>().AsSelf();
         builder.Register<PlayerController>(Lifetime.Singleton).As<ITickable>().AsSelf().As<IDisposable>();
 
-        // ControllerˆÈŠO’¼ÚQÆ‹Ö~
+        // Controllerï¿½ÈŠOï¿½ï¿½ï¿½ÚQï¿½Æ‹Ö~
         builder.RegisterComponent(_playerView);
 
 

@@ -4,7 +4,7 @@ using UniRx;
 using UnityEngine;
 
 /// <summary>
-/// Applicationのタイトル画面の状態を表すクラス。AppStateの1つ。
+/// Application・ｽﾌタ・ｽC・ｽg・ｽ・ｽ・ｽ・ｽﾊの擾ｿｽﾔゑｿｽ\・ｽ・ｽ・ｽN・ｽ・ｽ・ｽX・ｽBAppState・ｽ・ｽ1・ｽﾂ。
 /// </summary>
 public class TitleState : IAppState, IDisposable
 {

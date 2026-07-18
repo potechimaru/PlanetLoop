@@ -6,6 +6,9 @@ using UniRx;
 using UnityEngine;
 using VContainer;
 
+/// <summary>
+/// Enemyの管理を行うクラス。全敵を保持。敵の生成、登録、削除、状態管理などを担当する。
+/// </summary>
 public class EnemyManager : IDisposable
 {
     private readonly IObjectResolver _resolver;

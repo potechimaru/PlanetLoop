@@ -10,6 +10,9 @@ public class TutorialPageEntry
     public Image timelineDotImage;
 }
 
+/// <summary>
+/// ゲーム説明のボードを管理するクラス。ページの切り替えやタイムラインの表示を制御する。
+/// </summary>
 public class TutorialPageController : MonoBehaviour
 {
     [SerializeField] private List<TutorialPageEntry> pageEntries = new();

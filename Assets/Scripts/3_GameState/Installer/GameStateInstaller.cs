@@ -4,7 +4,7 @@ using VContainer.Unity;
 using System;
 
 /// <summary>
-/// GameStateƒRƒ“ƒ|[ƒlƒ“ƒgŒQ‚ğDIƒRƒ“ƒeƒi‚É“o˜^‚·‚é
+/// GameStateï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½gï¿½Qï¿½ï¿½DIï¿½Rï¿½ï¿½ï¿½eï¿½iï¿½É“oï¿½^ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public class GameStateInstaller : MonoBehaviour, IInstaller
 {

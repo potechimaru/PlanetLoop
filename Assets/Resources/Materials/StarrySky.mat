@@ -71,11 +71,11 @@ Material:
     - _MainTex: 0
     - _QueueControl: 0
     - _QueueOffset: 0
-    - _Radius: 0.92700124
+    - _Radius: 0.92700183
     - _Randomness: 50
     - _Speed: 3
     m_Colors:
     - _BlackHoleBrightnessColor: {r: 0.23642755, g: 0.4869944, b: 0.7264151, a: 1}
-    - _Center: {r: 2.3172095, g: 0.5665487, b: 0, a: 0}
+    - _Center: {r: 1.2955121, g: -0.015871704, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

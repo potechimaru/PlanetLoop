@@ -4,7 +4,7 @@ using UniRx;
 using UnityEngine;
 
 /// <summary>
-/// ゲームモード選択画面の状態を表す。AppStateの1つ。
+/// ・ｽQ・ｽ[・ｽ・ｽ・ｽ・ｽ・ｽ[・ｽh・ｽI・ｽ・ｽ・ｽ・ｽﾊの擾ｿｽﾔゑｿｽ\・ｽ・ｽ・ｽBAppState・ｽ・ｽ1・ｽﾂ。
 /// </summary>
 public class ModeSelectState : IAppState, IDisposable
 {

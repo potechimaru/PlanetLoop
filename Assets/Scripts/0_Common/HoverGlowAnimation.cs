@@ -3,7 +3,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 
 /// <summary>
-/// ƒ{ƒ^ƒ“‚Ìƒzƒo[‚ÉGlow‚·‚éƒAƒjƒ[ƒVƒ‡ƒ“‚ğ§Œä‚·‚éƒNƒ‰ƒX
+/// ï¿½{ï¿½^ï¿½ï¿½ï¿½Ìƒzï¿½oï¿½[ï¿½ï¿½ï¿½ï¿½Glowï¿½ï¿½ï¿½ï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ğ§Œä‚·ï¿½ï¿½Nï¿½ï¿½ï¿½X
 /// </summary>
 public class HoverGlowAnimation : MonoBehaviour
 {
@@ -31,11 +31,11 @@ public class HoverGlowAnimation : MonoBehaviour
             return;
         }
 
-        // ƒ}ƒeƒŠƒAƒ‹‚ğƒCƒ“ƒXƒ^ƒ“ƒX‰»
+        // ï¿½}ï¿½eï¿½ï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½ï¿½
         _materialInstance = Instantiate(targetImage.material);
         targetImage.material = _materialInstance;
 
-        // ‰Šú‚Í“§–¾
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Í“ï¿½ï¿½ï¿½
         SetAlphaImmediate(0f);
     }
 

@@ -5,7 +5,7 @@ using VContainer.Unity;
 using System;
 
 /// <summary>
-/// ƒ^ƒCƒgƒ‹ƒV[ƒ“‚ÌLifetimeScope‚ğ•\‚·ƒNƒ‰ƒXBƒ^ƒCƒgƒ‹ƒV[ƒ“‚ÌˆË‘¶ŠÖŒW‚ğŠÇ—‚·‚éB
+/// ï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½Vï¿½[ï¿½ï¿½ï¿½ï¿½LifetimeScopeï¿½ï¿½\ï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½Xï¿½Bï¿½^ï¿½Cï¿½gï¿½ï¿½ï¿½Vï¿½[ï¿½ï¿½ï¿½ÌˆË‘ï¿½ï¿½ÖŒWï¿½ï¿½ï¿½Ç—ï¿½ï¿½ï¿½ï¿½ï¿½B
 /// </summary>
 public class TitleLifetimeScope : LifetimeScope
 {
